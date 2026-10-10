@@ -1,0 +1,81 @@
+name: Derive and test v16 Beijing OSM road graph
+on:
+  push:
+    branches: [main]
+    paths:
+      - "artifacts/v16/*.py"
+      - "scripts/build_v16_bundle.py"
+      - "worldbook/v16.md"
+      - ".github/workflows/test-v16.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worldbook-v16-roadgraph
+  cancel-in-progress: false
+jobs:
+  extract-test-save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check frozen world and OSM raw SHA256
+        run: python scripts/check_data_manifest.py
+      - name: Install PyOsmium pinned parser
+        run: python -m pip install osmium==4.3.1
+      - name: Extract OSM nodes and directed edges (with grounded anchor)
+        run: python artifacts/v16/extract_v16.py
+      - name: Regression of v14 event engine (14)
+        run: python artifacts/v14/test_v14.py
+      - name: Regression of v15 decision planner (18)
+        run: python artifacts/v15/test_v15.py
+      - name: v16 OSM road graph tests (18)
+        run: python artifacts/v16/test_v16.py
+      - name: Route-constrained actual OSM-edge sandbox
+        run: python artifacts/v16/scenario_v16.py
+      - name: Package source data provenance, graph and reports
+        run: python scripts/build_v16_bundle.py
+      - name: Save derived graph, audited route and source/decision artifacts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          file=Path("artifacts/v16/osm_graph_report.json")
+          report=json.loads(file.read_text(encoding="utf-8"))
+          case=json.loads(Path("artifacts/v16/route_sandbox_report.json").read_text(encoding="utf-8"))
+          assert report["source_verified_sha256"]=="945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d"
+          assert case["official_game_events_written"]==0 and not case["audit_violations"]
+          assert report["graph"]["nodes"]>20 and report["graph"]["drive_edges"]>0 and report["graph"]["walk_edges"]>0
+          bundle=Path("artifacts/earth_realism_v16_bundle.zip")
+          ad=Path("docs/decisions/2026-10-10-v16-osm-network.md")
+          text=ad.read_text(encoding="utf-8")
+          marker="\n## v16 GitHub Actions自动验收结果\n"
+          if marker in text:
+            text=text.split(marker)[0]
+          text+=marker
+          text+="- v14旧版14项、v15旧版18项、v16新增18项测试均通过。\n"
+          text+=f"- 地图锚点：{report['anchor']['name']}（{report['anchor']['grade']}），精度仅限该来源明确提供的地点。\n"
+          text+=f"- 路网节点 {report['graph']['nodes']}，有向步行边 {report['graph']['walk_edges']}，有向机动车边 {report['graph']['drive_edges']}。\n"
+          text+=f"- 源PBF SHA256: {report['source_verified_sha256']}。\n"
+          text+=f"- 派生图 SHA256: {report['graph_json_sha256']}。\n"
+          text+=f"- ZIP SHA256: {hashlib.sha256(bundle.read_bytes()).hexdigest()}。\n"
+          text+=f"- 正式世界SHA256: {case['official_world_sha256']}，游戏历史新增0。\n"
+          text+="- 演示路线只是OSM边的候选路径：缺转向限制、障碍、交通、实际法规及实时车速，绝非导航/真实ETA。\n"
+          ad.write_text(text,encoding="utf-8")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/v16/osm_graph_sample.json artifacts/v16/osm_graph_report.json artifacts/v16/route_sandbox_journal.json artifacts/v16/route_sandbox_report.json artifacts/earth_realism_v16_bundle.zip docs/decisions/2026-10-10-v16-osm-network.md
+          if ! git diff --cached --quiet; then
+            git commit -m "data(v16): archive OSM-derived graph, route samples, evidence and tests"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
