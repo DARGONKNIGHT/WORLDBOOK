@@ -46,12 +46,12 @@ class CalendarV29:
         eligible=self.service_active(id,service_day)
         if eligible is None:return {"status":"U_NO_VERIFIED_SERVICE_CALENDAR"}
         if not eligible:return {"status":"NO_SCHEDULED_SERVICE_IN_PROVIDED_FEED"}
-        if id not in self.services:return {"status":"U_NO_VERIFIED_SERVICE_CALENDAR"}
         t=date.fromisoformat(service_day)
         if type(offset_minutes) is not int or not -720<=offset_minutes<=840:
             raise ValueError("invalid known timezone offset")
         start=datetime(t.year,t.month,t.day,tzinfo=timezone(timedelta(minutes=offset_minutes)))
         dep=start+timedelta(seconds=gtfs_seconds(hhmmss))
+        grade=self.services[id]["grade"] if id in self.services else "S_FIXTURE_EXCEPTION_ONLY"
         return {"status":"SCHEDULED_IN_PROVIDED_FEED","local_departure":dep.isoformat(),
-                "service_date":service_day,"grade":self.services[id]["grade"],
+                "service_date":service_day,"grade":grade,
                 "real_time_arrival":"U","booking_state":"U"}

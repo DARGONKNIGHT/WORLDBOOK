@@ -73,6 +73,10 @@ class CalendarTests(unittest.TestCase):
     def test_real_schedule_needs_source(self):
         with self.assertRaises(ValueError):
             self.c.add_service("fake_real","2026-10-01","2026-10-10",[0],"R_VERIFIED_SCHEDULE")
+    def test_exception_only_feed(self):
+        self.c.exception("NO_WEEKLY_CALENDAR","2026-10-10","add")
+        result=self.c.departure("NO_WEEKLY_CALENDAR","2026-10-10","09:15:00")
+        self.assertEqual("S_FIXTURE_EXCEPTION_ONLY",result["grade"])
 class ReadinessTests(unittest.TestCase):
     def test_frozen_world(self):
         d=checks()
