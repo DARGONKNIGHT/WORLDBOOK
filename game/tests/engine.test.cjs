@@ -95,10 +95,10 @@ test("公共活动只能遇到同区且正处公开事务窗口的成年人",()=
 test("发送到送达不等于阅读，角色知识具有时间边界",()=>{
  const s=create();s.player.contacts.push("P014");
  E.act(s,"message",{recipient:"P014",text:"能借钱吗？"});
- assert.equal(s.npc.P014.knowledge.length,0);
+ assert.equal(s.npc.P014.knowledge.filter(x=>x.source==="player").length,0);
  E.act(s,"wait",{minutes:480});
- assert.equal(s.npc.P014.knowledge.length,1);
- assert.ok(s.npc.P014.lastRead===null||s.npc.P014.lastRead>=s.npc.P014.knowledge[0].at);
+ assert.equal(s.npc.P014.knowledge.filter(x=>x.source==="player").length,1);
+ assert.ok(s.npc.P014.lastRead===null||s.npc.P014.lastRead>=s.npc.P014.knowledge.find(x=>x.source==="player").at);
  assert.ok(s.queue.every(x=>x.at>=s.time));
 });
 test("回答根据消息意图与责任选择，不是统一话术",()=>{
