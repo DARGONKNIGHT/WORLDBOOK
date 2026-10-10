@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c141d">
+  <title>地球：现实人生 · 可游玩版</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <a class="brand" href="./index.html" aria-label="地球：现实人生"><span class="brand-sign">E<span class="tiny-star">✦</span></span><span><strong>地球：现实人生</strong><small>EARTH · A LIFE SIMULATION</small></span></a>
+      <div class="header-mid"><span class="dot"></span> 离线单机 · S级独立分支 · 2026.10.09基准</div>
+      <div class="header-actions">
+        <button type="button" id="btn-save" class="ghost">存档</button>
+        <button type="button" id="btn-export" class="ghost">导出</button>
+        <button type="button" id="btn-import" class="ghost">导入</button>
+        <button type="button" id="btn-reset" class="ghost danger">新游戏</button>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+      </div>
+    </header>
+    <div class="layout" id="play-layout" hidden>
+      <aside class="sidebar">
+        <div class="sidebar-top"><div class="rail-label">PLAYER PROFILE</div><div class="avatar" id="avatar">人</div>
+          <h2 id="player-name">未创建</h2><p id="player-job">职业未知</p></div>
+        <nav class="nav" aria-label="游戏视图">
+          <button class="nav-btn active" data-tab="life"><span>◈</span> 我的生活</button>
+          <button class="nav-btn" data-tab="people"><span>♧</span> 人物与联系</button>
+          <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
+          <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
+        </nav>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>浏览器试玩层 v1.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+      </aside>
+      <main class="main" id="main">
+        <section class="status-row">
+          <div class="status-cell"><span class="status-icon">◷</span><div><small>游戏时间 · 北京</small><strong id="stat-time"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">⌖</span><div><small>当前所在区</small><strong id="stat-district"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">¥</span><div><small>现金记录 · S</small><strong id="stat-cash"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">↗</span><div><small>精力 · 游戏值</small><strong id="stat-energy"></strong></div></div>
+        </section>
+
+        <section class="tab-panel" id="tab-life">
+          <div class="eyebrow">CHAPTER 01 / EVERYDAY LIFE</div>
+          <h1>每一次选择，<br><em>都会花费真实的时间。</em></h1>
+          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界只会在你主动推进游戏时间时结算。</p>
+          <div class="two-col">
+            <section class="panel scene-panel"><div class="panel-head"><span>01 / 当前场景</span><span class="tag">S · 模拟情境</span></div>
+              <h2 id="scene-title"></h2><p id="scene-desc"></p>
+              <div class="line"></div><div class="hint"><span>ⓘ</span> 真实地理事实与假设行程、NPC事件分开标识。地点与人物不会凭空提供未经核实的现实信息。</div>
+            </section>
+            <section class="panel map-panel"><div class="panel-head"><span>02 / 位置概览</span><span class="tag">非比例示意</span></div>
+              <div class="map-graphic" aria-label="北京城区抽象示意，非真实地图"><div class="ring ring-one"></div><div class="ring ring-two"></div><div class="crosshair">+</div><span class="map-label map-label-one">BEIJING</span><span class="map-label map-label-two" id="map-location">—</span><span class="map-pin">⌖</span></div>
+              <p class="micro">未提供实时路况、准确区际交通时间或交通票价。前礼务村为顺义区观察样本，不是默认住所。</p>
+            </section>
+          </div>
+          <div class="section-head"><h2>现在，你准备做什么？</h2><span>每次行动将推进游戏时钟</span></div>
+          <div class="actions-grid">
+            <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="social"><span class="action-glyph">♧</span><strong>参加公共活动</strong><small>可能认识一位虚构人物</small><span class="action-time">45 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="study"><span class="action-glyph">⌘</span><strong>整理计划</strong><small>分析信息，不自动知晓秘密</small><span class="action-time">60 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="work"><span class="action-glyph">▣</span><strong>处理工作</strong><small>需要创建角色时填写职业</small><span class="action-time">120 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="rest"><span class="action-glyph">◌</span><strong>休息恢复</strong><small>恢复模拟精力，不产生收入</small><span class="action-time">60 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="wait"><span class="action-glyph">◷</span><strong>等待 / 推进</strong><small>让后台独立事件继续结算</small><span class="action-time">自定时长 <b>↗</b></span></button>
+          </div>
+          <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
+            <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
+            <form id="travel-form" class="travel-form">
+              <label>目的区<select id="travel-destination" required></select></label>
+              <label>预计分钟<input id="travel-minutes" type="number" min="15" max="480" step="1" value="60" required></label>
+              <label>现金支出（元）<input id="travel-fare" type="number" min="0" max="999999" step="1" value="0" required></label>
+              <button class="primary" type="submit">确认出发 <span>↗</span></button>
+            </form>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-people" hidden>
+          <div class="eyebrow">NETWORK / INFORMATION BOUNDARIES</div><h1>每个人，<br><em>都有自己的生活。</em></h1>
+          <p class="lead">31人来自世界书的S级人物档案，并非真实居民。只有在这一条试玩分支中认识的人才能直接联系；你无法查看他们的私密想法。</p>
+          <div class="people-summary panel"><span>已认识 <strong id="contact-count">0</strong> / 31 人</span><span>消息只有送达后才进入对方的信息边界</span></div>
+          <section id="people-list" class="people-list"></section>
+          <section class="panel message-panel"><div class="panel-head"><span>给已认识的人发消息</span><span class="tag">模拟通信</span></div>
+            <form id="message-form" class="message-form">
+              <label>联系人<select id="message-to"></select></label>
+              <label>内容<textarea id="message-text" maxlength="200" rows="2" placeholder="输入简短消息……" required></textarea></label>
+              <button class="primary" type="submit">发送消息 ↗</button>
+            </form>
+            <h3>收到的消息</h3><div id="inbox" class="inbox"></div>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-world" hidden>
+          <div class="eyebrow">WORLD / OUT-OF-CHARACTER</div><h1>主角看不见的，<br><em>世界仍在运转。</em></h1>
+          <p class="lead">以下为玩家视角之外的模拟审计信息。只有在玩家行动或等待推进时间时才计算，不能理解为这些人物的真实行踪，也不会自动成为角色的知识。</p>
+          <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
+            <div class="audit-top"><strong id="world-total">0</strong><span>已生成后台活动</span></div><div id="world-list" class="log-list"></div>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-archive" hidden>
+          <div class="eyebrow">ARCHIVE / SAVE & SOURCES</div><h1>每一件已发生的事，<br><em>都应当留下记录。</em></h1>
+          <p class="lead">此处存储的是浏览器试玩分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
+          <section class="panel"><div class="panel-head"><span>存档与版本</span><span class="tag">本地优先</span></div>
+            <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
+            <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
+            <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
+            <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
+            <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
+            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a>
+          </section>
+          <div class="section-head"><h2>主角经历的事件</h2><span>不展示尚未公开的NPC内幕</span></div>
+          <div id="full-log" class="log-list full-log"></div>
+        </section>
+      </main>
+      <aside class="right-rail">
+        <div class="rail-label">LIVE JOURNAL <span class="sim-dot"></span></div>
+        <h3>今天发生了什么</h3>
+        <div id="recent-log" class="recent-log"></div>
+        <div class="right-note"><strong>事实边界</strong><p><b>R</b> 已核实的现实资料<br><b>S</b> 明示的模拟情节<br><b>U</b> 未知 / 尚未核实</p><p>页面中人物、行为及行程估计均按S级处理。</p></div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog id="setup" class="setup" aria-labelledby="setup-title">
+    <form id="setup-form" class="setup-inner">
+      <div class="eyebrow">A NEW LIFE / NEW GAME</div><h1 id="setup-title">现实人生，<br><em>由你的选择开始。</em></h1>
+      <p class="lead">创建一条独立试玩存档。不会修改世界书 v33、31名NPC的原始资料或正式冻结状态。</p>
+      <div class="setup-grid">
+        <label>角色姓名 <input name="name" id="new-name" maxlength="30" required placeholder="输入姓名" autocomplete="off"></label>
+        <label>年龄 <input name="age" type="number" min="16" max="100" value="25" required></label>
+        <label>开局所在区 <select name="district" id="new-district"></select></label>
+        <label>开局时间 · 2026-10-09 <input name="start" type="time" value="09:00" required></label>
+        <label>职业 / 正在做的事（可留空）<input name="occupation" maxlength="60" placeholder="未知"></label>
+        <label>可支配现金 · 元（可留空）<input name="cash" type="number" min="0" max="1000000000" step="1" placeholder="未知"></label>
+      </div>
+      <label class="goal-label">眼下的目标（可留空） <input name="goal" maxlength="100" placeholder="例如：找到一份稳定工作"></label>
+      <p class="micro">输入的角色条件和金额属于本次S级模拟假设。未填写的财产不会被自动视为0元。开局所在区不等于房产或户籍登记。</p>
+      <button type="submit" class="primary start-button">进入北京 · 开始游玩 <span>↗</span></button>
+      <p id="setup-error" class="error" role="alert"></p>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./engine.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
