@@ -1,0 +1,34 @@
+name: Game · Offline Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "game/**"
+      - "scripts/build_standalone_game.py"
+      - ".github/workflows/game-tests.yml"
+  pull_request:
+    paths:
+      - "game/**"
+      - "scripts/build_standalone_game.py"
+      - ".github/workflows/game-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate JavaScript syntax
+        run: |
+          node --check game/engine.js
+          node --check game/app.js
+          node --check game/tests/engine.test.cjs
+      - name: Run game engine regression tests
+        run: node --test game/tests/engine.test.cjs
+      - name: Verify reproducible self-contained HTML build
+        run: python3 scripts/build_standalone_game.py --check
