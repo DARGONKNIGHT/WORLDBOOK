@@ -110,9 +110,13 @@
     return s;
   }
   function dueEvents(s, until) {
-    const due=s.queue.filter(x=>x.at<=until).sort((a,b)=>a.at-b.at||a.order-b.order);
-    s.queue=s.queue.filter(x=>x.at>until);
-    for(const q of due){
+    // A delivered message may generate a reply before 'until'.
+    // Drain recursively in chronological order so no past-due event remains.
+    s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
+    let processed=0;
+    while(s.queue.length && s.queue[0].at<=until){
+      assert(++processed<=2000,"单轮待办事件过多");
+      const q=s.queue.shift();
       if(q.type==="deliver"){
         const n=NPCS.find(x=>x.id===q.to);
         if(!n) continue;
