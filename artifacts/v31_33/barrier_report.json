@@ -1,0 +1,11 @@
+{
+  "tagged_barrier_nodes_in_city_pbf": 5443,
+  "on_local_road_graph": 3,
+  "uncertain_drive": 3,
+  "uncertain_walk": 3,
+  "bytes": 1120,
+  "sha256": "2a80130eeb67a16fdec8f55ffe03b7abde0c51b64dee51299a52a8ecc48dc15f",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "output": "artifacts/v31_33/osm_barrier_nodes.json",
+  "all_barriers_or_navigation_verified": false
+}

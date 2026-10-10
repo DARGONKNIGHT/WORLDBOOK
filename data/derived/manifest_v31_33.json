@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "source_id": "beijing_osm_2026_10_01",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "date": "2026-10-01",
+  "game_cutoff": "2026-10-09",
+  "scope": "Qianliwu 2800m OSM sample",
+  "license": "© OpenStreetMap contributors; ODbL 1.0",
+  "outputs": {
+    "multipolygons": {
+      "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+      "count": 0,
+      "candidate_multipolygons_in_whole_pbf": 42,
+      "malformed_or_missing_outer_rings": 0,
+      "bytes": 552,
+      "sha256": "d5f7a276bbb57f2896545f5d006913ba5aca0261dfdcf1c18429731b6aba8f82",
+      "output": "artifacts/v31_33/osm_public_multipolygons.json",
+      "all_areas_complete": false
+    },
+    "barriers": {
+      "tagged_barrier_nodes_in_city_pbf": 5443,
+      "on_local_road_graph": 3,
+      "uncertain_drive": 3,
+      "uncertain_walk": 3,
+      "bytes": 1120,
+      "sha256": "2a80130eeb67a16fdec8f55ffe03b7abde0c51b64dee51299a52a8ecc48dc15f",
+      "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+      "output": "artifacts/v31_33/osm_barrier_nodes.json",
+      "all_barriers_or_navigation_verified": false
+    }
+  },
+  "real_navigation_verified": false,
+  "actual_private_NPC_data": false,
+  "remaining_evidence_blockers": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07"
+  ],
+  "official_world_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087"
+}

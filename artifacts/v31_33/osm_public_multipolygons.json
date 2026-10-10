@@ -1,0 +1,22 @@
+{
+  "schema": 31,
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "snapshot": "2026-10-01",
+  "center": {
+    "name": "前礼务村",
+    "osm_node": "6410843713"
+  },
+  "radius_m": 2800,
+  "features": [],
+  "area_based": true,
+  "private_residences_included": false,
+  "not_included": [
+    "way-shaped facilities from v27",
+    "incomplete polygons",
+    "non-service areas",
+    "entrances",
+    "inner ring topology",
+    "actual providers"
+  ],
+  "attribution": "© OpenStreetMap contributors; ODbL 1.0"
+}

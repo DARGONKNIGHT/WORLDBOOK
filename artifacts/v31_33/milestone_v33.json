@@ -1,0 +1,21 @@
+{
+  "status": "SOURCE_GATED_MILESTONE_V33_NOT_COMPLETE_EARTH",
+  "source_osm_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "official_frozen_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
+  "official_history_written": 0,
+  "multipolygon_relation_count": 0,
+  "barrier_graph_node_count": 3,
+  "open_dependency_ids": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07"
+  ],
+  "still_technically_expandable": true,
+  "human_data_source_needed": true,
+  "next_layer_requires_new_ground_truth_or_distinct_engineering_scope": true,
+  "statement": "Pause unbounded auto-expansion at an honest data/verification gate; not proof no further possible layer."
+}

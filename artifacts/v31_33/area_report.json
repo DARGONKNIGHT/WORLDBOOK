@@ -1,0 +1,10 @@
+{
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "count": 0,
+  "candidate_multipolygons_in_whole_pbf": 42,
+  "malformed_or_missing_outer_rings": 0,
+  "bytes": 552,
+  "sha256": "d5f7a276bbb57f2896545f5d006913ba5aca0261dfdcf1c18429731b6aba8f82",
+  "output": "artifacts/v31_33/osm_public_multipolygons.json",
+  "all_areas_complete": false
+}

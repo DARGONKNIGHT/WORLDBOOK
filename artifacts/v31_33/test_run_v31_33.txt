@@ -1,0 +1,18 @@
+test_allow_school (__main__.PublicAreas.test_allow_school) ... ok
+test_exclude_private_residential (__main__.PublicAreas.test_exclude_private_residential) ... ok
+test_no_automatic_hours (__main__.PublicAreas.test_no_automatic_hours) ... ok
+test_outside_skipped (__main__.PublicAreas.test_outside_skipped) ... ok
+test_representation_bbox (__main__.PublicAreas.test_representation_bbox) ... ok
+test_frozen_report_when_generated (__main__.ReleaseGate.test_frozen_report_when_generated) ... ok
+test_no_claim_full_world (__main__.ReleaseGate.test_no_claim_full_world) ... ok
+test_bollard_no_automatic_car_clearance (__main__.RoadBarriers.test_bollard_no_automatic_car_clearance) ... ok
+test_no_source_node_not_applied (__main__.RoadBarriers.test_no_source_node_not_applied) ... ok
+test_open_entrance_differs_from_gate (__main__.RoadBarriers.test_open_entrance_differs_from_gate) ... ok
+test_private_gate_rejected (__main__.RoadBarriers.test_private_gate_rejected) ... ok
+test_unknown_gate_not_falsely_passable (__main__.RoadBarriers.test_unknown_gate_not_falsely_passable) ... ok
+test_vehicle_synthetic_path_blocked (__main__.RoadBarriers.test_vehicle_synthetic_path_blocked) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.083s
+
+OK

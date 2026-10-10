@@ -7,3 +7,9 @@
 - **外部依据**：PyOsmium Working with Geometries: https://docs.osmcode.org/pyosmium/latest/user_manual/03-Working-with-Geometries/；OSM © contributors ODbL。
 - **证据等级**：OSM众包R来源不是现实机构许可；个人财务/学校容量/U不得补全，S级情景不升级成正式事件。
 - **验收门槛**：GitHub Actions需验证源PBF SHA256、实际产出与独立测试，再提交派生清单和完整测试；CI未完成前状态PENDING。
+
+## GitHub Actions实际验收
+- 旧版v14—v30 117项测试回归＋v31—v33新增13项测试，共130项通过。
+- 本地OSM relation公共多边形数量：0；局部路网上实际带barrier标签节点数量：3。
+- 正式世界SHA256：75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087；正式历史0条。
+- 源于单个2026-10-01 OSM众包快照；现实交通通行、学校医疗容量和私人生活仍未验证。

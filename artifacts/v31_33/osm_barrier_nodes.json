@@ -1,0 +1,35 @@
+{
+  "schema": 32,
+  "snapshot": "2026-10-01",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "source_graph": "artifacts/v16/osm_graph_sample.json",
+  "source_graph_sha256": "2232370320a11d83c2017a58d5fc8859ae82793719b31893814d0c228784fd95",
+  "barriers": {
+    "1423069059": {
+      "osm_node": "1423069059",
+      "barrier": "gate",
+      "access_tags": {},
+      "walk": "U_BARRIER_PASSABILITY",
+      "drive": "U_BARRIER_PASSABILITY",
+      "status": "R_OSM_TAGGED_NOT_REAL_OPEN_STATUS"
+    },
+    "1423541164": {
+      "osm_node": "1423541164",
+      "barrier": "gate",
+      "access_tags": {},
+      "walk": "U_BARRIER_PASSABILITY",
+      "drive": "U_BARRIER_PASSABILITY",
+      "status": "R_OSM_TAGGED_NOT_REAL_OPEN_STATUS"
+    },
+    "4068376606": {
+      "osm_node": "4068376606",
+      "barrier": "gate",
+      "access_tags": {},
+      "walk": "U_BARRIER_PASSABILITY",
+      "drive": "U_BARRIER_PASSABILITY",
+      "status": "R_OSM_TAGGED_NOT_REAL_OPEN_STATUS"
+    }
+  },
+  "legal_navigation_authorized": false,
+  "license": "© OpenStreetMap contributors, ODbL 1.0"
+}
