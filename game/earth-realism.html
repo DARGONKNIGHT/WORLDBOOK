@@ -265,9 +265,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   };
   const SHIFT = new Set(["P009","P018","P023","P025","P029"]);
   const RETIRED = new Set(["P004","P016","P030","P010"]);
-  const FAMILY = new Set(["P001","P002","P004","P005","P006","P007","P008","P009","P010","P013","P031"]);
+  const FAMILY = new Set(["P001","P002","P003","P004","P005","P006","P007","P008","P009","P010","P013","P031"]);
   const CIVIL = new Set(["P003","P006","P011","P012","P013","P021","P028"]);
   const CHILDREN = new Set(["P007"]);
+  // Pre-existing family/colleague ties from docs/NPC_ROSTER.md; no new marriages invented.
+  const SOCIAL_TIES={
+    P001:{to:"P002",kind:"family"},P002:{to:"P001",kind:"family"},
+    P003:{to:"P002",kind:"family"},P004:{to:"P001",kind:"family"},
+    P005:{to:"P006",kind:"family"},P006:{to:"P005",kind:"family"},
+    P008:{to:"P009",kind:"family"},P009:{to:"P008",kind:"family"},
+    P010:{to:"P008",kind:"family"},P011:{to:"P013",kind:"work"},
+    P013:{to:"P011",kind:"work"},P014:{to:"P015",kind:"work"},
+    P015:{to:"P014",kind:"work"}
+  };
   const APPROACH_TTL = 100 * MINUTE;
   function districtFor(n){return DISTRICT_OVERRIDE[n.id] || REGION[n.group];}
   function minuteOfDay(ms){return ((ms+OFFSET)%DAY+DAY)%DAY/MINUTE;}
@@ -324,7 +334,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     for(const n of NPCS){
       const prior=s.npc[n.id]||{};
       s.npc[n.id]={...prior,stage:null,decisions:[],relation:s.player.contacts.includes(n.id)?2:0,
-        lastRead:null,responded:0,pending:[]};
+        lastRead:null,responded:0,pending:[],lastPeerDay:null};
     }
     return validateGame(s);
   }
@@ -355,7 +365,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       schema:VERSION, mode:"S_INDEPENDENT_PLAYTHROUGH", started:true,
       time, sequence:0,
       player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[],met:[],declined:[]},
-      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[],stage:null,decisions:[],relation:0,lastRead:null,responded:0,pending:[]}])),
+      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[],stage:null,decisions:[],relation:0,lastRead:null,responded:0,pending:[],lastPeerDay:null}])),
       queue:[], messages:[], journal:[], world:[], cycles:0, autonomy:{enabled:true,detail:"balanced"}
     };
     event(state,time,"你为这一条独立S级游戏分支创建了角色。正式世界书原始存档仍冻结；现有资料不足以宣称实时地球模拟。","system");
@@ -386,6 +396,20 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     state.lastActivity=line;
     state.stage={kind:c.kind,at,location:c.location};
     state.decisions.push({at,kind:c.kind,reason,score:c.score});
+    const tie=SOCIAL_TIES[n.id];
+    const day=localDay(at);
+    const relevant=(tie?.kind==="family"&&c.kind==="family")
+      ||(tie?.kind==="work"&&c.kind==="work"&&hourOf(at)===13);
+    if(tie&&relevant&&state.lastPeerDay!==day){
+      state.lastPeerDay=day;
+      const other=NPCS.find(x=>x.id===tie.to);
+      const topic=tie.kind==="family"?"需要协调今天的家庭安排":"需要核对今日工作衔接";
+      const lag=5+Math.floor(pseudorand(n.id.charCodeAt(3)*57+dayNumber(at))*36);
+      s.queue.push({type:"peerDeliver",at:at+lag*MINUTE,from:n.id,to:tie.to,
+        text:topic,order:s.sequence+state.decisions.length});
+      s.world.push({at,npcId:n.id,kind:"coordination",text:n.name+"主动给"+other.name+"发出协调消息："+
+        topic+"；送达后对方才会得知。",grade:"S",visibility:"out_of_character"});
+    }
     if(state.decisions.length>96)state.decisions.shift();
     s.world.push(line);if(s.world.length>4000)s.world.shift();
     if(visible)event(s,at,"你注意到"+n.name+"在附近处理日常事务。","observation");
@@ -450,7 +474,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       const q=s.queue.shift(),n=NPCS.find(x=>x.id===(q.to||q.from));
       if(!n)continue;
       const v=s.npc[n.id];
-      if(q.type==="deliver"){
+      if(q.type==="peerDeliver"){
+        // NPC-to-NPC propagation is delayed and never becomes player knowledge.
+        const sender=NPCS.find(x=>x.id===q.from);
+        v.knowledge.push({at:q.at,topic:q.text,source:q.from});
+        if(v.knowledge.length>160)v.knowledge.shift();
+        s.world.push({at:q.at,npcId:n.id,kind:"peerDelivered",
+          text:n.name+"收到"+(sender?.name||"熟人")+"的协调消息；是否答应仍需自主决定。",
+          grade:"S",visibility:"out_of_character"});
+      }else if(q.type==="deliver"){
         v.knowledge.push({at:q.at,topic:q.text,source:"player"});
         if(v.knowledge.length>160)v.knowledge.shift();
         // No player-visible receipt unless the recipient actually reads the message.
