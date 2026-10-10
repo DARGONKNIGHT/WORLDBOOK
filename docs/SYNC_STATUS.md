@@ -40,3 +40,13 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [ ] 31名NPC的完整实际日程/个人财务/认知和长期行为校准未完成；原v2-v12仍缺逐字原文
 
 此处的“自主”指人工明确给定需求和候选情况下的有限决策，不代表智能体可以独立发现并完整处理所有现实生活需求。正式游戏继续冻结。
+
+## v16.0 · OSM真实地理数据衍生（2026-10-10）
+- [x] [真实派生图](../artifacts/v16/osm_graph_sample.json)、[图统计](../artifacts/v16/osm_graph_report.json)，OSM前礼务村地点节点ID 6410843713，2.8km范围，1,244节点、步行边2,018、机动车边1,905
+- [x] [Python提取器](../artifacts/v16/extract_v16.py)、[保守路线算法](../artifacts/v16/network_v16.py)、[18项v16测试](../artifacts/v16/test_v16.py)、[沙盒出行日志](../artifacts/v16/route_sandbox_journal.json)及[ZIP](../artifacts/earth_realism_v16_bundle.zip)
+- [x] [派生数据来源、生成脚本、SHA256与ODbL许可](../data/derived/manifest.json)
+- [x] [GitHub v14/15/16测试50/50通过](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38038500429)
+- [ ] 真实驾驶路线仍缺转向限制、barrier、动态路况、实时速度/ETA、全北京联网拓扑；不是实际导航工具
+- [ ] v2—v12逐字对话原文仍缺失，不得冒充全量
+
+正式游戏2026-10-09仍冻结，玩家未创建，NPC实际出行历史零条。
