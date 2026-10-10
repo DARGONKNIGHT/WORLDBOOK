@@ -39,7 +39,7 @@
   "audit_violations": [],
   "state_sha256": "094d41bda801f4918f23c02451360a0a14eda866e080eb6c84f2e2fba126099f",
   "journal_final_sha256": "2908aa772d2026fb9eeb4401919ca0711e17fb20a7b6215a65127a10addf3ada",
-  "official_frozen_state_sha256": "cf3df3f39c5b251a965b274866fe9b5525971d65a051f0331d283e3328b02233",
+  "official_frozen_state_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
   "official_game_events_written": 0,
   "sandbox_assumptions": "所有金钱、位置、通信、权限、计划与选择仅为S级测试输入"
 }

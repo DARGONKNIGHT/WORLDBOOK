@@ -1,0 +1,105 @@
+{
+  "balances_cents": {
+    "P002": 190800,
+    "P014": 56200,
+    "P015": 33000
+  },
+  "locations": {
+    "P002": "TEST_SHOP",
+    "P005": "TEST_FACTORY",
+    "P006": "TEST_HOME_006",
+    "P014": "TEST_SITE_A",
+    "P015": "TEST_WORKSPACE_015"
+  },
+  "busy_until": {
+    "P002": "2026-10-09T12:00:00+08:00",
+    "P014": "2026-10-10T09:45:00+08:00"
+  },
+  "transit": {},
+  "knowledge": {
+    "P001": [],
+    "P002": [],
+    "P003": [],
+    "P004": [],
+    "P005": [
+      "shift_notice_ack"
+    ],
+    "P006": [
+      "shift_notice"
+    ],
+    "P007": [],
+    "P008": [],
+    "P009": [],
+    "P010": [],
+    "P011": [],
+    "P012": [],
+    "P013": [],
+    "P014": [],
+    "P015": [],
+    "P016": [],
+    "P017": [],
+    "P018": [],
+    "P019": [],
+    "P020": [],
+    "P021": [],
+    "P022": [],
+    "P023": [],
+    "P024": [],
+    "P025": [],
+    "P026": [],
+    "P027": [],
+    "P028": [],
+    "P029": [],
+    "P030": [],
+    "P031": []
+  },
+  "transactions": [
+    "TX-REPAIR-001",
+    "TX-TECH-001",
+    "TX-REPAIR-002"
+  ],
+  "ledger": [
+    {
+      "tx": "TX-REPAIR-001",
+      "account": "P002",
+      "delta_cents": -8000,
+      "currency": "CNY"
+    },
+    {
+      "tx": "TX-REPAIR-001",
+      "account": "P014",
+      "delta_cents": 8000,
+      "currency": "CNY"
+    },
+    {
+      "tx": "TX-TECH-001",
+      "account": "P014",
+      "delta_cents": -3000,
+      "currency": "CNY"
+    },
+    {
+      "tx": "TX-TECH-001",
+      "account": "P015",
+      "delta_cents": 3000,
+      "currency": "CNY"
+    },
+    {
+      "tx": "TX-REPAIR-002",
+      "account": "P002",
+      "delta_cents": -1200,
+      "currency": "CNY"
+    },
+    {
+      "tx": "TX-REPAIR-002",
+      "account": "P014",
+      "delta_cents": 1200,
+      "currency": "CNY"
+    }
+  ],
+  "approved": [
+    {
+      "actor": "P014",
+      "scope": "repair_approval"
+    }
+  ]
+}
