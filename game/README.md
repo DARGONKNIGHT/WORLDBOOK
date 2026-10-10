@@ -6,7 +6,7 @@
 
 **单文件方法（推荐）**：下载 [earth-realism.html](earth-realism.html)（GitHub 文件页右上角 Download raw file，或从 [raw 地址](https://raw.githubusercontent.com/DARGONKNIGHT/WORLDBOOK/main/game/earth-realism.html)保存为同名 .html），双击用现代浏览器打开，按提示创建角色。
 
-**在线部署**：GitHub Pages 成功启用且自动部署成功后，预计网址是 https://dargonknight.github.io/WORLDBOOK/ 。实际是否可用须以 GitHub Pages/Actions 状态为准；若发布工作流因为 Pages 尚未启用而失败，先进入 Settings → Pages → Build and deployment，将 Source 设为 GitHub Actions，再重新运行 Game · Test and Deploy。
+**在线部署**：GitHub Pages 成功启用且手动触发发布工作流成功后，预计网址是 https://dargonknight.github.io/WORLDBOOK/ 。实际是否可用须以 GitHub Pages/Actions 状态为准；若发布工作流因为 Pages 尚未启用而失败，先进入 Settings → Pages → Build and deployment，将 Source 设为 GitHub Actions，再手动运行 Game · Publish to Pages (after enablement)。
 
 **源代码方法**：下载本仓库 ZIP，解压后双击 game/index.html；该入口会引用同目录 engine.js、app.js、style.css。两个入口都可离线玩。
 
@@ -37,4 +37,4 @@
 - node --test game/tests/engine.test.cjs
 - python3 scripts/build_standalone_game.py --check
 
-编辑多文件源码后，运行 python3 scripts/build_standalone_game.py 更新独立单文件发布版。CI 工作流见 .github/workflows/game-pages.yml。单机游戏属于界面层，不自动升级核心世界书版本。
+编辑多文件源码后，运行 python3 scripts/build_standalone_game.py 更新独立单文件发布版。自动测试工作流见 .github/workflows/game-tests.yml；Pages发布为独立手动工作流 .github/workflows/game-pages.yml。单机游戏属于界面层，不自动升级核心世界书版本。
