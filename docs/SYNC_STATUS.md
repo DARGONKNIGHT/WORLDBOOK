@@ -74,3 +74,13 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [ ] 原始v2—v12聊天全文、当时真实公交时刻、统计历史发布版本、具体机构容量、法律通行资格及私人NPC财务仍未知或缺合法来源。
 
 当前版本v33.0。这次自动迭代到达**数据准入暂停点**，没有宣称所有后续层均已穷尽。正式游戏钟点未确定，玩家未创建，事件历史为空。
+
+
+## 浏览器游戏交付（独立应用层，不改变世界书v33冻结事实）
+
+- [x] 新增 game/ 可离线执行的浏览器界面及模拟引擎。
+- [x] 已生成可直接双击打开的 game/earth-realism.html 单文件，以及多文件的 game/index.html。
+- [x] 新增 game/tests/engine.test.cjs、scripts/build_standalone_game.py 及 GitHub Pages 工作流 game-pages.yml。
+- [x] 独立 S_INDEPENDENT_PLAYTHROUGH 试玩分支；正式世界状态JSON不改，开局无预设玩家；人物与事件R/S/U边界明确。
+- [ ] Pages是否能通过公开网址访问，需要确认真实部署运行成功；不能用提交工作流代替部署验证。
+- [ ] 该网页尚未与v14—v33全部Python事件模型融合，不具备实时导航、法律、银行、全面人口或后台持续运行能力。
