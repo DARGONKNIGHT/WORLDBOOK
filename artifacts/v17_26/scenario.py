@@ -76,6 +76,11 @@ def run():
                    "source_baseline":"GitHub artifacts/v14/official_world_state_frozen_v13.json"})
     log(26,"integrated_frozen_check",report.copy())
     report=lock.summary(ORIGINAL.read_bytes())
+    report.update({"versions_completed":list(range(17,27)),"test_fixture":"S_ONLY",
+                   "external_data":[{"id":"qianliwu_beijing_osm_local_graph_2026_10_01",
+                                     "reality":"R_OSM_PLACE_POINT_ONLY; no real timetables"}],
+                   "no_automatic_life_or_live_market_simulation":True,
+                   "source_baseline":"GitHub artifacts/v14/official_world_state_frozen_v13.json"})
     (BASE/"simulation_evidence.json").write_text(json.dumps(transcript,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     (BASE/"simulation_summary.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return report
