@@ -1,0 +1,70 @@
+name: Test and archive v15 NPC planning
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'artifacts/v15/*.py'
+      - 'worldbook/v15.md'
+      - 'scripts/build_v15_bundle.py'
+      - '.github/workflows/test-v15.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worldbook-v15-regression
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: v14 existing event engine regression (14 tests)
+        run: python artifacts/v14/test_v14.py
+      - name: v15 limited-rationality regression (18 tests)
+        run: python artifacts/v15/test_v15.py
+      - name: Preserve official frozen world and validate ingested data
+        run: python scripts/check_data_manifest.py
+      - name: Generate deterministic v15 S-grade decisions, event journal and summary
+        run: python artifacts/v15/scenario_v15.py
+      - name: Package source, evidence and outputs with fixed ZIP timestamps
+        run: python scripts/build_v15_bundle.py
+      - name: Update public ADR with validation result and push generated outputs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, hashlib
+          summary=json.loads(Path("artifacts/v15/sandbox_v15_summary.json").read_text())
+          assert not summary["audit_violations"]
+          assert summary["official_game_events_written"] == 0
+          p=Path("docs/decisions/2026-10-10-v15-limited-agent-scheduling.md")
+          txt=p.read_text()
+          marker="\n## 自动验收记录（GitHub Actions）\n"
+          if marker in txt:
+              txt=txt.split(marker)[0]
+          bundle=Path("artifacts/earth_realism_v15_bundle.zip")
+          txt+=marker
+          txt+="- 旧版v14回归14项及v15回归18项测试通过。\n"
+          txt+=f"- 规划候选 {summary['decision_count']} 项：接受 {summary['choices']['scheduled']} 项，拒绝/不作为 {summary['choices']['declined']} 项。\n"
+          txt+=f"- 决策摘要SHA256: {summary['decision_sha256']}。\n"
+          txt+=f"- 正式冻结状态SHA256: {summary['official_frozen_sha256']}，正式历史新增0。\n"
+          txt+=f"- v15归档SHA256: {hashlib.sha256(bundle.read_bytes()).hexdigest()}。\n"
+          txt+="- 以上只描述S级沙盒测试，不能解释为真实NPC职业与心理行为。\n"
+          p.write_text(txt)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/v15/sandbox_v15_decisions.json artifacts/v15/sandbox_v15_journal.json artifacts/v15/sandbox_v15_summary.json artifacts/earth_realism_v15_bundle.zip docs/decisions/2026-10-10-v15-limited-agent-scheduling.md
+          if ! git diff --cached --quiet; then
+            git commit -m "test(v15): store audited decisions, run journal, suite result and bundle"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
