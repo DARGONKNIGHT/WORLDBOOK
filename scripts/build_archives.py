@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Build v13/v14 archival bundles and regenerable 30-day simulation results.
+"""Rebuild auditable v13/v14 archives and v14 test outputs, using Python stdlib.
 
-Requires Python 3.10+ standard library only.
-Never changes the frozen official world state; sandbox fixtures are S-grade.
+Reproducible ZIP metadata; sandbox writes never modify official frozen state.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -19,11 +18,15 @@ ART = ROOT / "artifacts"
 def create_bundle(version: int) -> tuple[Path, int, str]:
     src = ART / f"v{version}"
     out = ART / f"earth_realism_v{version}_bundle.zip"
-    with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+    with zipfile.ZipFile(out, "w") as zf:
         for file in sorted(src.rglob("*")):
             if not file.is_file() or "__pycache__" in file.parts:
                 continue
-            zf.write(file, arcname=f"earth_realism_v{version}/{file.relative_to(src)}")
+            name = f"earth_realism_v{version}/{file.relative_to(src).as_posix()}"
+            meta = zipfile.ZipInfo(name, date_time=(2026, 10, 9, 0, 0, 0))
+            meta.compress_type = zipfile.ZIP_DEFLATED
+            meta.external_attr = 0o100644 << 16
+            zf.writestr(meta, file.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     data = out.read_bytes()
     return out, len(data), hashlib.sha256(data).hexdigest()
 
@@ -36,7 +39,7 @@ def main() -> None:
     subprocess.run([sys.executable, str(v14 / "scenario_v14.py")], cwd=v14, check=True)
     after = hashlib.sha256(frozen.read_bytes()).hexdigest()
     if before != after:
-        raise RuntimeError("Frozen official v13 state was modified")
+        raise RuntimeError("Frozen official world state was modified")
     result = {"frozen_state_sha256": after, "bundles": []}
     for version in (13, 14):
         p, size, digest = create_bundle(version)
