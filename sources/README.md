@@ -58,6 +58,15 @@
 | TRA-001 | international_trade | [海关总署](https://www.customs.gov.cn/) | China：进出口监管、税则及数据 | official_reuse_verify |
 | AGR-001 | agriculture | [农业农村部](https://www.moa.gov.cn/) | China：农业生产、农产品价格及农村政策 | official_reuse_verify |
 
+
+## 配套文件
+
+- [机器可读的43条资源目录](catalog.json)
+- [真实资料引用与时间口径账本](usage_ledger.csv)
+- [地图、路网、经济、住房与公共服务的引擎加载矩阵](IMPLEMENTATION_MATRIX.md)
+- [许可、隐私、快照与数据治理规则](DATA_GOVERNANCE.md)
+- [数据索引结构校验程序](../scripts/validate_sources.py)
+
 ## 实际下载与使用规则
 
 - 本索引全部标为 `INDEX_ONLY`，不代表路网、影像、人口或企业数据库已经下载到仓库。
