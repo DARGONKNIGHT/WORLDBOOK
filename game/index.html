@@ -30,7 +30,7 @@
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>浏览器试玩层 v1.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>游戏行为层 v2.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -76,8 +76,9 @@
 
         <section class="tab-panel" id="tab-people" hidden>
           <div class="eyebrow">NETWORK / INFORMATION BOUNDARIES</div><h1>每个人，<br><em>都有自己的生活。</em></h1>
-          <p class="lead">31人来自世界书的S级人物档案，并非真实居民。只有在这一条试玩分支中认识的人才能直接联系；你无法查看他们的私密想法。</p>
-          <div class="people-summary panel"><span>已认识 <strong id="contact-count">0</strong> / 31 人</span><span>消息只有送达后才进入对方的信息边界</span></div>
+          <p class="lead">31名人物都属于S级虚构档案，但主角不会天然认识他们。只有在同一地点、对方有空且愿意交流时，才可能建立关系；交谈不等于获得联系方式。</p>
+          <div class="people-summary panel"><span>可联系 <strong id="contact-count">0</strong> / 31 人</span><span>消息经历发送 → 送达 → 阅读 → 自主决定回应</span></div>
+          <section class="panel message-panel" id="encounter-panel"><div class="panel-head"><span>本次分支的相遇记录</span><span class="tag">非自动好友</span></div><div id="encounter-list"></div></section>
           <section id="people-list" class="people-list"></section>
           <section class="panel message-panel"><div class="panel-head"><span>给已认识的人发消息</span><span class="tag">模拟通信</span></div>
             <form id="message-form" class="message-form">
@@ -91,9 +92,14 @@
 
         <section class="tab-panel" id="tab-world" hidden>
           <div class="eyebrow">WORLD / OUT-OF-CHARACTER</div><h1>主角看不见的，<br><em>世界仍在运转。</em></h1>
-          <p class="lead">以下为玩家视角之外的模拟审计信息。只有在玩家行动或等待推进时间时才计算，不能理解为这些人物的真实行踪，也不会自动成为角色的知识。</p>
+          <p class="lead">你可以控制自主模拟的启停和记录详细程度，但不能替NPC强迫决定。个人工作、家庭、休息和拒绝行动按时间优先级结算；这里是玩家外审计视图，不会自动进入角色认知。</p>
+          <section class="panel autonomy-controls"><div class="panel-head"><span>人物自主活动 · 控制台</span><span class="tag">S · 决策模拟</span></div>
+            <form id="autonomy-form" class="autonomy-form"><label>自动结算<select id="autonomy-enabled"><option value="true">开启 · 所有行动同步推进NPC</option><option value="false">暂停 · 不生成后续NPC活动</option></select></label><label>活动记录<select id="autonomy-detail"><option value="balanced">日常 · 只记录状态变更</option><option value="detailed">详细 · 每小时记录决定</option></select></label><button class="primary" type="submit">应用设置</button></form>
+            <div class="autonomy-steps"><button type="button" class="ghost" id="world-step-60">所有NPC自主运行 1 小时</button><button type="button" class="ghost" id="world-step-240">所有NPC自主运行 4 小时</button><span class="micro">会推进游戏时间；暂停时按钮只推进时间，不生成活动</span></div>
+            <div class="autonomy-focus"><label>观察单个人物（玩家外视角）<select id="world-npc"></select></label><div id="npc-preview" class="npc-preview"></div></div>
+          </section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
-            <div class="audit-top"><strong id="world-total">0</strong><span>已生成后台活动</span></div><div id="world-list" class="log-list"></div>
+            <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
           </section>
         </section>
 
@@ -107,7 +113,7 @@
             <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
             <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
-            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a>
+            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
           </section>
           <div class="section-head"><h2>主角经历的事件</h2><span>不展示尚未公开的NPC内幕</span></div>
           <div id="full-log" class="log-list full-log"></div>
