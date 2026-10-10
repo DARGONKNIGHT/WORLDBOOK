@@ -13,9 +13,21 @@
 ## 保真与限制
 - v13/v14 GitHub ZIP为**从仓库内容重新生成的归档**，并非聊天中原ZIP文件的逐字节复制；ZIP文件大小、元数据与SHA256可能不同。核心文本已从聊天附件转录，v14完整30日日志由原沙盒代码重新生成。
 - 官方游戏世界日期2026-10-09，具体时刻未设，玩家未创建，历史空；所有沙盒事件不属于正式历史。
-- 所有现实资料条目目前是**索引（INDEX_ONLY）**，不能称为已下载/缓存/具备API使用权。
+- 43项来源仍以**索引**方式维护；其中Geofabrik北京2026-10-01 OSM PBF和World Bank中国4个指标已经以5份真实原始字节文件存入GitHub并用SHA-256校验。其他来源大多未实际入库，不应误称为全量。
 - 早期v2—v12当前为整理稿；若需要逐字聊天存档，请另行从对话导出原文并校对。
 - **同步是会话内提交操作**，不是ChatGPT在无人交互时自动监测或后台提交。Github Actions仅在已入库代码变化时执行测试/打包，并不会自动获得ChatGPT新生成的章节。
 
 ## 当前测试
 GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38036402157 （状态：成功）。
+
+## 2026-10-10 实际新增数据
+- [x] [36,823,056字节北京2026-10-01 OSM原始数据](../data/raw/osm/beijing-2026-10-01.osm.pbf)，© OpenStreetMap contributors，ODbL 1.0
+- [x] [四份中国2020—2025 World Bank年度指标原始JSON](../data/raw/worldbank/)
+- [x] [5份文件的下载来源、字节数和SHA256清单](../data/manifest.json)
+- [x] [GitHub-first工作协议](../AGENTS.md)、[公开的设计决策记录](decisions/)、[缺口台账](FULL_DATA_GAP_REGISTER.md)
+- [x] [自动数据校验与决策日志要求](../.github/workflows/governance.yml)
+- [x] [自动采集运行成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38037144842)，实际数据提交 `2e8954a04c388f3d3186510586e50cec39645181`
+- [ ] v2—v12聊天原文逐字存档；需要原始导出校对，现有章节仍是摘要
+- [ ] 其余地图数据、北京市完整统计、学校医疗/住房/实时交通原始数据及许可审计
+
+**数据采集成功并不意味着现实地球“全量数据”已入库**。统计数据首次发布日期仍需核查；真实个人信息不得写入公开仓库。

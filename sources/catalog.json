@@ -89,10 +89,13 @@
       "scope": "Beijing",
       "cadence": "daily",
       "license": "ODbL-1.0",
-      "notes": "大型数据单独按需下载；index-only，本仓库未存储路网",
-      "repository_status": "INDEX_ONLY",
+      "notes": "大型数据单独按需下载；index-only，本仓库未存储路网；已缓存2026-10-01历史PBF 36,823,056 bytes；其余版本和实时交通不在库；参见data/manifest.json",
+      "repository_status": "PARTIAL_RAW_CACHED",
       "verified_or_discovered_as_of": "2026-10-10",
-      "game_cutoff": "2026-10-09"
+      "game_cutoff": "2026-10-09",
+      "cached_dataset_ids": [
+        "beijing_osm_2026_10_01"
+      ]
     },
     {
       "id": "MAP-007",
@@ -329,10 +332,16 @@
       "scope": "Global",
       "cadence": "annual",
       "license": "worldbank_terms",
-      "notes": "示例URL；须保留年份、单位和来源",
-      "repository_status": "INDEX_ONLY",
+      "notes": "示例URL；须保留年份、单位和来源；中国2020—2025四项指标API原始JSON已缓存；发布日期仍需另核",
+      "repository_status": "PARTIAL_RAW_CACHED",
       "verified_or_discovered_as_of": "2026-10-10",
-      "game_cutoff": "2026-10-09"
+      "game_cutoff": "2026-10-09",
+      "cached_dataset_ids": [
+        "wdi_CHN_FP.CPI.TOTL.ZG",
+        "wdi_CHN_NY.GDP.MKTP.CD",
+        "wdi_CHN_SL.UEM.TOTL.ZS",
+        "wdi_CHN_SP.POP.TOTL"
+      ]
     },
     {
       "id": "ECO-007",

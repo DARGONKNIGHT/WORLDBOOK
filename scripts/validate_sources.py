@@ -19,6 +19,8 @@ REQUIRED = {"id", "category", "title", "url", "authority", "purpose",
 def validate() -> list[str]:
     data = json.loads(CATALOG.read_text(encoding="utf-8"))
     sources = data["sources"]
+    manifest_file = CATALOG.parents[1] / "data" / "manifest.json"
+    ingested = {x["id"]: x for x in json.loads(manifest_file.read_text(encoding="utf-8"))["datasets"]} if manifest_file.exists() else {}
     errors, ids = [], set()
     if data.get("game_baseline") != "2026-10-09":
         errors.append("Game baseline must remain 2026-10-09")
@@ -36,8 +38,15 @@ def validate() -> list[str]:
         url = urlsplit(row["url"])
         if url.scheme != "https" or not url.netloc:
             errors.append(f"source {sid} has non-https/invalid URL")
-        if row["repository_status"] != "INDEX_ONLY":
-            errors.append(f"source {sid} implies dataset ingestion without an approved ingest ledger")
+        status = row["repository_status"]
+        if status not in ("INDEX_ONLY", "PARTIAL_RAW_CACHED"):
+            errors.append(f"source {sid} has invalid repository_status: {status}")
+        if status == "PARTIAL_RAW_CACHED":
+            refs = row.get("cached_dataset_ids", [])
+            if not refs or any(rid not in ingested for rid in refs):
+                errors.append(f"source {sid} has unverified cached_dataset_ids")
+            elif any(ingested[rid].get("status") != "INGESTED_VERIFIED_BYTES" for rid in refs):
+                errors.append(f"source {sid} refers to incomplete ingestion")
         if row["game_cutoff"] != "2026-10-09":
             errors.append(f"source {sid} has inconsistent game cutoff")
         for key in ("category", "title", "authority", "purpose", "scope", "license"):

@@ -8,8 +8,8 @@
 | v7—v12原始逐字全文 | INCOMPLETE_SOURCE_TEXT | 从真实聊天导出转录并标明校对完成；目前GitHub仅摘要 |
 | v13审计/校验程序 | RECONSTRUCTED_IN_REPO | 保存源码、测试输出、冻结世界JSON，标注ZIP为重建版本 |
 | v14引擎与30日日志 | RECONSTRUCTED_IN_REPO | 源码、日志、测试和重建ZIP在仓库存在，且能复跑 |
-| 北京OSM路网PBF | PENDING_ACTUAL_DOWNLOAD | `data/raw/osm/`文件入库，`manifest.json`有来源+SHA256，自动校验通过 |
-| 中国宏观经济原始数据 | PENDING_ACTUAL_DOWNLOAD | `data/raw/worldbank/`原始JSON，SHA256和统计时期、发布时间边界 |
+| 北京OSM路网PBF | INGESTED_FIXED_SNAPSHOT (2026-10-01; SHA256验证) | `data/raw/osm/`文件入库，`manifest.json`有来源+SHA256，自动校验通过 |
+| 中国宏观经济原始数据 | PARTIALLY_INGESTED (4项WDI指标; 首次发布日U) | `data/raw/worldbank/`原始JSON，SHA256和统计时期、发布时间边界 |
 | 官方北京行政区划与地图 | INDEX_ONLY | 按许可保存真实版本化快照；不允许复制受限影像或未授权图层 |
 | 北京住房/市场价格原始数据 | INDEX_ONLY | 明确来源、地区口径、采集时间、再分发权及原始文件 |
 | 公交/地铁实时运营数据 | INDEX_ONLY | 在API权限范围内获取，不用静态路网冒充实时数据 |
