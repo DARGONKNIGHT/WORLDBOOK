@@ -1,12 +1,8 @@
-name: Game · Test and Deploy
+name: Game · Publish to Pages (after enablement)
 
+# Manual deployment because the repository owner must first enable Pages:
+# Settings → Pages → Build and deployment → Source: GitHub Actions.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "game/**"
-      - "scripts/build_standalone_game.py"
-      - ".github/workflows/game-pages.yml"
   workflow_dispatch:
 
 permissions:
