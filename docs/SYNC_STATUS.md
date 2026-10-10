@@ -50,3 +50,14 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [ ] v2—v12逐字对话原文仍缺失，不得冒充全量
 
 正式游戏2026-10-09仍冻结，玩家未创建，NPC实际出行历史零条。
+
+
+## v17—v26连续十层验收（2026-10-10）
+- [x] [十份完整世界书](../worldbook/)与[十份公开决策记录](decisions/)已写入GitHub
+- [x] [10个有限过程模型](../artifacts/v17_26/realism_layers.py)、[45项新测试](../artifacts/v17_26/test_realism_layers.py)、[12条S级模拟事件](../artifacts/v17_26/simulation_evidence.json)
+- [x] [OSM节点公交相关清单40项](../artifacts/v17_26/osm_transit_nodes.json)、[节点型公共/商业POI 1项](../artifacts/v17_26/osm_civic_poi_nodes.json)及[来源与SHA256](../data/derived/manifest_v17_26.json)
+- [x] [十层归档ZIP](../artifacts/earth_realism_v17_to_v26_bundle.zip)；[CI实际95/95项通过](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38039469845)
+- [ ] 2026北京实际公交班次/GTFS、城市完整POI/开放服务、真实社保税费与合法机构档案仍缺；现有示例为S等级
+- [ ] v2—v12原始聊天逐字全文仍未补齐，当前为整理摘要，不能冒充完整逐字档案
+
+本轮达到用户上限10层，终止于v26；正式游戏仍冻结于2026-10-09，未创建玩家、正式事件历史为空。

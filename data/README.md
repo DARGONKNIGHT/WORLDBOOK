@@ -15,3 +15,8 @@ python scripts/check_data_manifest.py
 GitHub Actions可以从公网抓取数据并提交实际字节。如果工作流失败，仍只算采集计划；必须核实`data/raw/`真实存在与哈希一致才算已保存。
 
 **全量的边界**：世界书全文及项目关联数据、许可允许的地图/经济快照和所有可复现派生结果。全球全部原始地图、付费实时交通、未经授权地图影像、真实私人银行/病历等不可能也不应该无条件纳入公开Git；大型文件采用Git LFS、Release或合法对象存储，同时在本仓库留有可验证的完整清单。
+
+
+## v17—v26实际衍生原始节点数据
+
+真实字节来源仍为2026-10-01北京Geofabrik OSM PBF（在`data/raw/osm/`）。新派生文件`artifacts/v17_26/osm_transit_nodes.json`（40个公交/站台相关OSM节点）及`artifacts/v17_26/osm_civic_poi_nodes.json`（1个公共服务/商业相关OSM节点）已在GitHub保存，[manifest](derived/manifest_v17_26.json)含原始SHA、派生SHA和时间范围。仅含OSM node标签而非全体way/area设施，不提供实际公交班次、营业时间、机构资格、私人信息。© OpenStreetMap contributors，ODbL 1.0。
