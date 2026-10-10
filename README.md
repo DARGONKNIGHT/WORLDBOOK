@@ -95,6 +95,6 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 
 ## 可直接游玩的浏览器游戏 · 独立试玩层
 
-新增 [《地球：现实人生》离线单文件](game/earth-realism.html)（在GitHub文件页面下载后双击即可玩）、[游戏启动与操作说明](game/README.md)、[多文件源码](game/)、[自动化测试](game/tests/engine.test.cjs)及[GitHub Pages部署工作流](.github/workflows/game-pages.yml)。Pages实际启用和部署成功后可从 https://dargonknight.github.io/WORLDBOOK/ 访问；如果Pages尚未启用，本地单文件不受影响。
+新增 [《地球：现实人生》离线单文件](game/earth-realism.html)（在GitHub文件页面下载后双击即可玩）、[游戏启动与操作说明](game/README.md)、[多文件源码](game/)、[自动化测试](game/tests/engine.test.cjs)、[自动测试](.github/workflows/game-tests.yml)及[手动Pages发布工作流](.github/workflows/game-pages.yml)。Pages实际启用和部署成功后可从 https://dargonknight.github.io/WORLDBOOK/ 访问；如果Pages尚未启用，本地单文件不受影响。
 
 当前已支持玩家自行创建角色、北京区际出行、工作/休息/等待、31名虚构NPC有限后台活动、消息发送/送达、浏览器存档与JSON导入导出。**本游戏是S级独立分支**，不是全量真实地球模拟、不是v14 Python沙盒的全模块网页移植；世界书v33与冻结正式世界未被修改。设计决策记录见 [ADR](docs/decisions/2026-10-10-playable-offline-game.md)。
