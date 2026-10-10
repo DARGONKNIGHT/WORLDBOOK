@@ -34,5 +34,7 @@ jobs:
           git add data/raw/ data/manifest.json
           if ! git diff --cached --quiet; then
             git commit -m "data: archive baseline Beijing OSM and China WDI source bytes"
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           fi
