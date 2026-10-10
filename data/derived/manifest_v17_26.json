@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "COMMITTED_OSM_SOURCE_DERIVED",
+  "source": {
+    "id": "beijing_osm_2026_10_01",
+    "path": "data/raw/osm/beijing-2026-10-01.osm.pbf",
+    "bytes": 36823056,
+    "sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d"
+  },
+  "snapshot_date": "2026-10-01",
+  "game_date": "2026-10-09",
+  "license": "© OpenStreetMap contributors; ODbL 1.0",
+  "center": {
+    "place_name": "前礼务村",
+    "osm_node_id": "6410843713",
+    "latitude": 40.1880155,
+    "longitude": 116.7077492
+  },
+  "radius_m": 2800,
+  "outputs": {
+    "transit_nodes": {
+      "count": 40,
+      "path": "artifacts/v17_26/osm_transit_nodes.json",
+      "sha256": "471bc3ed53e9ef2b03c2ad0f7e11d04caf86dfb61e4c3026d18f4d56d7b43967",
+      "bytes": 16186
+    },
+    "civic_poi_nodes": {
+      "count": 1,
+      "path": "artifacts/v17_26/osm_civic_poi_nodes.json",
+      "sha256": "82601d52c1615cdd7e26cb00657b45cfb544284b7c634fcfbd03142736f8bc9d",
+      "bytes": 1013
+    }
+  },
+  "coverage": "node-tagged OSM stops and civic facilities only; ways/areas not indexed",
+  "timetables": "U_NOT_INGESTED",
+  "hours_and_capacities": "U_NOT_INGESTED",
+  "private_personal_information_included": false,
+  "original_official_state_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087"
+}

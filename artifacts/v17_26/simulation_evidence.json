@@ -1,0 +1,191 @@
+[
+  {
+    "id": "v17-synthetic_two_leg",
+    "system": "v17",
+    "detail": [
+      {
+        "legs": [
+          "S_TEST_TRIP_1",
+          "S_TEST_TRIP_2"
+        ],
+        "arrive": "2026-10-09T10:00:00+08:00",
+        "provenance": "S_OR_MIXED_NOT_TICKETED",
+        "booked": false
+      }
+    ],
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v18-real_anchor_unknown_hours",
+    "system": "v18",
+    "detail": {
+      "id": "OSM:6410843713",
+      "kind": "place",
+      "lat": 40.1880155,
+      "lon": 116.7077492,
+      "source_grade": "R_OSM",
+      "source_ref": "data/derived/manifest.json",
+      "display_name": "前礼务村",
+      "open_status": "U",
+      "capacity": "U"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v19-rent_atomic",
+    "system": "v19",
+    "detail": {
+      "event": {
+        "lease": "S_LEASE",
+        "period": "2026-10",
+        "cash_transfer": 30000,
+        "currency": "CNY"
+      },
+      "balances": {
+        "S_TENANT": 90000,
+        "S_LANDLORD": 50000
+      }
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v20-quote_not_contract",
+    "system": "v20",
+    "detail": {
+      "seller": "S_SELLER",
+      "buyer": "S_BUYER",
+      "item": "S_BOX",
+      "qty": 2,
+      "price": 4000,
+      "contract": "quotation",
+      "shipment": "not_dispatched",
+      "payment": "unpaid"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v20-goods_received_payment_pending",
+    "system": "v20",
+    "detail": {
+      "seller": "S_SELLER",
+      "buyer": "S_BUYER",
+      "item": "S_BOX",
+      "qty": 2,
+      "price": 4000,
+      "contract": "confirmed",
+      "shipment": "received",
+      "payment": "unpaid"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v20-payment_separate",
+    "system": "v20",
+    "detail": {
+      "order": {
+        "seller": "S_SELLER",
+        "buyer": "S_BUYER",
+        "item": "S_BOX",
+        "qty": 2,
+        "price": 4000,
+        "contract": "confirmed",
+        "shipment": "received",
+        "payment": "paid"
+      },
+      "balances": {
+        "S_BUYER": 26000,
+        "S_SELLER": 4000
+      }
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v21-payslip_only_explicit_withholding",
+    "system": "v21",
+    "detail": {
+      "person": "S_WORKER",
+      "gross": 30000,
+      "withheld": 2500,
+      "net": 27500,
+      "withheld_disposition": "U_PENDING_REMITTANCE",
+      "rule_grade": "S_SUPPLIED_FIGURE_NOT_LEGAL_TAX_CALCULATION"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v22-service_approved_with_capacity",
+    "system": "v22",
+    "detail": {
+      "status": "accepted",
+      "capacity_remaining": 0
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v23-limited_approval",
+    "system": "v23",
+    "detail": {
+      "status": "approved"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v24-recipient_only_rumor",
+    "system": "v24",
+    "detail": [
+      {
+        "content": "S_UNVERIFIED_REPORT",
+        "grade": "S_UNVERIFIED",
+        "message_id": "S_MESSAGE"
+      }
+    ],
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v25-hypothetical_exposure_no_payment",
+    "system": "v25",
+    "detail": {
+      "signal": "S_INDEX",
+      "actor": "S_ACTOR",
+      "reference": 10,
+      "assumed_coefficient": 0.3,
+      "impact_estimate": 3.0,
+      "grade": "S_HYPOTHETICAL_NOT_SETTLED"
+    },
+    "grade": "S_TEST"
+  },
+  {
+    "id": "v26-integrated_frozen_check",
+    "system": "v26",
+    "detail": {
+      "test_only": true,
+      "event_count": 11,
+      "digest": "555cc1fff361efb859be464df84583460a3a590dff4fbf17cbe1412a7b527554",
+      "official_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
+      "official_game_events_written": 0,
+      "comprehensive_real_life_simulation": false,
+      "versions_completed": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "test_fixture": "S_ONLY",
+      "external_data": [
+        {
+          "id": "qianliwu_beijing_osm_local_graph_2026_10_01",
+          "reality": "R_OSM_PLACE_POINT_ONLY; not R transit/housing/commerce"
+        }
+      ],
+      "no_automatic_life_or_live_market_simulation": true,
+      "source_baseline": "GitHub artifacts/v14/official_world_state_frozen_v13.json"
+    },
+    "grade": "S_TEST"
+  }
+]

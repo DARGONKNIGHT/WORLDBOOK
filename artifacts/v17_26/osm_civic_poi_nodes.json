@@ -1,0 +1,33 @@
+{
+  "source_id": "beijing_osm_2026_10_01",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "source_date": "2026-10-01",
+  "radius_m": 2800,
+  "center": {
+    "place_name": "前礼务村",
+    "osm_node_id": "6410843713",
+    "lat": 40.1880155,
+    "lon": 116.7077492
+  },
+  "license": "© OpenStreetMap contributors, ODbL 1.0",
+  "scope": "Node-based public tags only; excludes polygon/way features.",
+  "verified_schedules": false,
+  "official_service_eligibility_verified": false,
+  "kind": "civic_poi_nodes",
+  "features": [
+    {
+      "osm_node_id": "9921246281",
+      "lat": 40.1631384,
+      "lon": 116.7070898,
+      "name": "郝家疃社区卫生服务站",
+      "grade": "R_OSM_NODE_CROWDSOURCED",
+      "effective_snapshot": "2026-10-01",
+      "opening_hours": "U",
+      "service_schedule": "U",
+      "service_capacity": "U",
+      "category": "clinic",
+      "operator_identity": "U",
+      "address_precision": "OSM_NODE_ONLY_NO_HOUSENUMBER"
+    }
+  ]
+}

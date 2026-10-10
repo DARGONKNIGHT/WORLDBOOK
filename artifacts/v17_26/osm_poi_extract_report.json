@@ -1,0 +1,21 @@
+{
+  "grade": "R_OSM_DERIVED_NOT_AUTHORITATIVE",
+  "records": {
+    "transit_nodes": {
+      "count": 40,
+      "path": "artifacts/v17_26/osm_transit_nodes.json",
+      "sha256": "471bc3ed53e9ef2b03c2ad0f7e11d04caf86dfb61e4c3026d18f4d56d7b43967",
+      "bytes": 16186
+    },
+    "civic_poi_nodes": {
+      "count": 1,
+      "path": "artifacts/v17_26/osm_civic_poi_nodes.json",
+      "sha256": "82601d52c1615cdd7e26cb00657b45cfb544284b7c634fcfbd03142736f8bc9d",
+      "bytes": 1013
+    }
+  },
+  "transit_timetables": "U_NOT_INGESTED",
+  "real_medical_education_legal_eligibility": "U",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "official_game_events_written": 0
+}

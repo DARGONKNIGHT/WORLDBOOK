@@ -1,0 +1,29 @@
+{
+  "test_only": true,
+  "event_count": 12,
+  "digest": "d68ef6ae87c2fd11403158efb2d70a31a80e18b1de59926c03d1667638962ee3",
+  "official_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
+  "official_game_events_written": 0,
+  "comprehensive_real_life_simulation": false,
+  "versions_completed": [
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "test_fixture": "S_ONLY",
+  "external_data": [
+    {
+      "id": "qianliwu_beijing_osm_local_graph_2026_10_01",
+      "reality": "R_OSM_PLACE_POINT_ONLY; no real timetables"
+    }
+  ],
+  "no_automatic_life_or_live_market_simulation": true,
+  "source_baseline": "GitHub artifacts/v14/official_world_state_frozen_v13.json"
+}
