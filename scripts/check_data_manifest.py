@@ -70,4 +70,27 @@ if new_manifest.exists():
     official_bytes=(ROOT/"artifacts/v14/official_world_state_frozen_v13.json").read_bytes()
     assert proof["official_sha256"]==hashlib.sha256(official_bytes).hexdigest()
     print("Verified v17-v26 real OSM derived node bytes, manifest and frozen sandbox report")
+# v27-v33 verified source-data derivatives. A URL without bytes never passes.
+for label,filename in (("v27-v30","manifest_v27_30.json"),
+                       ("v31-v33","manifest_v31_33.json")):
+    meta_path=ROOT/"data/derived"/filename
+    if meta_path.exists():
+        meta=json.loads(meta_path.read_text(encoding="utf-8"))
+        src=next(x for x in docs if x["id"]=="beijing_osm_2026_10_01")
+        assert meta["source_sha256"]==src["sha256"],"OSM source lineage conflict"
+        for item in meta["outputs"].values():
+            assert item["source_sha256"]==src["sha256"]
+            dest=item.get("output")
+            if dest is None and filename=="manifest_v27_30.json":
+                dest="artifacts/v27_30/turn_restrictions_local.json"
+            p=ROOT/dest
+            assert p.is_file(),f"missing derived bytes {p}"
+            assert p.stat().st_size==item["bytes"],f"derived size mismatch {p}"
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==item["sha256"],f"derived sha mismatch {p}"
+        if filename=="manifest_v31_33.json":
+            checkpoint=json.loads((ROOT/"artifacts/v31_33/milestone_v33.json").read_text())
+            assert checkpoint["official_history_written"]==0
+            frozen_bytes=(ROOT/"artifacts/v14/official_world_state_frozen_v13.json").read_bytes()
+            assert hashlib.sha256(frozen_bytes).hexdigest()==checkpoint["official_frozen_sha256"]
+        print(f"Verified {label} real OSM derived files and lineage")
 print("Frozen world and source-of-truth checks passed")

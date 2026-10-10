@@ -20,3 +20,13 @@ GitHub Actions可以从公网抓取数据并提交实际字节。如果工作流
 ## v17—v26实际衍生原始节点数据
 
 真实字节来源仍为2026-10-01北京Geofabrik OSM PBF（在`data/raw/osm/`）。新派生文件`artifacts/v17_26/osm_transit_nodes.json`（40个公交/站台相关OSM节点）及`artifacts/v17_26/osm_civic_poi_nodes.json`（1个公共服务/商业相关OSM节点）已在GitHub保存，[manifest](derived/manifest_v17_26.json)含原始SHA、派生SHA和时间范围。仅含OSM node标签而非全体way/area设施，不提供实际公交班次、营业时间、机构资格、私人信息。© OpenStreetMap contributors，ODbL 1.0。
+
+## v27—v33新增已验证OSM派生对象
+
+- [v27公共服务/商业ways原始对象11条](../artifacts/v27_30/osm_public_way_features.json)，闭合ways 11、线状0；实际数据来自固定2026-10-01北京PBF。
+- [v28本地区可直接应用的node-via限制关系0项](../artifacts/v27_30/turn_restrictions_local.json)：缺失/复杂关系排除计数完整保存在报告。
+- [v31公共多边形relation筛选0项](../artifacts/v31_33/osm_public_multipolygons.json)，全北京PBF符合标签初筛的已组装候选42项；0不是公共服务不存在的证明。
+- [v32局部有来源的路网障碍节点3项](../artifacts/v31_33/osm_barrier_nodes.json)，其通过许可/当前状态未核实。
+- [派生manifest v27-v30](derived/manifest_v27_30.json)、[派生manifest v31-v33](derived/manifest_v31_33.json)记录真实字节量、SHA-256、来源与筛选边界。
+
+Geofabrik与OSM原始数据署名遵守 © OpenStreetMap contributors，ODbL 1.0。此处道路或公共设施标签不代表行政许可、法律通行权、地面实时状态或准确到达时间。
