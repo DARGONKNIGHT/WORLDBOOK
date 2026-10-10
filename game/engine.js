@@ -6,7 +6,7 @@
   else root.EarthGame = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = 1;
+  const VERSION = 2;
   const BASE_DAY = "2026-10-09";
   const HOUR = 3600000, MINUTE = 60000, DAY = 24 * HOUR, OFFSET = 8 * HOUR;
   const DISTRICTS = ["东城","西城","朝阳","海淀","丰台","石景山","门头沟","房山","通州","顺义","昌平","大兴","怀柔","平谷","密云","延庆"];
@@ -62,6 +62,91 @@
   function dayNumber(ms) { return Math.floor((ms+OFFSET)/DAY); }
   function localDay(ms) { return new Date(dayNumber(ms)*DAY).toISOString().slice(0,10); }
   function pseudorand(seed) { let x = (seed >>> 0) + 0x6D2B79F5; x = Math.imul(x ^ x>>>15,x|1); x ^= x + Math.imul(x ^ x>>>7,x|61); return ((x ^ x>>>14)>>>0)/4294967296; }
+
+  // Explicit S-grade scenario assumptions, never real NPC addresses or true schedules.
+  // F-family locality is a playable sandbox convention, not a claim about real residents.
+  const REGION = {
+    F01:"顺义",F02:"顺义",F03:"顺义",F04:"顺义",F05:"顺义",
+    E01:"顺义",E02:"昌平",E03:"海淀",E04:"海淀"
+  };
+  const DISTRICT_OVERRIDE = {P010:"外省（未知）",P012:"朝阳",P014:"顺义",P017:"顺义",P020:"昌平",P028:"海淀"};
+  const FOCUS = {
+    P001:"田间事务与家庭开支",P002:"小店营业与家中照顾",P003:"单位事务与家人联系",P004:"身体休息与家人来往",
+    P005:"设备维修排班与家务",P006:"工作账务与照料孩子",P007:"学校作息与监护安排",
+    P008:"物流排班与租住事务",P009:"服务业轮班与家庭",P010:"异地生活和亲属联系",
+    P011:"备课与同事协作",P012:"上班与私人生活",P013:"教学协作和婚姻家庭",
+    P014:"客户需求与维修合作",P015:"技术维修与工单安排",P016:"家庭日常与健康",
+    P017:"进货供货与信用关系",P018:"送货与路线时间",P019:"小店经营与库存",
+    P020:"班组进度与安全",P021:"人事材料与工作流程",P022:"质检记录与返工",P023:"货运排班与休息",
+    P024:"车队调度与时效",P025:"餐饮轮班与顾客",P026:"现场维修与安全",P027:"客户服务与私人生活",
+    P028:"教学准备与家庭",P029:"护理轮班与睡眠",P030:"退休生活与旧友",P031:"家庭照护与在职事务"
+  };
+  const SHIFT = new Set(["P009","P018","P023","P025","P029"]);
+  const RETIRED = new Set(["P004","P016","P030","P010"]);
+  const FAMILY = new Set(["P001","P002","P004","P005","P006","P007","P008","P009","P010","P013","P031"]);
+  const CIVIL = new Set(["P003","P006","P011","P012","P013","P021","P028"]);
+  const CHILDREN = new Set(["P007"]);
+  const APPROACH_TTL = 100 * MINUTE;
+  function districtFor(n){return DISTRICT_OVERRIDE[n.id] || REGION[n.group];}
+  function minuteOfDay(ms){return ((ms+OFFSET)%DAY+DAY)%DAY/MINUTE;}
+  function hourOf(ms){return Math.floor(minuteOfDay(ms)/60);}
+  function weekday(ms){return new Date(ms+OFFSET).getUTCDay();}
+  function stage(n,ms){
+    const h=hourOf(ms), weekend=[0,6].includes(weekday(ms));
+    if(CHILDREN.has(n.id))return {kind:h>=8&&h<16?"school":h>=21||h<7?"sleep":"family",reason:"未成年人有监护和学校约束"};
+    if(h<7||h>=23)return {kind:"sleep",reason:"夜间休息优先，不随时接待"};
+    if(RETIRED.has(n.id)){
+      if(h===9||h===16)return {kind:"errand",reason:"保留日间外出窗口，非每日必发生"};
+      return {kind:h>=18?"family":"personal",reason:"生活安排优先于陌生社交"};
+    }
+    if(SHIFT.has(n.id)){
+      if(h>=14&&h<22)return {kind:"work",reason:"假设性轮班，履行工作责任"};
+      if(h===11||h===12)return {kind:"errand",reason:"班前可能处理个人事务"};
+      return {kind:h<10?"rest":"personal",reason:"轮班休息与个人时间"};
+    }
+    if(n.id==="P002"||n.id==="P014"||n.id==="P017"||n.id==="P019"){
+      if(h>=9&&h<19 && !weekend)return {kind:"work",reason:"经营营业与既有客户责任"};
+      if(h>=9&&h<17)return {kind:"work",reason:"假设周末营业，但不等于真实开门"};
+      return {kind:"family",reason:"店务结束后有家庭和休息安排"};
+    }
+    if(h>=9&&h<12&&!weekend || h>=13&&h<18&&!weekend)return {kind:"work",reason:"假设工作日日间工作安排"};
+    if(h===12||h===18)return {kind:"errand",reason:"午间或傍晚可能处理生活事务"};
+    if(h>=19&&h<22 && FAMILY.has(n.id))return {kind:"family",reason:"家人和既有承诺优先"};
+    return {kind:"personal",reason:weekend?"非工作日个人计划":"下班后个人事务"};
+  }
+  const STAGE_TEXT={
+    work:"投入既有工作／营业安排",family:"处理家庭责任和既定约定",
+    errand:"考虑外出办事与日常采购",school:"按监护与学校作息安排活动",
+    sleep:"优先休息，不接受临时社交",rest:"恢复体力或处理轮班休息",
+    personal:"保留私人时间，不必参与公开活动"
+  };
+  function choice(s,n,at){
+    const base=stage(n,at),seed=dayNumber(at)*133+n.id.charCodeAt(3)*41+hourOf(at)*991;
+    // Chance of opting OUT of discretionary errands; no compulsory activity per NPC.
+    const skip=base.kind==="errand"&&pseudorand(seed)<0.35;
+    return {kind:skip?"personal":base.kind,reason:skip?"评估事务优先级后决定暂不外出":base.reason,
+      location:districtFor(n),focus:FOCUS[n.id],score:skip?0:base.kind==="work"?39:base.kind==="family"?31:base.kind==="sleep"?36:16,
+      optional:base.kind==="errand"};
+  }
+  function plan(s,id,at=s.time){
+    const n=NPCS.find(x=>x.id===id);assert(n,"未知人物");
+    return choice(s,n,at);
+  }
+  function upgradeGame(s){
+    assert(s&&typeof s==="object","存档无效");
+    if(s.schema===2)return validateGame(s);
+    assert(s.schema===1&&s.mode==="S_INDEPENDENT_PLAYTHROUGH","旧存档无法迁移");
+    // Preserve the historical v1 game record; do not retroactively rewrite outcomes.
+    s.schema=2;s.autonomy={enabled:true,detail:"balanced"};
+    s.player.met=[];s.player.declined=[];
+    for(const n of NPCS){
+      const prior=s.npc[n.id]||{};
+      s.npc[n.id]={...prior,stage:null,decisions:[],relation:s.player.contacts.includes(n.id)?2:0,
+        lastRead:null,responded:0,pending:[]};
+    }
+    return validateGame(s);
+  }
+
   function event(state, at, message, kind="scene", visible=true, grade="S") {
     state.sequence++;
     const item={id:state.sequence,at,kind,text:message,grade,visible};
@@ -87,9 +172,9 @@
     const state={
       schema:VERSION, mode:"S_INDEPENDENT_PLAYTHROUGH", started:true,
       time, sequence:0,
-      player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[]},
-      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[]}])),
-      queue:[], messages:[], journal:[], world:[], cycles:0
+      player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[],met:[],declined:[]},
+      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[],stage:null,decisions:[],relation:0,lastRead:null,responded:0,pending:[]}])),
+      queue:[], messages:[], journal:[], world:[], cycles:0, autonomy:{enabled:true,detail:"balanced"}
     };
     event(state,time,"你为这一条独立S级游戏分支创建了角色。正式世界书原始存档仍冻结；现有资料不足以宣称实时地球模拟。","system");
     event(state,time,"2026年10月9日，"+name+"从北京"+district+"区开始自己的第一天。你可以探索、安排事务、结识人物或前往其他区。","scene");
@@ -106,58 +191,110 @@
     assert(s.player.cash===null||(Number.isSafeInteger(s.player.cash)&&s.player.cash>=0),"资金字段无效");
     assert(Number.isInteger(s.player.energy)&&s.player.energy>=0&&s.player.energy<=100,"精力字段无效");
     assert(Array.isArray(s.player.contacts)&&s.player.contacts.every(id=>NPCS.some(n=>n.id===id)),"联系人列表无效");
+    assert(s.autonomy && typeof s.autonomy.enabled==="boolean" && ["balanced","detailed"].includes(s.autonomy.detail),"NPC自主选项无效");
+    assert(Array.isArray(s.player.met)&&Array.isArray(s.player.declined),"相遇状态无效");
+    assert(NPCS.every(n=>Number.isInteger(s.npc[n.id].relation)&&Array.isArray(s.npc[n.id].decisions)),"NPC关系/决策数据无效");
     assert(s.queue.every(q=>Number.isFinite(q.at)&&q.at>=s.time&&typeof q.type==="string"),"待办队列有过期或非法事件");
     return s;
   }
-  function dueEvents(s, until) {
-    // A delivered message may generate a reply before 'until'.
-    // Drain recursively in chronological order so no past-due event remains.
+  function npcRecord(s,n,at,c,reason,visible=false){
+    const state=s.npc[n.id];
+    const line={at,npcId:n.id,kind:c.kind,text:n.name+"："+
+      STAGE_TEXT[c.kind]+"；"+reason+"。",reason,score:c.score,location:c.location,grade:"S",visibility:"out_of_character"};
+    state.lastActivity=line;
+    state.stage={kind:c.kind,at,location:c.location};
+    state.decisions.push({at,kind:c.kind,reason,score:c.score});
+    if(state.decisions.length>96)state.decisions.shift();
+    s.world.push(line);if(s.world.length>4000)s.world.shift();
+    if(visible)event(s,at,"你注意到"+n.name+"在附近处理日常事务。","observation");
+  }
+  function autonomousWorld(s,start,end){
+    if(!s.autonomy.enabled)return;
+    // Tick at hour boundaries. Each NPC has a stable sample location, no teleportation.
+    for(let at=Math.floor(start/HOUR)*HOUR+HOUR;at<=end;at+=HOUR){
+      for(const n of NPCS){
+        const c=choice(s,n,at), prev=s.npc[n.id].stage;
+        if(!prev||prev.kind!==c.kind||s.autonomy.detail==="detailed")
+          npcRecord(s,n,at,c,c.reason);
+      }
+    }
+  }
+  function categorize(text){
+    if(/借钱|转账|贷款|周转|给我钱/.test(text))return "money";
+    if(/见面|约|一起吃|喝咖啡|拜访/.test(text))return "meet";
+    if(/工作|招聘|简历|入职|雇佣/.test(text))return "job";
+    if(/维修|报价|修理|订单|采购/.test(text))return "business";
+    if(/急|救命|危险|受伤/.test(text))return "urgent";
+    if(/你好|早上好|最近如何|在吗|谢谢/.test(text))return "greeting";
+    return "general";
+  }
+  function response(s,n,message,at){
+    const kind=categorize(message),c=choice(s,n,at),r=s.npc[n.id].relation;
+    // The answer reflects topic and prior relationship, not a random universal template.
+    if(kind==="money")return "涉及借款和转账，我不能凭一条消息就答应。你需要另想办法。";
+    if(kind==="meet")return c.kind==="work"||c.kind==="family"?
+      "我现在有"+(c.kind==="work"?"工作":"家里")+"的安排，今天不能临时约。先把时间和事情说清楚。":
+      r<2?"我们还不熟，我暂时不约单独见面。":"先把地点和具体时间说一下，我确认后再答复。";
+    if(kind==="job")return CIVIL.has(n.id)?
+      "工作上的事情要按正式流程来，我不能私下保证岗位。":
+      "我不掌握招聘决定权，最好核对岗位要求和公开渠道。";
+    if(kind==="business")return (n.id==="P014"||n.id==="P015")?
+      "维修需要先看故障、地址和时间，我目前不能直接承诺上门或报价。":
+      "你先说明事项和条件，我不能在不了解情况时确认交易。";
+    if(kind==="urgent")return "如果确有即时危险，请优先联系当地紧急服务；我不能保证现在赶到。";
+    if(kind==="greeting")return c.kind==="work"?
+      "刚看到消息，今天手头事务多，没法聊太久。":
+      r>=2?"我看到了。最近还在忙自己的事，你那边怎么样？":"你好。有什么具体事吗？";
+    return c.kind==="family"?
+      "家里现在有事。你的消息我看了，等事情明确后再回复。":
+      c.kind==="work"?"我手上正在处理"+FOCUS[n.id]+"。请把需要我回应的问题讲具体些。":
+      r<2?"这件事我还不清楚，不方便立刻表态。":"我得先确认信息，暂时不能答应。";
+  }
+  function nextAvailable(s,n,at){
+    // Delivery does not equal reading. Respect quiet hours, work and family duties.
+    let t=Math.ceil(at/(30*MINUTE))*30*MINUTE;
+    for(let i=0;i<72;i++,t+=30*MINUTE){
+      const c=choice(s,n,t),h=hourOf(t);
+      if(h>=8&&h<=22 && !["work","sleep","school"].includes(c.kind) && !(c.kind==="family"&&pseudorand(dayNumber(t)*89+n.id.charCodeAt(3))<0.5))return t;
+    }
+    return null;
+  }
+  function dueEvents(s,until){
     let processed=0;
     while(s.queue.length){
       s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
-      if(s.queue[0].at>until) break;
-      assert(++processed<=2000,"单轮待办事件过多");
-      const q=s.queue.shift();
+      if(s.queue[0].at>until)break;
+      assert(++processed<=2500,"单轮待办事件过多");
+      const q=s.queue.shift(),n=NPCS.find(x=>x.id===(q.to||q.from));
+      if(!n)continue;
+      const v=s.npc[n.id];
       if(q.type==="deliver"){
-        const n=NPCS.find(x=>x.id===q.to);
-        if(!n) continue;
-        s.npc[n.id].knowledge.push({at:q.at,topic:q.text,source:"player"});
-        event(s,q.at,"发送给"+n.name+"的消息已经送达，但不意味着对方同意任何请求。","message");
-        if(pseudorand(q.seed)>0.49){
-          const responseAt=q.at+(15+Math.floor(pseudorand(q.seed+17)*90))*MINUTE;
-          s.queue.push({type:"reply",at:responseAt,from:n.id,order:s.sequence+1});
+        v.knowledge.push({at:q.at,topic:q.text,source:"player"});
+        if(v.knowledge.length>160)v.knowledge.shift();
+        // No player-visible receipt unless the recipient actually reads the message.
+        const readAt=nextAvailable(s,n,q.at);
+        if(readAt!==null)s.queue.push({type:"read",at:readAt,to:n.id,text:q.text,order:s.sequence+1,seed:q.seed});
+      }else if(q.type==="read"){
+        v.lastRead=q.at;
+        event(s,q.at,n.name+"已读你之前发出的消息。","message");
+        const category=categorize(q.text);
+        const outcome=pseudorand(q.seed+v.responded*31+17);
+        // People may choose silence; repeated greetings need not yield replies.
+        const chance=category==="money"?0.85:category==="urgent"?0.85:category==="meet"?0.75:category==="greeting"?0.6:0.7;
+        if(outcome<chance){
+          v.responded++;
+          const replyAt=q.at+(10+Math.floor(pseudorand(q.seed+37)*26))*MINUTE;
+          s.queue.push({type:"reply",at:replyAt,from:n.id,content:response(s,n,q.text,q.at),order:s.sequence+1});
+        }else{
+          s.world.push({at:q.at,npcId:n.id,kind:"silence",text:n.name+"已读后没有回复；眼前责任或意愿优先。",reason:"可选择不回应",grade:"S",visibility:"out_of_character"});
         }
-      } else if(q.type==="reply"){
-        const n=NPCS.find(x=>x.id===q.from);
-        if(!n) continue;
-        const text=n.name+"：消息收到了。我还得处理自己的事情，具体情况之后再商量。";
-        s.messages.push({at:q.at,from:n.id,content:text,grade:"S"});
-        event(s,q.at,"你收到来自"+n.name+"的一条消息。","message");
+      }else if(q.type==="reply"){
+        s.messages.push({at:q.at,from:n.id,content:n.name+"："+q.content,grade:"S"});
+        event(s,q.at,"你收到"+n.name+"的一条回复。","message");
       }
     }
     s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
-  }
-  function autonomousWorld(s, start, end) {
-    const from=dayNumber(start), to=dayNumber(end);
-    for(let day=from;day<=to;day++){
-      for(let i=0;i<NPCS.length;i++){
-        const n=NPCS[i], fraction=pseudorand(day*131+i*104729);
-        const hour=7+Math.floor(fraction*11);
-        const minute=Math.floor(pseudorand(day*79+i*4391)*60);
-        const at=day*DAY-OFFSET+hour*HOUR+minute*MINUTE;
-        if(at<=start||at>end) continue;
-        const possibilities=[
-          "围绕既有职业与责任整理一项待办（具体结果未知）",
-          "为家庭或个人生活安排一段时间（具体细节未知）",
-          "因既有约定调整计划（内容不自动公开）",
-          "判断眼前事务尚无足够信息，暂不作出决定"
-        ];
-        const text=n.name+"："+possibilities[Math.floor(pseudorand(i+day*97)*possibilities.length)];
-        s.npc[n.id].lastActivity={at,text,grade:"S"};
-        s.world.push({at,npcId:n.id,text,grade:"S",visibility:"out_of_character"});
-      }
-    }
-    if(s.world.length>1500) s.world=s.world.slice(-1500);
+    if(s.world.length>4000)s.world=s.world.slice(-4000);
   }
   function advance(s, minutes) {
     assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=480,"每次推进必须为1至480分钟");
@@ -209,15 +346,44 @@
     }else if(kind==="social"){
       assert(p.energy>=9,"精力不足，请先休息");
       advance(s,45);p.energy-=9;
-      const unknown=NPCS.filter(n=>!p.contacts.includes(n.id));
-      if(!unknown.length){event(s,s.time,"你参加了一场S级公共活动。31名档案角色都已成为你的可联系对象。","scene");}
-      else{
-        const index=Math.floor(pseudorand(s.sequence*9137+dayNumber(s.time))*unknown.length);
-        const n=unknown[index];
-        p.contacts.push(n.id);
-        p.knowledge.push({at:s.time,npc:n.id,topic:"在模拟公共活动中认识",grade:"S"});
-        event(s,s.time,"模拟场景：你在"+p.district+"区的公共活动中认识"+n.name+"（"+n.occupation+"）。这次偶遇是新生成的S级情节，不能据此推断其现实住址或当日行踪。","contact");
+      const eligible=NPCS.filter(n=>n.age>=18&&districtFor(n)===p.district
+          &&choice(s,n,s.time).kind==="errand"
+          &&!p.contacts.includes(n.id)
+          &&!p.met.some(m=>m.id===n.id&&m.at>at-2*HOUR));
+      const chance=pseudorand(s.sequence*9137+dayNumber(s.time)*37+hourOf(s.time)*79);
+      if(!eligible.length||chance<0.3){
+        event(s,s.time,"你在附近进行了一次正常的公共活动。路人有自己的安排，没有发生值得建立联系的交谈。","social");
+      }else{
+        const n=eligible[Math.floor(pseudorand(s.sequence*2381+hourOf(s.time))*eligible.length)];
+        p.met.push({id:n.id,at:s.time,district:p.district});
+        if(p.met.length>80)p.met.shift();
+        event(s,s.time,"你在"+p.district+"区的S级公共场景里与"+n.name+"有过简短交谈。对方没有主动留下联系方式，你可以选择礼貌询问，也可以就此结束。","social");
       }
+    }else if(kind==="request_contact"){
+      const id=validText(payload.recipient,8);
+      const n=NPCS.find(x=>x.id===id), met=p.met.filter(m=>m.id===id).at(-1);
+      assert(n&&met,"你们尚未实际见过面");
+      assert(!p.contacts.includes(id),"已经有联系方式");
+      assert(!p.declined.some(x=>x.id===id&&x.at>=met.at),"同一次相遇已被拒绝，请尊重对方决定");
+      assert(met.district===p.district&&s.time-met.at<=APPROACH_TTL,"已离开相遇场景，不能远程索取联系方式");
+      assert(p.energy>=2,"精力不足");
+      advance(s,5);p.energy-=2;
+      const c=choice(s,n,s.time),r=s.npc[id].relation,seed=s.sequence*917+id.charCodeAt(3)+dayNumber(s.time);
+      const consents=pseudorand(seed)>0.5 && !["work","sleep","family"].includes(c.kind);
+      if(consents){
+        p.contacts.push(id);s.npc[id].relation=Math.max(1,r);
+        event(s,s.time,n.name+"考虑后同意互留联系方式。双方只是初识，没有其他承诺。","contact");
+      }else{
+        p.declined.push({id,at:met.at});
+        event(s,s.time,n.name+"没有同意交换联系方式。你没有继续纠缠；对方仍按原计划离开。","social");
+      }
+    }else if(kind==="npc_autonomy"){
+      // Choice changes the simulator, not the person's own will or player knowledge.
+      if(payload.enabled!==undefined)assert(typeof payload.enabled==="boolean","自动结算开关无效");
+      const detail=payload.detail||s.autonomy.detail;
+      assert(["balanced","detailed"].includes(detail),"请选择正确的自主活动详细程度");
+      s.autonomy={enabled:payload.enabled===undefined?s.autonomy.enabled:payload.enabled,detail};
+      event(s,s.time,"【模拟器设置】人物自主活动"+(s.autonomy.enabled?"已启用":"已暂停")+"；观察精度："+(detail==="detailed"?"逐时记录":"只记状态变更")+"。设置不推进游戏时间。","system");
     }else if(kind==="message"){
       const to=validText(payload.recipient,8), text=validText(payload.text,200);
       assert(p.contacts.includes(to),"主角尚未建立该联系人关系");
@@ -225,7 +391,7 @@
       assert(p.energy>=1,"精力不足");
       advance(s,5);p.energy-=1;
       const n=NPCS.find(x=>x.id===to);
-      const delay=10+Math.floor(pseudorand(s.sequence*83+to.length)*35);
+      const delay=1+Math.floor(pseudorand(s.sequence*83+to.length)*12);
       s.queue.push({type:"deliver",at:s.time+delay*MINUTE,to,text,order:s.sequence+1,seed:s.sequence*83+to.charCodeAt(1)});
       event(s,s.time,"你向"+n.name+"发出：“"+text+"”。已发出但尚未送达，对方尚未知情。","message");
     }else{
@@ -244,5 +410,5 @@
     };
   }
   return Object.freeze({VERSION,BASE_DAY,DISTRICTS,GROUPS,NPCS,AREAS,clock,
-    makeGame,validateGame,act,summary,dayNumber,localDay});
+    makeGame,validateGame,act,summary,dayNumber,localDay,plan,upgradeGame,districtFor});
 });
