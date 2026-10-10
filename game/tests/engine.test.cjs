@@ -96,6 +96,8 @@ test("回答根据消息意图与责任选择，不是统一话术",()=>{
  for(let i=0;i<8;i++){
    E.act(s,"message",{recipient:"P014",text:i%2?"维修报价需要哪些信息":"能借钱给我吗"});
  }
+ // P014 is on a hypothetical business shift; at 17:00 he may not have read.
+ E.act(s,"wait",{minutes:480});
  E.act(s,"wait",{minutes:480});
  const replies=s.messages.map(x=>x.content);
  assert.ok(replies.length>0);
