@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "datasets": [
+    {
+      "id": "beijing_osm_2026_10_01",
+      "status": "INGESTED_VERIFIED_BYTES",
+      "url": "https://download.geofabrik.de/asia/china/beijing-261001.osm.pbf",
+      "dest": "data/raw/osm/beijing-2026-10-01.osm.pbf",
+      "bytes": 36823056,
+      "sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+      "acquired_at_utc": "2026-10-10T08:13:52.366323+00:00",
+      "effective_period": "2026-10-01",
+      "game_baseline": "2026-10-09",
+      "license_note": "© OpenStreetMap contributors; ODbL 1.0; extract: Geofabrik GmbH"
+    },
+    {
+      "id": "wdi_CHN_FP.CPI.TOTL.ZG",
+      "status": "INGESTED_VERIFIED_BYTES",
+      "url": "https://api.worldbank.org/v2/country/CHN/indicator/FP.CPI.TOTL.ZG?format=json&date=2020%3A2025&per_page=100",
+      "dest": "data/raw/worldbank/CHN_FP_CPI_TOTL_ZG_2020-2025.json",
+      "bytes": 1444,
+      "sha256": "3b3f04b5075c6b968adfb723f75929617c2d3fc7097db80ebcda86f6d0b7607e",
+      "acquired_at_utc": "2026-10-10T08:13:53.785398+00:00",
+      "effective_period": "2020-2025 reference years",
+      "game_baseline": "2026-10-09",
+      "license_note": "World Bank open-data terms; source attribution required",
+      "indicator": "FP.CPI.TOTL.ZG",
+      "description": "annual consumer price inflation %",
+      "publication_as_of_2026_10_09": "UNVERIFIED_DO_NOT_BACKFILL"
+    },
+    {
+      "id": "wdi_CHN_NY.GDP.MKTP.CD",
+      "status": "INGESTED_VERIFIED_BYTES",
+      "url": "https://api.worldbank.org/v2/country/CHN/indicator/NY.GDP.MKTP.CD?format=json&date=2020%3A2025&per_page=100",
+      "dest": "data/raw/worldbank/CHN_NY_GDP_MKTP_CD_2020-2025.json",
+      "bytes": 1317,
+      "sha256": "50a91a43a625d4ca11aa8205967888849a392b5f1420e0309f2deff6ec7781d6",
+      "acquired_at_utc": "2026-10-10T08:13:52.650227+00:00",
+      "effective_period": "2020-2025 reference years",
+      "game_baseline": "2026-10-09",
+      "license_note": "World Bank open-data terms; source attribution required",
+      "indicator": "NY.GDP.MKTP.CD",
+      "description": "GDP current USD",
+      "publication_as_of_2026_10_09": "UNVERIFIED_DO_NOT_BACKFILL"
+    },
+    {
+      "id": "wdi_CHN_SL.UEM.TOTL.ZS",
+      "status": "INGESTED_VERIFIED_BYTES",
+      "url": "https://api.worldbank.org/v2/country/CHN/indicator/SL.UEM.TOTL.ZS?format=json&date=2020%3A2025&per_page=100",
+      "dest": "data/raw/worldbank/CHN_SL_UEM_TOTL_ZS_2020-2025.json",
+      "bytes": 1547,
+      "sha256": "076e91b54e2ba8177b5011ef7c0fc8dae3e5452d43bb66cd5c628f55f0ea89ed",
+      "acquired_at_utc": "2026-10-10T08:13:53.953610+00:00",
+      "effective_period": "2020-2025 reference years",
+      "game_baseline": "2026-10-09",
+      "license_note": "World Bank open-data terms; source attribution required",
+      "indicator": "SL.UEM.TOTL.ZS",
+      "description": "unemployment modeled ILO estimate %",
+      "publication_as_of_2026_10_09": "UNVERIFIED_DO_NOT_BACKFILL"
+    },
+    {
+      "id": "wdi_CHN_SP.POP.TOTL",
+      "status": "INGESTED_VERIFIED_BYTES",
+      "url": "https://api.worldbank.org/v2/country/CHN/indicator/SP.POP.TOTL?format=json&date=2020%3A2025&per_page=100",
+      "dest": "data/raw/worldbank/CHN_SP_POP_TOTL_2020-2025.json",
+      "bytes": 1267,
+      "sha256": "7f545a10dd8dc16b7812b3726c9bbb2d0ce0562e65240384b956cce54a7a83df",
+      "acquired_at_utc": "2026-10-10T08:13:52.541870+00:00",
+      "effective_period": "2020-2025 reference years",
+      "game_baseline": "2026-10-09",
+      "license_note": "World Bank open-data terms; source attribution required",
+      "indicator": "SP.POP.TOTL",
+      "description": "population",
+      "publication_as_of_2026_10_09": "UNVERIFIED_DO_NOT_BACKFILL"
+    }
+  ]
+}
