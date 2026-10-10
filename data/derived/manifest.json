@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "qianliwu_beijing_osm_local_graph_2026_10_01",
+  "status": "COMMITTED_WITH_SHA256",
+  "source": {
+    "id": "beijing_osm_2026_10_01",
+    "path": "data/raw/osm/beijing-2026-10-01.osm.pbf",
+    "bytes": 36823056,
+    "sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d"
+  },
+  "derived": {
+    "path": "artifacts/v16/osm_graph_sample.json",
+    "bytes": 308692,
+    "sha256": "2232370320a11d83c2017a58d5fc8859ae82793719b31893814d0c228784fd95"
+  },
+  "anchor": {
+    "name": "前礼务村",
+    "grade": "R_OSM_PLACE_NODE",
+    "node_id": "6410843713",
+    "lat": 40.1880155,
+    "lon": 116.7077492
+  },
+  "radius_m": 2800,
+  "nodes": 1244,
+  "edges": {
+    "walk": 2018,
+    "drive": 1905
+  },
+  "generator": "artifacts/v16/extract_v16.py",
+  "router": "artifacts/v16/network_v16.py",
+  "dependency": "osmium==4.3.1",
+  "reference_date": "2026-10-01",
+  "game_cutoff": "2026-10-09",
+  "license": "© OpenStreetMap contributors; ODbL 1.0; derived OSM database use subject to ODbL",
+  "limitations": [
+    "turn restrictions",
+    "barriers",
+    "time-conditional access",
+    "real traffic",
+    "traffic lights",
+    "legal confirmation",
+    "live ETA"
+  ],
+  "tests": {
+    "v14": 14,
+    "v15": 18,
+    "v16": 18,
+    "github_actions": "https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38038500429"
+  },
+  "official_history_written": 0
+}
