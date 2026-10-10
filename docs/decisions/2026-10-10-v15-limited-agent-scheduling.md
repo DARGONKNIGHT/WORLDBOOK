@@ -33,3 +33,9 @@ B. 在v14约束引擎上增加有限决策候选、信息先决、日程预约�
 - 正式冻结状态SHA256: 75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087，正式历史新增0。
 - v15归档SHA256: b0e9db309f740b46fdfcbadd731989601a9a5edaf94dc83b9427f1f5783130ce。
 - 以上只描述S级沙盒测试，不能解释为真实NPC职业与心理行为。
+
+## 已核实的GitHub验收
+
+- [GitHub Actions运行38037749491](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38037749491) 成功，v14原14项与v15新18项测试全部通过。
+- [提交c3f1a51](https://github.com/DARGONKNIGHT/WORLDBOOK/commit/c3f1a51c2bc33944b43a32f70462ce51b26679fd) 存入完整沙盒决策、事件日志和ZIP。决策18项：9个预排、9个拒绝/不作为；实际底层事件13条，零资金过账。
+- 正式世界的冻结文件保持不变；世界书不存在角色创建和时间推进。
