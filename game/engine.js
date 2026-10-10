@@ -112,9 +112,10 @@
   function dueEvents(s, until) {
     // A delivered message may generate a reply before 'until'.
     // Drain recursively in chronological order so no past-due event remains.
-    s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
     let processed=0;
-    while(s.queue.length && s.queue[0].at<=until){
+    while(s.queue.length){
+      s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
+      if(s.queue[0].at>until) break;
       assert(++processed<=2000,"单轮待办事件过多");
       const q=s.queue.shift();
       if(q.type==="deliver"){
