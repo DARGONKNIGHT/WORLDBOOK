@@ -3,7 +3,7 @@
 (() => {
   "use strict";
   const E=window.EarthGame;
-  const KEY="earth-realism-playable-v1";
+  const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -19,7 +19,7 @@
     catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);return raw?E.validateGame(JSON.parse(raw)):null;}
+    try{const raw=localStorage.getItem(KEY);return raw?E.upgradeGame(JSON.parse(raw)):null;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -64,18 +64,42 @@
     const to=$("message-to"),selected=to.value;
     to.innerHTML=p.contacts.length?p.contacts.map(id=>'<option value="'+escapeHTML(id)+'">'+escapeHTML(NPC(id).name)+'</option>').join(""):'<option value="">尚无可联系人物</option>';
     if(p.contacts.includes(selected))to.value=selected;
-    $("people-list").innerHTML=E.NPCS.map(n=>{
-      const known=p.contacts.includes(n.id);
-      return '<div class="person"><div><div class="person-id">'+escapeHTML(n.id)+' · '+escapeHTML(E.GROUPS[n.group])+'</div><strong>'+escapeHTML(n.name)+' <small style="display:inline">· '+n.age+'岁</small></strong><small>'+escapeHTML(n.occupation)+'</small></div><span class="'+(known?"known":"")+'">'+(known?"● 已认识":"○ 尚未认识")+'</span></div>';
-    }).join("");
-    $("inbox").innerHTML=state.messages.length?state.messages.slice().reverse().map(m=>'<article class="inbox-item"><time>'+escapeHTML(E.clock(m.at))+' · S级模拟回复</time><p>'+escapeHTML(m.content)+'</p></article>').join(""):'<p class="micro">还没有收到模拟消息。发送后需等待送达，对方可能不回复。</p>';
+    const metIds=[...new Set(p.met.map(m=>m.id))];
+    const knownIds=[...new Set([...p.contacts,...metIds])];
+    $("people-list").innerHTML=knownIds.length?knownIds.map(id=>{
+      const n=NPC(id),known=p.contacts.includes(id),m=p.met.filter(x=>x.id===id).at(-1);
+      return '<div class="person"><div><div class="person-id">'+escapeHTML(n.id)+' · S级相遇档案</div><strong>'+escapeHTML(n.name)+'</strong><small>'+escapeHTML(n.occupation)+'</small></div><span class="'+(known?"known":"")+'">'+(known?"● 可联系":"○ 曾交谈")+'</span></div>';
+    }).join(""):'<p class="micro">尚未与任何世界书人物实际交谈。其他人物依旧存在并自主行动，但你不能直接读取他们的身份档案。</p>';
+    const encounters=p.met.slice(-8).reverse();
+    $("encounter-list").innerHTML=encounters.length?encounters.map(m=>{
+      const n=NPC(m.id),isKnown=p.contacts.includes(m.id),declined=p.declined.some(x=>x.id===m.id&&x.at===m.at);
+      const nearby=state.time-m.at<=100*60000&&m.district===p.district;
+      return '<div class="encounter"><div><strong>'+escapeHTML(n.name)+'</strong><small>'+escapeHTML(E.clock(m.at))+' · '+escapeHTML(m.district)+'区</small></div>'+
+      (isKnown?'<span class="known">已互留联系方式</span>':declined?'<span>对方已拒绝，请勿纠缠</span>':nearby?'<button type="button" class="ghost ask-contact" data-contact="'+escapeHTML(m.id)+'">礼貌询问联系方式</button>':'<span>已离开相遇场景</span>')+'</div>';
+    }).join(""):'<p class="micro">前往公共场所不保证认识某个人。相遇后，是否交换联系方式仍由对方决定。</p>';
+    $("inbox").innerHTML=state.messages.length?state.messages.slice().reverse().map(m=>'<article class="inbox-item"><time>'+escapeHTML(E.clock(m.at))+' · S级模拟回复</time><p>'+escapeHTML(m.content)+'</p></article>').join(""):'<p class="micro">暂未收到回复。发送、送达和阅读是不同阶段，对方有权不回应。</p>';
     $("message-to").disabled=!p.contacts.length;
     $("message-text").disabled=!p.contacts.length;
     $("message-form").querySelector("button").disabled=!p.contacts.length;
   }
   function renderWorld(){
-    $("world-total").textContent=state.world.length;
-    $("world-list").innerHTML=logs(state.world.map(x=>({...x,kind:x.npcId+" · 后台"})),120);
+    const select=$("world-npc"),current=select.value;
+    if(!select.options.length){
+      select.innerHTML='<option value="all">全部31名人物</option>'+E.NPCS.map(n=>'<option value="'+escapeHTML(n.id)+'">'+escapeHTML(n.name)+' · '+escapeHTML(n.id)+'</option>').join("");
+    }else if(current)select.value=current;
+    $("autonomy-enabled").value=String(state.autonomy.enabled);
+    $("autonomy-detail").value=state.autonomy.detail;
+    const id=select.value;
+    const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
+    $("world-total").textContent=records.length;
+    $("world-list").innerHTML=logs(records.map(x=>({...x,kind:x.kind||"自主活动"})),150);
+    if(id==="all"){
+      $("npc-preview").textContent="选择具体人物查看这一时刻的S级候选事务、地点假设和决策原因。这是审计视角，主角不会自动得知。";
+      return;
+    }
+    const n=NPC(id),c=E.plan(state,id),latest=state.npc[id].lastActivity;
+    $("npc-preview").innerHTML='<strong>'+escapeHTML(n.name)+' · '+escapeHTML(c.kind)+'</strong><p>当前判断：'+escapeHTML(c.reason)+'；优先事务：'+escapeHTML(c.focus)+'。</p><p>假设所在地区：'+escapeHTML(c.location)+' · 状态评分：'+escapeHTML(c.score)+'（S级规则权重，不代表人的心理测量）</p>'+
+    '<p>最近结算：'+(latest?escapeHTML(E.clock(latest.at))+' · '+escapeHTML(latest.text):'尚无执行记录')+'</p>';
   }
   function renderArchive(){
     $("archive-player").textContent=state.player.name+"（"+state.player.age+"岁）";
@@ -85,7 +109,7 @@
   }
   function execute(kind,payload={}){
     if(!state)return;
-    try{E.act(state,kind,payload);save(true);render();toast("行动完成 · 时间已推进");}
+    try{E.act(state,kind,payload);save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");}
     catch(err){toast(err.message,true);}
   }
   function setup(){
@@ -115,6 +139,17 @@
       ev.preventDefault();
       execute("travel",{destination:$("travel-destination").value,minutes:$("travel-minutes").value,fare:$("travel-fare").value});
     });
+    $("encounter-list").addEventListener("click",ev=>{
+      const btn=ev.target.closest(".ask-contact");
+      if(btn)execute("request_contact",{recipient:btn.dataset.contact});
+    });
+    $("autonomy-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      execute("npc_autonomy",{enabled:$("autonomy-enabled").value==="true",detail:$("autonomy-detail").value});
+    });
+    $("world-npc").addEventListener("change",()=>renderWorld());
+    $("world-step-60").addEventListener("click",()=>execute("wait",{minutes:60}));
+    $("world-step-240").addEventListener("click",()=>execute("wait",{minutes:240}));
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
       execute("message",{recipient:$("message-to").value,text:$("message-text").value});
@@ -136,7 +171,7 @@
       const file=ev.target.files?.[0];if(!file)return;
       try{
         if(file.size>3*1024*1024)throw new Error("存档超过3MB，拒绝导入");
-        const candidate=E.validateGame(JSON.parse(await file.text()));
+        const candidate=E.upgradeGame(JSON.parse(await file.text()));
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
         state=candidate;save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
