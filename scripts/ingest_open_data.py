@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
-OSM_URL="https://download.geofabrik.de/asia/china/beijing-260924.osm.pbf"
+OSM_URL="https://download.geofabrik.de/asia/china/beijing-261001.osm.pbf"
 INDICATORS={
   "SP.POP.TOTL":"population",
   "NY.GDP.MKTP.CD":"GDP current USD",
@@ -49,13 +49,13 @@ def main():
     state=json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else {"schema_version":1,"datasets":[]}
     by_id={item["id"]:item for item in state["datasets"]}
     if args.osm:
-        p=ROOT/"data/raw/osm/beijing-2026-09-24.osm.pbf"
+        p=ROOT/"data/raw/osm/beijing-2026-10-01.osm.pbf"
         n,sha=download(OSM_URL,p,80*1024*1024)
         if n<10*1024*1024 or b"OSMHeader" not in p.read_bytes()[:4096]:
             raise ValueError("Invalid Beijing OSM PBF")
-        id="beijing_osm_2026_09_24"
+        id="beijing_osm_2026_10_01"
         by_id[id]=make_record(id,OSM_URL,p,n,sha,
-          "© OpenStreetMap contributors; ODbL 1.0; extract: Geofabrik GmbH","2026-09-24")
+          "© OpenStreetMap contributors; ODbL 1.0; extract: Geofabrik GmbH","2026-10-01")
     if args.wdi:
         for ind,description in INDICATORS.items():
             url=f"https://api.worldbank.org/v2/country/CHN/indicator/{ind}?format=json&date=2020%3A2025&per_page=100"
