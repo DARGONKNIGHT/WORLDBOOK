@@ -47,4 +47,27 @@ if derived_manifest.exists():
     assert sum(edge[2]=="drive" for edge in graph["edges"])==item["edges"]["drive"]
     assert not frozen["actual_game_events"],"Official game events unexpectedly modified"
     print("Verified OSM-derived graph geometry, counts, source lineage and SHA256")
+# v17-v26: the actual data bytes and node-count claims must match the registry.
+new_manifest=ROOT/"data/derived/manifest_v17_26.json"
+if new_manifest.exists():
+    cache=json.loads(new_manifest.read_text(encoding="utf-8"))
+    assert cache["source"]["sha256"]==next(x["sha256"] for x in docs if x["id"]==cache["source"]["id"])
+    assert cache["source"]["path"]==next(x["dest"] for x in docs if x["id"]==cache["source"]["id"])
+    assert cache["timetables"]=="U_NOT_INGESTED" and cache["hours_and_capacities"]=="U_NOT_INGESTED"
+    for category,rec in cache["outputs"].items():
+        target=ROOT/rec["path"]
+        assert target.is_file(),f"Missing OSM node snapshot {target}"
+        raw=target.read_bytes()
+        assert len(raw)==rec["bytes"] and hashlib.sha256(raw).hexdigest()==rec["sha256"]
+        data=json.loads(raw)
+        assert data["source_sha256"]==cache["source"]["sha256"]
+        assert data["source_date"]=="2026-10-01"
+        assert len(data["features"])==rec["count"],"OSM node feature count mismatch"
+        assert all(z["grade"]=="R_OSM_NODE_CROWDSOURCED" and z["opening_hours"]=="U" for z in data["features"])
+    proof=json.loads((ROOT/"artifacts/v17_26/simulation_summary.json").read_text(encoding="utf-8"))
+    assert proof["versions_completed"]==list(range(17,27))
+    assert proof["official_game_events_written"]==0 and not proof["comprehensive_real_life_simulation"]
+    official_bytes=(ROOT/"artifacts/v14/official_world_state_frozen_v13.json").read_bytes()
+    assert proof["official_sha256"]==hashlib.sha256(official_bytes).hexdigest()
+    print("Verified v17-v26 real OSM derived node bytes, manifest and frozen sandbox report")
 print("Frozen world and source-of-truth checks passed")
