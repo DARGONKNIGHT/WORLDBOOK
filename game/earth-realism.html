@@ -19,6 +19,24 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 @media(max-width:800px){.header{position:static;height:auto;min-height:75px;flex-wrap:wrap;padding:12px 16px}.brand{min-width:0}.header-mid{display:none}.header-actions{width:100%;justify-content:space-between}.layout{display:block}.sidebar{padding:15px;border-right:0;border-bottom:1px solid var(--border)}.sidebar-top{display:none}.nav{display:flex;margin:0;overflow:auto;gap:6px}.nav-btn{white-space:nowrap;font-size:11px;padding:9px}.nav-btn span{display:none}.rail-foot{display:none}.main{padding:20px 13px 38px}.status-row{grid-template-columns:repeat(2,1fr);margin-bottom:27px}.status-cell{padding:12px}.two-col{grid-template-columns:1fr}.actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.travel-form{grid-template-columns:1fr 1fr}.travel-form .primary{grid-column:1/-1}.people-list{grid-template-columns:1fr}.right-rail{padding:20px}.setup-inner{padding:21px}.setup-grid{grid-template-columns:1fr 1fr;gap:10px}.setup h1{font-size:28px}}
 @media(max-width:480px){.setup-grid{grid-template-columns:1fr}.action-card{min-height:166px;padding:13px}.status-cell strong{font-size:11px}.panel{padding:16px}.section-head span{display:none}.people-summary{display:block}.setup{max-height:95vh;overflow:auto}}
 
+
+/* NPC autonomy cockpit and consent-aware introductions */
+.autonomy-controls{margin:0 0 18px}
+.autonomy-form{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:12px}
+.autonomy-steps{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:20px}
+.autonomy-steps .ghost{padding:11px 14px}
+.autonomy-focus{border-top:1px solid var(--border);margin-top:20px;padding-top:18px}
+.autonomy-focus label{max-width:340px}
+.npc-preview{background:#0d1923;border:1px solid #324c4b;padding:15px;margin-top:12px;font-size:12px;color:#b8cbd0;line-height:1.9}
+.npc-preview strong{color:#d5e7d8}
+.npc-preview p{margin:7px 0}
+.encounter{display:flex;align-items:center;justify-content:space-between;gap:13px;padding:13px 0;border-bottom:1px solid var(--border);font-size:11px}
+.encounter strong{display:block;font-size:13px}
+.encounter small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.encounter .known{color:#a3ccb1}
+@media(max-width:800px){.autonomy-form{grid-template-columns:1fr 1fr}.autonomy-form .primary{grid-column:1/-1}}
+@media(max-width:480px){.autonomy-form{grid-template-columns:1fr}.autonomy-form .primary{grid-column:auto}.encounter{align-items:flex-start;flex-wrap:wrap}}
+
 </style>
 </head>
 <body>
@@ -44,7 +62,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>浏览器试玩层 v1.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>游戏行为层 v2.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -90,8 +108,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
         <section class="tab-panel" id="tab-people" hidden>
           <div class="eyebrow">NETWORK / INFORMATION BOUNDARIES</div><h1>每个人，<br><em>都有自己的生活。</em></h1>
-          <p class="lead">31人来自世界书的S级人物档案，并非真实居民。只有在这一条试玩分支中认识的人才能直接联系；你无法查看他们的私密想法。</p>
-          <div class="people-summary panel"><span>已认识 <strong id="contact-count">0</strong> / 31 人</span><span>消息只有送达后才进入对方的信息边界</span></div>
+          <p class="lead">31名人物都属于S级虚构档案，但主角不会天然认识他们。只有在同一地点、对方有空且愿意交流时，才可能建立关系；交谈不等于获得联系方式。</p>
+          <div class="people-summary panel"><span>可联系 <strong id="contact-count">0</strong> / 31 人</span><span>消息经历发送 → 送达 → 阅读 → 自主决定回应</span></div>
+          <section class="panel message-panel" id="encounter-panel"><div class="panel-head"><span>本次分支的相遇记录</span><span class="tag">非自动好友</span></div><div id="encounter-list"></div></section>
           <section id="people-list" class="people-list"></section>
           <section class="panel message-panel"><div class="panel-head"><span>给已认识的人发消息</span><span class="tag">模拟通信</span></div>
             <form id="message-form" class="message-form">
@@ -105,9 +124,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
         <section class="tab-panel" id="tab-world" hidden>
           <div class="eyebrow">WORLD / OUT-OF-CHARACTER</div><h1>主角看不见的，<br><em>世界仍在运转。</em></h1>
-          <p class="lead">以下为玩家视角之外的模拟审计信息。只有在玩家行动或等待推进时间时才计算，不能理解为这些人物的真实行踪，也不会自动成为角色的知识。</p>
+          <p class="lead">你可以控制自主模拟的启停和记录详细程度，但不能替NPC强迫决定。个人工作、家庭、休息和拒绝行动按时间优先级结算；这里是玩家外审计视图，不会自动进入角色认知。</p>
+          <section class="panel autonomy-controls"><div class="panel-head"><span>人物自主活动 · 控制台</span><span class="tag">S · 决策模拟</span></div>
+            <form id="autonomy-form" class="autonomy-form"><label>自动结算<select id="autonomy-enabled"><option value="true">开启 · 所有行动同步推进NPC</option><option value="false">暂停 · 不生成后续NPC活动</option></select></label><label>活动记录<select id="autonomy-detail"><option value="balanced">日常 · 只记录状态变更</option><option value="detailed">详细 · 每小时记录决定</option></select></label><button class="primary" type="submit">应用设置</button></form>
+            <div class="autonomy-steps"><button type="button" class="ghost" id="world-step-60">所有NPC自主运行 1 小时</button><button type="button" class="ghost" id="world-step-240">所有NPC自主运行 4 小时</button><span class="micro">会推进游戏时间；暂停时按钮只推进时间，不生成活动</span></div>
+            <div class="autonomy-focus"><label>观察单个人物（玩家外视角）<select id="world-npc"></select></label><div id="npc-preview" class="npc-preview"></div></div>
+          </section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
-            <div class="audit-top"><strong id="world-total">0</strong><span>已生成后台活动</span></div><div id="world-list" class="log-list"></div>
+            <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
           </section>
         </section>
 
@@ -121,7 +145,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
             <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
             <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
-            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a>
+            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
           </section>
           <div class="section-head"><h2>主角经历的事件</h2><span>不展示尚未公开的NPC内幕</span></div>
           <div id="full-log" class="log-list full-log"></div>
@@ -164,7 +188,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   else root.EarthGame = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = 1;
+  const VERSION = 2;
   const BASE_DAY = "2026-10-09";
   const HOUR = 3600000, MINUTE = 60000, DAY = 24 * HOUR, OFFSET = 8 * HOUR;
   const DISTRICTS = ["东城","西城","朝阳","海淀","丰台","石景山","门头沟","房山","通州","顺义","昌平","大兴","怀柔","平谷","密云","延庆"];
@@ -220,6 +244,91 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   function dayNumber(ms) { return Math.floor((ms+OFFSET)/DAY); }
   function localDay(ms) { return new Date(dayNumber(ms)*DAY).toISOString().slice(0,10); }
   function pseudorand(seed) { let x = (seed >>> 0) + 0x6D2B79F5; x = Math.imul(x ^ x>>>15,x|1); x ^= x + Math.imul(x ^ x>>>7,x|61); return ((x ^ x>>>14)>>>0)/4294967296; }
+
+  // Explicit S-grade scenario assumptions, never real NPC addresses or true schedules.
+  // F-family locality is a playable sandbox convention, not a claim about real residents.
+  const REGION = {
+    F01:"顺义",F02:"顺义",F03:"顺义",F04:"顺义",F05:"顺义",
+    E01:"顺义",E02:"昌平",E03:"海淀",E04:"海淀"
+  };
+  const DISTRICT_OVERRIDE = {P010:"外省（未知）",P012:"朝阳",P014:"顺义",P017:"顺义",P020:"昌平",P028:"海淀"};
+  const FOCUS = {
+    P001:"田间事务与家庭开支",P002:"小店营业与家中照顾",P003:"单位事务与家人联系",P004:"身体休息与家人来往",
+    P005:"设备维修排班与家务",P006:"工作账务与照料孩子",P007:"学校作息与监护安排",
+    P008:"物流排班与租住事务",P009:"服务业轮班与家庭",P010:"异地生活和亲属联系",
+    P011:"备课与同事协作",P012:"上班与私人生活",P013:"教学协作和婚姻家庭",
+    P014:"客户需求与维修合作",P015:"技术维修与工单安排",P016:"家庭日常与健康",
+    P017:"进货供货与信用关系",P018:"送货与路线时间",P019:"小店经营与库存",
+    P020:"班组进度与安全",P021:"人事材料与工作流程",P022:"质检记录与返工",P023:"货运排班与休息",
+    P024:"车队调度与时效",P025:"餐饮轮班与顾客",P026:"现场维修与安全",P027:"客户服务与私人生活",
+    P028:"教学准备与家庭",P029:"护理轮班与睡眠",P030:"退休生活与旧友",P031:"家庭照护与在职事务"
+  };
+  const SHIFT = new Set(["P009","P018","P023","P025","P029"]);
+  const RETIRED = new Set(["P004","P016","P030","P010"]);
+  const FAMILY = new Set(["P001","P002","P004","P005","P006","P007","P008","P009","P010","P013","P031"]);
+  const CIVIL = new Set(["P003","P006","P011","P012","P013","P021","P028"]);
+  const CHILDREN = new Set(["P007"]);
+  const APPROACH_TTL = 100 * MINUTE;
+  function districtFor(n){return DISTRICT_OVERRIDE[n.id] || REGION[n.group];}
+  function minuteOfDay(ms){return ((ms+OFFSET)%DAY+DAY)%DAY/MINUTE;}
+  function hourOf(ms){return Math.floor(minuteOfDay(ms)/60);}
+  function weekday(ms){return new Date(ms+OFFSET).getUTCDay();}
+  function stage(n,ms){
+    const h=hourOf(ms), weekend=[0,6].includes(weekday(ms));
+    if(CHILDREN.has(n.id))return {kind:h>=8&&h<16?"school":h>=21||h<7?"sleep":"family",reason:"未成年人有监护和学校约束"};
+    if(h<7||h>=23)return {kind:"sleep",reason:"夜间休息优先，不随时接待"};
+    if(RETIRED.has(n.id)){
+      if(h===9||h===16)return {kind:"errand",reason:"保留日间外出窗口，非每日必发生"};
+      return {kind:h>=18?"family":"personal",reason:"生活安排优先于陌生社交"};
+    }
+    if(SHIFT.has(n.id)){
+      if(h>=14&&h<22)return {kind:"work",reason:"假设性轮班，履行工作责任"};
+      if(h===11||h===12)return {kind:"errand",reason:"班前可能处理个人事务"};
+      return {kind:h<10?"rest":"personal",reason:"轮班休息与个人时间"};
+    }
+    if(n.id==="P002"||n.id==="P014"||n.id==="P017"||n.id==="P019"){
+      if(h>=9&&h<19 && !weekend)return {kind:"work",reason:"经营营业与既有客户责任"};
+      if(h>=9&&h<17)return {kind:"work",reason:"假设周末营业，但不等于真实开门"};
+      return {kind:"family",reason:"店务结束后有家庭和休息安排"};
+    }
+    if(h>=9&&h<12&&!weekend || h>=13&&h<18&&!weekend)return {kind:"work",reason:"假设工作日日间工作安排"};
+    if(h===12||h===18)return {kind:"errand",reason:"午间或傍晚可能处理生活事务"};
+    if(h>=19&&h<22 && FAMILY.has(n.id))return {kind:"family",reason:"家人和既有承诺优先"};
+    return {kind:"personal",reason:weekend?"非工作日个人计划":"下班后个人事务"};
+  }
+  const STAGE_TEXT={
+    work:"投入既有工作／营业安排",family:"处理家庭责任和既定约定",
+    errand:"考虑外出办事与日常采购",school:"按监护与学校作息安排活动",
+    sleep:"优先休息，不接受临时社交",rest:"恢复体力或处理轮班休息",
+    personal:"保留私人时间，不必参与公开活动"
+  };
+  function choice(s,n,at){
+    const base=stage(n,at),seed=dayNumber(at)*133+n.id.charCodeAt(3)*41+hourOf(at)*991;
+    // Chance of opting OUT of discretionary errands; no compulsory activity per NPC.
+    const skip=base.kind==="errand"&&pseudorand(seed)<0.35;
+    return {kind:skip?"personal":base.kind,reason:skip?"评估事务优先级后决定暂不外出":base.reason,
+      location:districtFor(n),focus:FOCUS[n.id],score:skip?0:base.kind==="work"?39:base.kind==="family"?31:base.kind==="sleep"?36:16,
+      optional:base.kind==="errand"};
+  }
+  function plan(s,id,at=s.time){
+    const n=NPCS.find(x=>x.id===id);assert(n,"未知人物");
+    return choice(s,n,at);
+  }
+  function upgradeGame(s){
+    assert(s&&typeof s==="object","存档无效");
+    if(s.schema===2)return validateGame(s);
+    assert(s.schema===1&&s.mode==="S_INDEPENDENT_PLAYTHROUGH","旧存档无法迁移");
+    // Preserve the historical v1 game record; do not retroactively rewrite outcomes.
+    s.schema=2;s.autonomy={enabled:true,detail:"balanced"};
+    s.player.met=[];s.player.declined=[];
+    for(const n of NPCS){
+      const prior=s.npc[n.id]||{};
+      s.npc[n.id]={...prior,stage:null,decisions:[],relation:s.player.contacts.includes(n.id)?2:0,
+        lastRead:null,responded:0,pending:[]};
+    }
+    return validateGame(s);
+  }
+
   function event(state, at, message, kind="scene", visible=true, grade="S") {
     state.sequence++;
     const item={id:state.sequence,at,kind,text:message,grade,visible};
@@ -245,9 +354,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     const state={
       schema:VERSION, mode:"S_INDEPENDENT_PLAYTHROUGH", started:true,
       time, sequence:0,
-      player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[]},
-      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[]}])),
-      queue:[], messages:[], journal:[], world:[], cycles:0
+      player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[],met:[],declined:[]},
+      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[],stage:null,decisions:[],relation:0,lastRead:null,responded:0,pending:[]}])),
+      queue:[], messages:[], journal:[], world:[], cycles:0, autonomy:{enabled:true,detail:"balanced"}
     };
     event(state,time,"你为这一条独立S级游戏分支创建了角色。正式世界书原始存档仍冻结；现有资料不足以宣称实时地球模拟。","system");
     event(state,time,"2026年10月9日，"+name+"从北京"+district+"区开始自己的第一天。你可以探索、安排事务、结识人物或前往其他区。","scene");
@@ -264,58 +373,110 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     assert(s.player.cash===null||(Number.isSafeInteger(s.player.cash)&&s.player.cash>=0),"资金字段无效");
     assert(Number.isInteger(s.player.energy)&&s.player.energy>=0&&s.player.energy<=100,"精力字段无效");
     assert(Array.isArray(s.player.contacts)&&s.player.contacts.every(id=>NPCS.some(n=>n.id===id)),"联系人列表无效");
+    assert(s.autonomy && typeof s.autonomy.enabled==="boolean" && ["balanced","detailed"].includes(s.autonomy.detail),"NPC自主选项无效");
+    assert(Array.isArray(s.player.met)&&Array.isArray(s.player.declined),"相遇状态无效");
+    assert(NPCS.every(n=>Number.isInteger(s.npc[n.id].relation)&&Array.isArray(s.npc[n.id].decisions)),"NPC关系/决策数据无效");
     assert(s.queue.every(q=>Number.isFinite(q.at)&&q.at>=s.time&&typeof q.type==="string"),"待办队列有过期或非法事件");
     return s;
   }
-  function dueEvents(s, until) {
-    // A delivered message may generate a reply before 'until'.
-    // Drain recursively in chronological order so no past-due event remains.
+  function npcRecord(s,n,at,c,reason,visible=false){
+    const state=s.npc[n.id];
+    const line={at,npcId:n.id,kind:c.kind,text:n.name+"："+
+      STAGE_TEXT[c.kind]+"；"+reason+"。",reason,score:c.score,location:c.location,grade:"S",visibility:"out_of_character"};
+    state.lastActivity=line;
+    state.stage={kind:c.kind,at,location:c.location};
+    state.decisions.push({at,kind:c.kind,reason,score:c.score});
+    if(state.decisions.length>96)state.decisions.shift();
+    s.world.push(line);if(s.world.length>4000)s.world.shift();
+    if(visible)event(s,at,"你注意到"+n.name+"在附近处理日常事务。","observation");
+  }
+  function autonomousWorld(s,start,end){
+    if(!s.autonomy.enabled)return;
+    // Tick at hour boundaries. Each NPC has a stable sample location, no teleportation.
+    for(let at=Math.floor(start/HOUR)*HOUR+HOUR;at<=end;at+=HOUR){
+      for(const n of NPCS){
+        const c=choice(s,n,at), prev=s.npc[n.id].stage;
+        if(!prev||prev.kind!==c.kind||s.autonomy.detail==="detailed")
+          npcRecord(s,n,at,c,c.reason);
+      }
+    }
+  }
+  function categorize(text){
+    if(/借钱|转账|贷款|周转|给我钱/.test(text))return "money";
+    if(/见面|约|一起吃|喝咖啡|拜访/.test(text))return "meet";
+    if(/工作|招聘|简历|入职|雇佣/.test(text))return "job";
+    if(/维修|报价|修理|订单|采购/.test(text))return "business";
+    if(/急|救命|危险|受伤/.test(text))return "urgent";
+    if(/你好|早上好|最近如何|在吗|谢谢/.test(text))return "greeting";
+    return "general";
+  }
+  function response(s,n,message,at){
+    const kind=categorize(message),c=choice(s,n,at),r=s.npc[n.id].relation;
+    // The answer reflects topic and prior relationship, not a random universal template.
+    if(kind==="money")return "涉及借款和转账，我不能凭一条消息就答应。你需要另想办法。";
+    if(kind==="meet")return c.kind==="work"||c.kind==="family"?
+      "我现在有"+(c.kind==="work"?"工作":"家里")+"的安排，今天不能临时约。先把时间和事情说清楚。":
+      r<2?"我们还不熟，我暂时不约单独见面。":"先把地点和具体时间说一下，我确认后再答复。";
+    if(kind==="job")return CIVIL.has(n.id)?
+      "工作上的事情要按正式流程来，我不能私下保证岗位。":
+      "我不掌握招聘决定权，最好核对岗位要求和公开渠道。";
+    if(kind==="business")return (n.id==="P014"||n.id==="P015")?
+      "维修需要先看故障、地址和时间，我目前不能直接承诺上门或报价。":
+      "你先说明事项和条件，我不能在不了解情况时确认交易。";
+    if(kind==="urgent")return "如果确有即时危险，请优先联系当地紧急服务；我不能保证现在赶到。";
+    if(kind==="greeting")return c.kind==="work"?
+      "刚看到消息，今天手头事务多，没法聊太久。":
+      r>=2?"我看到了。最近还在忙自己的事，你那边怎么样？":"你好。有什么具体事吗？";
+    return c.kind==="family"?
+      "家里现在有事。你的消息我看了，等事情明确后再回复。":
+      c.kind==="work"?"我手上正在处理"+FOCUS[n.id]+"。请把需要我回应的问题讲具体些。":
+      r<2?"这件事我还不清楚，不方便立刻表态。":"我得先确认信息，暂时不能答应。";
+  }
+  function nextAvailable(s,n,at){
+    // Delivery does not equal reading. Respect quiet hours, work and family duties.
+    let t=Math.ceil(at/(30*MINUTE))*30*MINUTE;
+    for(let i=0;i<72;i++,t+=30*MINUTE){
+      const c=choice(s,n,t),h=hourOf(t);
+      if(h>=8&&h<=22 && !["work","sleep","school"].includes(c.kind) && !(c.kind==="family"&&pseudorand(dayNumber(t)*89+n.id.charCodeAt(3))<0.5))return t;
+    }
+    return null;
+  }
+  function dueEvents(s,until){
     let processed=0;
     while(s.queue.length){
       s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
-      if(s.queue[0].at>until) break;
-      assert(++processed<=2000,"单轮待办事件过多");
-      const q=s.queue.shift();
+      if(s.queue[0].at>until)break;
+      assert(++processed<=2500,"单轮待办事件过多");
+      const q=s.queue.shift(),n=NPCS.find(x=>x.id===(q.to||q.from));
+      if(!n)continue;
+      const v=s.npc[n.id];
       if(q.type==="deliver"){
-        const n=NPCS.find(x=>x.id===q.to);
-        if(!n) continue;
-        s.npc[n.id].knowledge.push({at:q.at,topic:q.text,source:"player"});
-        event(s,q.at,"发送给"+n.name+"的消息已经送达，但不意味着对方同意任何请求。","message");
-        if(pseudorand(q.seed)>0.49){
-          const responseAt=q.at+(15+Math.floor(pseudorand(q.seed+17)*90))*MINUTE;
-          s.queue.push({type:"reply",at:responseAt,from:n.id,order:s.sequence+1});
+        v.knowledge.push({at:q.at,topic:q.text,source:"player"});
+        if(v.knowledge.length>160)v.knowledge.shift();
+        // No player-visible receipt unless the recipient actually reads the message.
+        const readAt=nextAvailable(s,n,q.at);
+        if(readAt!==null)s.queue.push({type:"read",at:readAt,to:n.id,text:q.text,order:s.sequence+1,seed:q.seed});
+      }else if(q.type==="read"){
+        v.lastRead=q.at;
+        event(s,q.at,n.name+"已读你之前发出的消息。","message");
+        const category=categorize(q.text);
+        const outcome=pseudorand(q.seed+v.responded*31+17);
+        // People may choose silence; repeated greetings need not yield replies.
+        const chance=category==="money"?0.85:category==="urgent"?0.85:category==="meet"?0.75:category==="greeting"?0.6:0.7;
+        if(outcome<chance){
+          v.responded++;
+          const replyAt=q.at+(10+Math.floor(pseudorand(q.seed+37)*26))*MINUTE;
+          s.queue.push({type:"reply",at:replyAt,from:n.id,content:response(s,n,q.text,q.at),order:s.sequence+1});
+        }else{
+          s.world.push({at:q.at,npcId:n.id,kind:"silence",text:n.name+"已读后没有回复；眼前责任或意愿优先。",reason:"可选择不回应",grade:"S",visibility:"out_of_character"});
         }
-      } else if(q.type==="reply"){
-        const n=NPCS.find(x=>x.id===q.from);
-        if(!n) continue;
-        const text=n.name+"：消息收到了。我还得处理自己的事情，具体情况之后再商量。";
-        s.messages.push({at:q.at,from:n.id,content:text,grade:"S"});
-        event(s,q.at,"你收到来自"+n.name+"的一条消息。","message");
+      }else if(q.type==="reply"){
+        s.messages.push({at:q.at,from:n.id,content:n.name+"："+q.content,grade:"S"});
+        event(s,q.at,"你收到"+n.name+"的一条回复。","message");
       }
     }
     s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
-  }
-  function autonomousWorld(s, start, end) {
-    const from=dayNumber(start), to=dayNumber(end);
-    for(let day=from;day<=to;day++){
-      for(let i=0;i<NPCS.length;i++){
-        const n=NPCS[i], fraction=pseudorand(day*131+i*104729);
-        const hour=7+Math.floor(fraction*11);
-        const minute=Math.floor(pseudorand(day*79+i*4391)*60);
-        const at=day*DAY-OFFSET+hour*HOUR+minute*MINUTE;
-        if(at<=start||at>end) continue;
-        const possibilities=[
-          "围绕既有职业与责任整理一项待办（具体结果未知）",
-          "为家庭或个人生活安排一段时间（具体细节未知）",
-          "因既有约定调整计划（内容不自动公开）",
-          "判断眼前事务尚无足够信息，暂不作出决定"
-        ];
-        const text=n.name+"："+possibilities[Math.floor(pseudorand(i+day*97)*possibilities.length)];
-        s.npc[n.id].lastActivity={at,text,grade:"S"};
-        s.world.push({at,npcId:n.id,text,grade:"S",visibility:"out_of_character"});
-      }
-    }
-    if(s.world.length>1500) s.world=s.world.slice(-1500);
+    if(s.world.length>4000)s.world=s.world.slice(-4000);
   }
   function advance(s, minutes) {
     assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=480,"每次推进必须为1至480分钟");
@@ -367,15 +528,44 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     }else if(kind==="social"){
       assert(p.energy>=9,"精力不足，请先休息");
       advance(s,45);p.energy-=9;
-      const unknown=NPCS.filter(n=>!p.contacts.includes(n.id));
-      if(!unknown.length){event(s,s.time,"你参加了一场S级公共活动。31名档案角色都已成为你的可联系对象。","scene");}
-      else{
-        const index=Math.floor(pseudorand(s.sequence*9137+dayNumber(s.time))*unknown.length);
-        const n=unknown[index];
-        p.contacts.push(n.id);
-        p.knowledge.push({at:s.time,npc:n.id,topic:"在模拟公共活动中认识",grade:"S"});
-        event(s,s.time,"模拟场景：你在"+p.district+"区的公共活动中认识"+n.name+"（"+n.occupation+"）。这次偶遇是新生成的S级情节，不能据此推断其现实住址或当日行踪。","contact");
+      const eligible=NPCS.filter(n=>n.age>=18&&districtFor(n)===p.district
+          &&choice(s,n,s.time).kind==="errand"
+          &&!p.contacts.includes(n.id)
+          &&!p.met.some(m=>m.id===n.id&&m.at>at-2*HOUR));
+      const chance=pseudorand(s.sequence*9137+dayNumber(s.time)*37+hourOf(s.time)*79);
+      if(!eligible.length||chance<0.3){
+        event(s,s.time,"你在附近进行了一次正常的公共活动。路人有自己的安排，没有发生值得建立联系的交谈。","social");
+      }else{
+        const n=eligible[Math.floor(pseudorand(s.sequence*2381+hourOf(s.time))*eligible.length)];
+        p.met.push({id:n.id,at:s.time,district:p.district});
+        if(p.met.length>80)p.met.shift();
+        event(s,s.time,"你在"+p.district+"区的S级公共场景里与"+n.name+"有过简短交谈。对方没有主动留下联系方式，你可以选择礼貌询问，也可以就此结束。","social");
       }
+    }else if(kind==="request_contact"){
+      const id=validText(payload.recipient,8);
+      const n=NPCS.find(x=>x.id===id), met=p.met.filter(m=>m.id===id).at(-1);
+      assert(n&&met,"你们尚未实际见过面");
+      assert(!p.contacts.includes(id),"已经有联系方式");
+      assert(!p.declined.some(x=>x.id===id&&x.at>=met.at),"同一次相遇已被拒绝，请尊重对方决定");
+      assert(met.district===p.district&&s.time-met.at<=APPROACH_TTL,"已离开相遇场景，不能远程索取联系方式");
+      assert(p.energy>=2,"精力不足");
+      advance(s,5);p.energy-=2;
+      const c=choice(s,n,s.time),r=s.npc[id].relation,seed=s.sequence*917+id.charCodeAt(3)+dayNumber(s.time);
+      const consents=pseudorand(seed)>0.5 && !["work","sleep","family"].includes(c.kind);
+      if(consents){
+        p.contacts.push(id);s.npc[id].relation=Math.max(1,r);
+        event(s,s.time,n.name+"考虑后同意互留联系方式。双方只是初识，没有其他承诺。","contact");
+      }else{
+        p.declined.push({id,at:met.at});
+        event(s,s.time,n.name+"没有同意交换联系方式。你没有继续纠缠；对方仍按原计划离开。","social");
+      }
+    }else if(kind==="npc_autonomy"){
+      // Choice changes the simulator, not the person's own will or player knowledge.
+      if(payload.enabled!==undefined)assert(typeof payload.enabled==="boolean","自动结算开关无效");
+      const detail=payload.detail||s.autonomy.detail;
+      assert(["balanced","detailed"].includes(detail),"请选择正确的自主活动详细程度");
+      s.autonomy={enabled:payload.enabled===undefined?s.autonomy.enabled:payload.enabled,detail};
+      event(s,s.time,"【模拟器设置】人物自主活动"+(s.autonomy.enabled?"已启用":"已暂停")+"；观察精度："+(detail==="detailed"?"逐时记录":"只记状态变更")+"。设置不推进游戏时间。","system");
     }else if(kind==="message"){
       const to=validText(payload.recipient,8), text=validText(payload.text,200);
       assert(p.contacts.includes(to),"主角尚未建立该联系人关系");
@@ -383,7 +573,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       assert(p.energy>=1,"精力不足");
       advance(s,5);p.energy-=1;
       const n=NPCS.find(x=>x.id===to);
-      const delay=10+Math.floor(pseudorand(s.sequence*83+to.length)*35);
+      const delay=1+Math.floor(pseudorand(s.sequence*83+to.length)*12);
       s.queue.push({type:"deliver",at:s.time+delay*MINUTE,to,text,order:s.sequence+1,seed:s.sequence*83+to.charCodeAt(1)});
       event(s,s.time,"你向"+n.name+"发出：“"+text+"”。已发出但尚未送达，对方尚未知情。","message");
     }else{
@@ -402,7 +592,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     };
   }
   return Object.freeze({VERSION,BASE_DAY,DISTRICTS,GROUPS,NPCS,AREAS,clock,
-    makeGame,validateGame,act,summary,dayNumber,localDay});
+    makeGame,validateGame,act,summary,dayNumber,localDay,plan,upgradeGame,districtFor});
 });
 
 </script>
@@ -412,7 +602,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 (() => {
   "use strict";
   const E=window.EarthGame;
-  const KEY="earth-realism-playable-v1";
+  const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -428,7 +618,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);return raw?E.validateGame(JSON.parse(raw)):null;}
+    try{const raw=localStorage.getItem(KEY);return raw?E.upgradeGame(JSON.parse(raw)):null;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -473,18 +663,42 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     const to=$("message-to"),selected=to.value;
     to.innerHTML=p.contacts.length?p.contacts.map(id=>'<option value="'+escapeHTML(id)+'">'+escapeHTML(NPC(id).name)+'</option>').join(""):'<option value="">尚无可联系人物</option>';
     if(p.contacts.includes(selected))to.value=selected;
-    $("people-list").innerHTML=E.NPCS.map(n=>{
-      const known=p.contacts.includes(n.id);
-      return '<div class="person"><div><div class="person-id">'+escapeHTML(n.id)+' · '+escapeHTML(E.GROUPS[n.group])+'</div><strong>'+escapeHTML(n.name)+' <small style="display:inline">· '+n.age+'岁</small></strong><small>'+escapeHTML(n.occupation)+'</small></div><span class="'+(known?"known":"")+'">'+(known?"● 已认识":"○ 尚未认识")+'</span></div>';
-    }).join("");
-    $("inbox").innerHTML=state.messages.length?state.messages.slice().reverse().map(m=>'<article class="inbox-item"><time>'+escapeHTML(E.clock(m.at))+' · S级模拟回复</time><p>'+escapeHTML(m.content)+'</p></article>').join(""):'<p class="micro">还没有收到模拟消息。发送后需等待送达，对方可能不回复。</p>';
+    const metIds=[...new Set(p.met.map(m=>m.id))];
+    const knownIds=[...new Set([...p.contacts,...metIds])];
+    $("people-list").innerHTML=knownIds.length?knownIds.map(id=>{
+      const n=NPC(id),known=p.contacts.includes(id),m=p.met.filter(x=>x.id===id).at(-1);
+      return '<div class="person"><div><div class="person-id">'+escapeHTML(n.id)+' · S级相遇档案</div><strong>'+escapeHTML(n.name)+'</strong><small>'+escapeHTML(n.occupation)+'</small></div><span class="'+(known?"known":"")+'">'+(known?"● 可联系":"○ 曾交谈")+'</span></div>';
+    }).join(""):'<p class="micro">尚未与任何世界书人物实际交谈。其他人物依旧存在并自主行动，但你不能直接读取他们的身份档案。</p>';
+    const encounters=p.met.slice(-8).reverse();
+    $("encounter-list").innerHTML=encounters.length?encounters.map(m=>{
+      const n=NPC(m.id),isKnown=p.contacts.includes(m.id),declined=p.declined.some(x=>x.id===m.id&&x.at===m.at);
+      const nearby=state.time-m.at<=100*60000&&m.district===p.district;
+      return '<div class="encounter"><div><strong>'+escapeHTML(n.name)+'</strong><small>'+escapeHTML(E.clock(m.at))+' · '+escapeHTML(m.district)+'区</small></div>'+
+      (isKnown?'<span class="known">已互留联系方式</span>':declined?'<span>对方已拒绝，请勿纠缠</span>':nearby?'<button type="button" class="ghost ask-contact" data-contact="'+escapeHTML(m.id)+'">礼貌询问联系方式</button>':'<span>已离开相遇场景</span>')+'</div>';
+    }).join(""):'<p class="micro">前往公共场所不保证认识某个人。相遇后，是否交换联系方式仍由对方决定。</p>';
+    $("inbox").innerHTML=state.messages.length?state.messages.slice().reverse().map(m=>'<article class="inbox-item"><time>'+escapeHTML(E.clock(m.at))+' · S级模拟回复</time><p>'+escapeHTML(m.content)+'</p></article>').join(""):'<p class="micro">暂未收到回复。发送、送达和阅读是不同阶段，对方有权不回应。</p>';
     $("message-to").disabled=!p.contacts.length;
     $("message-text").disabled=!p.contacts.length;
     $("message-form").querySelector("button").disabled=!p.contacts.length;
   }
   function renderWorld(){
-    $("world-total").textContent=state.world.length;
-    $("world-list").innerHTML=logs(state.world.map(x=>({...x,kind:x.npcId+" · 后台"})),120);
+    const select=$("world-npc"),current=select.value;
+    if(!select.options.length){
+      select.innerHTML='<option value="all">全部31名人物</option>'+E.NPCS.map(n=>'<option value="'+escapeHTML(n.id)+'">'+escapeHTML(n.name)+' · '+escapeHTML(n.id)+'</option>').join("");
+    }else if(current)select.value=current;
+    $("autonomy-enabled").value=String(state.autonomy.enabled);
+    $("autonomy-detail").value=state.autonomy.detail;
+    const id=select.value;
+    const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
+    $("world-total").textContent=records.length;
+    $("world-list").innerHTML=logs(records.map(x=>({...x,kind:x.kind||"自主活动"})),150);
+    if(id==="all"){
+      $("npc-preview").textContent="选择具体人物查看这一时刻的S级候选事务、地点假设和决策原因。这是审计视角，主角不会自动得知。";
+      return;
+    }
+    const n=NPC(id),c=E.plan(state,id),latest=state.npc[id].lastActivity;
+    $("npc-preview").innerHTML='<strong>'+escapeHTML(n.name)+' · '+escapeHTML(c.kind)+'</strong><p>当前判断：'+escapeHTML(c.reason)+'；优先事务：'+escapeHTML(c.focus)+'。</p><p>假设所在地区：'+escapeHTML(c.location)+' · 状态评分：'+escapeHTML(c.score)+'（S级规则权重，不代表人的心理测量）</p>'+
+    '<p>最近结算：'+(latest?escapeHTML(E.clock(latest.at))+' · '+escapeHTML(latest.text):'尚无执行记录')+'</p>';
   }
   function renderArchive(){
     $("archive-player").textContent=state.player.name+"（"+state.player.age+"岁）";
@@ -494,7 +708,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   }
   function execute(kind,payload={}){
     if(!state)return;
-    try{E.act(state,kind,payload);save(true);render();toast("行动完成 · 时间已推进");}
+    try{E.act(state,kind,payload);save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");}
     catch(err){toast(err.message,true);}
   }
   function setup(){
@@ -524,6 +738,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       ev.preventDefault();
       execute("travel",{destination:$("travel-destination").value,minutes:$("travel-minutes").value,fare:$("travel-fare").value});
     });
+    $("encounter-list").addEventListener("click",ev=>{
+      const btn=ev.target.closest(".ask-contact");
+      if(btn)execute("request_contact",{recipient:btn.dataset.contact});
+    });
+    $("autonomy-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      execute("npc_autonomy",{enabled:$("autonomy-enabled").value==="true",detail:$("autonomy-detail").value});
+    });
+    $("world-npc").addEventListener("change",()=>renderWorld());
+    $("world-step-60").addEventListener("click",()=>execute("wait",{minutes:60}));
+    $("world-step-240").addEventListener("click",()=>execute("wait",{minutes:240}));
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
       execute("message",{recipient:$("message-to").value,text:$("message-text").value});
@@ -545,7 +770,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       const file=ev.target.files?.[0];if(!file)return;
       try{
         if(file.size>3*1024*1024)throw new Error("存档超过3MB，拒绝导入");
-        const candidate=E.validateGame(JSON.parse(await file.text()));
+        const candidate=E.upgradeGame(JSON.parse(await file.text()));
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
         state=candidate;save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
