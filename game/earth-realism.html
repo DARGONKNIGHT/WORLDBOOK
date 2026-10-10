@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c141d">
+  <title>地球：现实人生 · 可游玩版</title>
+  <style>
+:root{color-scheme:dark;--bg:#0b131c;--panel:#111c27;--panel2:#142332;--border:#263644;--ink:#e9f2f4;--muted:#93a4af;--accent:#bdd3be;--warm:#e5d8ae;--line:#263642}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft Yahei",system-ui,sans-serif;font-size:14px;line-height:1.6}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}a{color:inherit;text-decoration:none}a:hover{color:var(--accent)}[hidden]{display:none!important}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.header{height:76px;display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--border);padding:0 30px;background:#0b141d;position:sticky;top:0;z-index:10}.brand{display:flex;align-items:center;gap:13px;min-width:244px}.brand-sign{display:grid;place-items:center;width:41px;height:41px;font-size:30px;font-family:Georgia,serif;line-height:1;border:1px solid #738a88;color:#b8c7ba;position:relative}.tiny-star{font-size:10px;position:absolute;right:-5px;top:-5px;background:var(--bg);padding:2px}.brand strong{display:block;font-size:16px;letter-spacing:.1em;font-weight:600}.brand small{display:block;font-size:8px;letter-spacing:.2em;color:var(--muted)}.header-mid{font-size:11px;color:#96aca7;letter-spacing:.08em}.dot,.sim-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#90c69d;margin-right:7px;box-shadow:0 0 10px #83c79780}.header-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}.ghost{background:transparent;color:#b0c4c4;border:1px solid #364650;padding:8px 10px;border-radius:4px;font-size:12px}.ghost:hover{background:#1a2c35}.ghost.danger{color:#d2a7a2}
+.layout{display:grid;grid-template-columns:224px minmax(520px,1fr) 254px;max-width:1700px;margin:0 auto;min-height:calc(100vh - 76px)}.sidebar{border-right:1px solid var(--border);padding:35px 23px;display:flex;flex-direction:column;background:#0d1822}.sidebar-top{text-align:center;border-bottom:1px solid var(--border);padding:10px 0 24px}.rail-label,.eyebrow{font-size:10px;letter-spacing:.2em;color:#93b1a5;font-weight:700}.avatar{height:66px;width:66px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(150deg,#355850,#1b3537);border:1px solid #53776f;margin:22px auto 12px;font-size:28px;font-family:Georgia,serif}.sidebar h2{font-size:19px;margin:0}.sidebar p{color:var(--muted);font-size:11px;margin:6px 0 0}.nav{margin-top:27px;display:grid;gap:7px}.nav-btn{border:0;background:none;color:#99adb5;text-align:left;padding:12px 15px;border-radius:5px;display:flex;gap:13px;align-items:center;font-weight:500}.nav-btn span{font-family:Georgia,serif;font-size:21px;font-weight:400;width:19px;text-align:center}.nav-btn:hover{color:var(--ink);background:#1b2b35}.nav-btn.active{color:#d6e6d9;background:#20352f;border-left:2px solid #aecbb8}.rail-foot{margin-top:auto;padding-top:30px;font-size:11px;color:#8a9ca7}.rail-foot strong,.rail-foot span{display:block;margin-top:7px}.rail-foot strong{color:#e1ebea;letter-spacing:.05em;font-size:13px}
+.main{padding:34px 42px 80px;min-width:0}.status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#263642;border:1px solid var(--border);margin-bottom:45px}.status-cell{display:flex;align-items:center;background:#111d28;padding:17px 12px;gap:10px;min-width:0}.status-icon{font-family:Georgia,serif;color:#9abaad;font-size:23px}.status-cell small{display:block;color:var(--muted);font-size:10px;white-space:nowrap}.status-cell strong{display:block;font-size:13px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.eyebrow{margin-bottom:14px}.tab-panel h1{font-size:clamp(30px,3.2vw,49px);font-weight:600;line-height:1.33;letter-spacing:.02em;margin:0 0 14px}.tab-panel h1 em,.setup h1 em{font-family:Georgia,serif;font-style:normal;color:#afc8bb;font-weight:400}.lead{color:#9baeb8;font-size:13px;max-width:650px;line-height:1.95;margin:0 0 29px}.two-col{display:grid;grid-template-columns:1.15fr 1fr;gap:15px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:22px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#aec5c7;font-size:11px;font-weight:600;letter-spacing:.08em;margin-bottom:21px}.tag{color:#8cad9d;border:1px solid #35534a;padding:3px 7px;font-size:9px;border-radius:2px;letter-spacing:.04em;white-space:nowrap}.scene-panel h2{font-size:21px;margin:0 0 14px}.scene-panel p{color:#b7c7cd;line-height:2;font-size:13px;margin:0}.line{height:1px;background:var(--border);margin:22px 0 14px}.hint{display:flex;gap:10px;color:#899ba6;font-size:11px;line-height:1.8}.hint span{font-size:18px}.map-panel{overflow:hidden}.map-graphic{height:190px;background:radial-gradient(ellipse at 50% 60%,#203d42 0,#152c38 55%,#142430 90%);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #294551}.map-graphic:before,.map-graphic:after{content:"";position:absolute;inset:0;background-image:linear-gradient(#8faeac14 1px,transparent 1px),linear-gradient(90deg,#8faeac14 1px,transparent 1px);background-size:26px 26px}.ring{border:1px solid #7da19548;position:absolute;width:145px;height:145px;transform:rotate(25deg);border-radius:30% 55% 50% 40%}.ring-two{width:225px;height:220px;transform:rotate(-32deg);border-style:dashed;border-radius:40%}.crosshair{position:absolute;font-size:26px;color:#618b7e;top:13px;left:16px}.map-label{position:absolute;font-size:10px;letter-spacing:.18em;color:#94b6ac}.map-label-one{top:20px;right:18px}.map-label-two{bottom:17px;left:18px;font-size:13px;color:#dce9dc}.map-pin{color:#d4eccf;font-size:49px;z-index:1;text-shadow:0 0 22px #8cd9b6}.micro{font-size:11px;line-height:1.85;color:#7f98a3;margin:15px 0 0}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:34px 0 14px}.section-head h2{font-size:17px;margin:0;font-weight:600}.section-head span{color:#748c98;font-size:10px}.actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.action-card{background:var(--panel);border:1px solid var(--border);color:var(--ink);text-align:left;padding:17px 16px;min-height:164px;border-radius:5px;transition:background .16s,border .16s,transform .16s;display:flex;flex-direction:column}.action-card:hover{background:#1a3040;border-color:#7b9a8c;transform:translateY(-2px)}.action-glyph{color:#b8d3c3;font-size:28px;font-family:Georgia,serif;height:35px}.action-card strong{font-size:14px;font-weight:600;margin-bottom:6px}.action-card small{font-size:11px;color:#8fa6b0;line-height:1.6}.action-time{display:flex;align-items:center;justify-content:space-between;margin-top:auto;border-top:1px solid #2b3947;padding-top:12px;font-size:10px;color:#9bb9ad}.action-time b{font-size:18px;font-weight:400}.travel-panel,.message-panel{margin-top:20px}.panel-desc{font-size:12px;color:#9babb5}.travel-form{display:grid;grid-template-columns:1.2fr .9fr 1fr auto;align-items:end;gap:11px;margin-top:14px}label{font-size:11px;color:#b1c3c7;display:grid;gap:7px}input,select,textarea{width:100%;background:#0e1b26;color:#e9f2f4;border:1px solid #344956;border-radius:4px;padding:10px;outline:none;min-width:0}textarea{resize:vertical}input:focus,select:focus,textarea:focus{border-color:#a1c4ab}.primary{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#bcd3be;color:#112521;border:0;border-radius:4px;font-weight:700;font-size:12px;padding:12px 15px;min-height:43px}.primary:hover{background:#d5e7d3}.primary span{font-size:17px}
+.right-rail{padding:39px 21px;background:#0d1822;border-left:1px solid var(--border)}.right-rail h3{font-size:17px;font-weight:600;margin:10px 0 22px}.recent-log{border-left:1px solid #3a5752;padding-left:15px;display:grid;gap:22px}.log-item{position:relative}.recent-log .log-item:before{content:"";width:7px;height:7px;border-radius:50%;background:#aecdb7;position:absolute;left:-19px;top:8px;border:2px solid #13232e}.log-item time{color:#8299a4;font-size:10px;display:block}.log-item p{font-size:12px;margin:7px 0 0;color:#d0dddd;line-height:1.8;overflow-wrap:anywhere}.log-item .log-kind{color:#afc9bc;font-size:10px}.right-note{margin-top:38px;padding:19px;background:#162734;border:1px solid #2c4450}.right-note strong{font-size:12px}.right-note p{font-size:11px;color:#9bb0b4;line-height:2}.right-note b{color:#e3d8ad;font-size:12px;padding-right:5px}
+.people-summary{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:15px;font-size:12px;color:#96aeb4}.people-summary strong{color:#ddebe3;font-size:19px}.people-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.person{border:1px solid var(--border);padding:16px;background:#111e29;display:flex;justify-content:space-between;gap:12px;align-items:start}.person strong{display:block;font-size:14px}.person small{display:block;font-size:11px;color:#8a9dab;margin-top:3px}.person span{font-size:10px;letter-spacing:.04em;white-space:nowrap;color:#98a5ad}.person .known{color:#a3ccb1}.person .person-id{color:#6f8694;font-size:9px}.message-form{display:grid;gap:13px}.message-panel h3{font-size:15px;font-weight:600;margin:26px 0 8px}.inbox{display:grid;gap:8px}.inbox-item{padding:11px 14px;border:1px solid #345047;background:#173027;font-size:12px}.inbox-item time{display:block;color:#91b4a0;font-size:10px}.inbox-item p{margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}.audit-top{display:flex;gap:15px;align-items:center;margin-bottom:15px;color:#8ea4ae}.audit-top strong{font-size:40px;color:#d7eadb;font-family:Georgia,serif}.log-list{display:grid;gap:10px}.audit-panel .log-list{max-height:480px;overflow:auto}.log-line{padding:13px;border:1px solid var(--border);background:#0e1b26}.log-line .meta{font-size:10px;color:#8aac9e;margin-bottom:4px}.log-line p{font-size:12px;line-height:1.7;color:#c7d7dd;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.archive-line{padding:13px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:20px;font-size:12px}.archive-line span{color:#879da8}.archive-line strong{text-align:right;font-weight:500;overflow-wrap:anywhere}.repo-link{display:inline-block;margin-top:22px;color:#b6d7c3;font-size:12px;border-bottom:1px solid #7a9a86}.full-log{max-height:560px;overflow:auto}
+.setup{border:1px solid #4b665f;padding:0;color:var(--ink);background:#12202b;max-width:720px;width:calc(100% - 30px);border-radius:9px;box-shadow:0 25px 100px #000a}.setup::backdrop{background:#030a0deb;backdrop-filter:blur(5px)}.setup-inner{padding:34px 38px}.setup h1{font-size:35px;font-weight:600;margin:12px 0 14px;line-height:1.45}.setup .lead{margin-bottom:22px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.goal-label{margin-top:16px}.start-button{width:100%;margin-top:22px}.error{color:#efa9a5;font-size:12px;min-height:12px}.toast{position:fixed;bottom:24px;right:25px;z-index:40;padding:12px 17px;border:1px solid #5d806e;background:#203d31;color:#e3f1e7;border-radius:5px;box-shadow:0 12px 30px #0007;opacity:0;pointer-events:none;transition:opacity .2s}.toast.show{opacity:1}
+@media(max-width:1280px){.layout{grid-template-columns:185px minmax(460px,1fr)}.right-rail{grid-column:2;border-left:0;border-top:1px solid var(--border)}.recent-log{grid-template-columns:repeat(3,1fr);display:grid;border-left:0;gap:12px;padding-left:0}.recent-log .log-item{border-left:1px solid #46645b;padding-left:12px}.recent-log .log-item:before{left:-5px}.main{padding:30px 28px 50px}.sidebar{padding:30px 15px}}
+@media(max-width:800px){.header{position:static;height:auto;min-height:75px;flex-wrap:wrap;padding:12px 16px}.brand{min-width:0}.header-mid{display:none}.header-actions{width:100%;justify-content:space-between}.layout{display:block}.sidebar{padding:15px;border-right:0;border-bottom:1px solid var(--border)}.sidebar-top{display:none}.nav{display:flex;margin:0;overflow:auto;gap:6px}.nav-btn{white-space:nowrap;font-size:11px;padding:9px}.nav-btn span{display:none}.rail-foot{display:none}.main{padding:20px 13px 38px}.status-row{grid-template-columns:repeat(2,1fr);margin-bottom:27px}.status-cell{padding:12px}.two-col{grid-template-columns:1fr}.actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.travel-form{grid-template-columns:1fr 1fr}.travel-form .primary{grid-column:1/-1}.people-list{grid-template-columns:1fr}.right-rail{padding:20px}.setup-inner{padding:21px}.setup-grid{grid-template-columns:1fr 1fr;gap:10px}.setup h1{font-size:28px}}
+@media(max-width:480px){.setup-grid{grid-template-columns:1fr}.action-card{min-height:166px;padding:13px}.status-cell strong{font-size:11px}.panel{padding:16px}.section-head span{display:none}.people-summary{display:block}.setup{max-height:95vh;overflow:auto}}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <a class="brand" href="./index.html" aria-label="地球：现实人生"><span class="brand-sign">E<span class="tiny-star">✦</span></span><span><strong>地球：现实人生</strong><small>EARTH · A LIFE SIMULATION</small></span></a>
+      <div class="header-mid"><span class="dot"></span> 离线单机 · S级独立分支 · 2026.10.09基准</div>
+      <div class="header-actions">
+        <button type="button" id="btn-save" class="ghost">存档</button>
+        <button type="button" id="btn-export" class="ghost">导出</button>
+        <button type="button" id="btn-import" class="ghost">导入</button>
+        <button type="button" id="btn-reset" class="ghost danger">新游戏</button>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+      </div>
+    </header>
+    <div class="layout" id="play-layout" hidden>
+      <aside class="sidebar">
+        <div class="sidebar-top"><div class="rail-label">PLAYER PROFILE</div><div class="avatar" id="avatar">人</div>
+          <h2 id="player-name">未创建</h2><p id="player-job">职业未知</p></div>
+        <nav class="nav" aria-label="游戏视图">
+          <button class="nav-btn active" data-tab="life"><span>◈</span> 我的生活</button>
+          <button class="nav-btn" data-tab="people"><span>♧</span> 人物与联系</button>
+          <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
+          <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
+        </nav>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>浏览器试玩层 v1.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+      </aside>
+      <main class="main" id="main">
+        <section class="status-row">
+          <div class="status-cell"><span class="status-icon">◷</span><div><small>游戏时间 · 北京</small><strong id="stat-time"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">⌖</span><div><small>当前所在区</small><strong id="stat-district"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">¥</span><div><small>现金记录 · S</small><strong id="stat-cash"></strong></div></div>
+          <div class="status-cell"><span class="status-icon">↗</span><div><small>精力 · 游戏值</small><strong id="stat-energy"></strong></div></div>
+        </section>
+
+        <section class="tab-panel" id="tab-life">
+          <div class="eyebrow">CHAPTER 01 / EVERYDAY LIFE</div>
+          <h1>每一次选择，<br><em>都会花费真实的时间。</em></h1>
+          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界只会在你主动推进游戏时间时结算。</p>
+          <div class="two-col">
+            <section class="panel scene-panel"><div class="panel-head"><span>01 / 当前场景</span><span class="tag">S · 模拟情境</span></div>
+              <h2 id="scene-title"></h2><p id="scene-desc"></p>
+              <div class="line"></div><div class="hint"><span>ⓘ</span> 真实地理事实与假设行程、NPC事件分开标识。地点与人物不会凭空提供未经核实的现实信息。</div>
+            </section>
+            <section class="panel map-panel"><div class="panel-head"><span>02 / 位置概览</span><span class="tag">非比例示意</span></div>
+              <div class="map-graphic" aria-label="北京城区抽象示意，非真实地图"><div class="ring ring-one"></div><div class="ring ring-two"></div><div class="crosshair">+</div><span class="map-label map-label-one">BEIJING</span><span class="map-label map-label-two" id="map-location">—</span><span class="map-pin">⌖</span></div>
+              <p class="micro">未提供实时路况、准确区际交通时间或交通票价。前礼务村为顺义区观察样本，不是默认住所。</p>
+            </section>
+          </div>
+          <div class="section-head"><h2>现在，你准备做什么？</h2><span>每次行动将推进游戏时钟</span></div>
+          <div class="actions-grid">
+            <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="social"><span class="action-glyph">♧</span><strong>参加公共活动</strong><small>可能认识一位虚构人物</small><span class="action-time">45 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="study"><span class="action-glyph">⌘</span><strong>整理计划</strong><small>分析信息，不自动知晓秘密</small><span class="action-time">60 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="work"><span class="action-glyph">▣</span><strong>处理工作</strong><small>需要创建角色时填写职业</small><span class="action-time">120 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="rest"><span class="action-glyph">◌</span><strong>休息恢复</strong><small>恢复模拟精力，不产生收入</small><span class="action-time">60 分钟 <b>↗</b></span></button>
+            <button class="action-card" data-kind="wait"><span class="action-glyph">◷</span><strong>等待 / 推进</strong><small>让后台独立事件继续结算</small><span class="action-time">自定时长 <b>↗</b></span></button>
+          </div>
+          <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
+            <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
+            <form id="travel-form" class="travel-form">
+              <label>目的区<select id="travel-destination" required></select></label>
+              <label>预计分钟<input id="travel-minutes" type="number" min="15" max="480" step="1" value="60" required></label>
+              <label>现金支出（元）<input id="travel-fare" type="number" min="0" max="999999" step="1" value="0" required></label>
+              <button class="primary" type="submit">确认出发 <span>↗</span></button>
+            </form>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-people" hidden>
+          <div class="eyebrow">NETWORK / INFORMATION BOUNDARIES</div><h1>每个人，<br><em>都有自己的生活。</em></h1>
+          <p class="lead">31人来自世界书的S级人物档案，并非真实居民。只有在这一条试玩分支中认识的人才能直接联系；你无法查看他们的私密想法。</p>
+          <div class="people-summary panel"><span>已认识 <strong id="contact-count">0</strong> / 31 人</span><span>消息只有送达后才进入对方的信息边界</span></div>
+          <section id="people-list" class="people-list"></section>
+          <section class="panel message-panel"><div class="panel-head"><span>给已认识的人发消息</span><span class="tag">模拟通信</span></div>
+            <form id="message-form" class="message-form">
+              <label>联系人<select id="message-to"></select></label>
+              <label>内容<textarea id="message-text" maxlength="200" rows="2" placeholder="输入简短消息……" required></textarea></label>
+              <button class="primary" type="submit">发送消息 ↗</button>
+            </form>
+            <h3>收到的消息</h3><div id="inbox" class="inbox"></div>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-world" hidden>
+          <div class="eyebrow">WORLD / OUT-OF-CHARACTER</div><h1>主角看不见的，<br><em>世界仍在运转。</em></h1>
+          <p class="lead">以下为玩家视角之外的模拟审计信息。只有在玩家行动或等待推进时间时才计算，不能理解为这些人物的真实行踪，也不会自动成为角色的知识。</p>
+          <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
+            <div class="audit-top"><strong id="world-total">0</strong><span>已生成后台活动</span></div><div id="world-list" class="log-list"></div>
+          </section>
+        </section>
+
+        <section class="tab-panel" id="tab-archive" hidden>
+          <div class="eyebrow">ARCHIVE / SAVE & SOURCES</div><h1>每一件已发生的事，<br><em>都应当留下记录。</em></h1>
+          <p class="lead">此处存储的是浏览器试玩分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
+          <section class="panel"><div class="panel-head"><span>存档与版本</span><span class="tag">本地优先</span></div>
+            <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
+            <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
+            <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
+            <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
+            <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
+            <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a>
+          </section>
+          <div class="section-head"><h2>主角经历的事件</h2><span>不展示尚未公开的NPC内幕</span></div>
+          <div id="full-log" class="log-list full-log"></div>
+        </section>
+      </main>
+      <aside class="right-rail">
+        <div class="rail-label">LIVE JOURNAL <span class="sim-dot"></span></div>
+        <h3>今天发生了什么</h3>
+        <div id="recent-log" class="recent-log"></div>
+        <div class="right-note"><strong>事实边界</strong><p><b>R</b> 已核实的现实资料<br><b>S</b> 明示的模拟情节<br><b>U</b> 未知 / 尚未核实</p><p>页面中人物、行为及行程估计均按S级处理。</p></div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog id="setup" class="setup" aria-labelledby="setup-title">
+    <form id="setup-form" class="setup-inner">
+      <div class="eyebrow">A NEW LIFE / NEW GAME</div><h1 id="setup-title">现实人生，<br><em>由你的选择开始。</em></h1>
+      <p class="lead">创建一条独立试玩存档。不会修改世界书 v33、31名NPC的原始资料或正式冻结状态。</p>
+      <div class="setup-grid">
+        <label>角色姓名 <input name="name" id="new-name" maxlength="30" required placeholder="输入姓名" autocomplete="off"></label>
+        <label>年龄 <input name="age" type="number" min="16" max="100" value="25" required></label>
+        <label>开局所在区 <select name="district" id="new-district"></select></label>
+        <label>开局时间 · 2026-10-09 <input name="start" type="time" value="09:00" required></label>
+        <label>职业 / 正在做的事（可留空）<input name="occupation" maxlength="60" placeholder="未知"></label>
+        <label>可支配现金 · 元（可留空）<input name="cash" type="number" min="0" max="1000000000" step="1" placeholder="未知"></label>
+      </div>
+      <label class="goal-label">眼下的目标（可留空） <input name="goal" maxlength="100" placeholder="例如：找到一份稳定工作"></label>
+      <p class="micro">输入的角色条件和金额属于本次S级模拟假设。未填写的财产不会被自动视为0元。开局所在区不等于房产或户籍登记。</p>
+      <button type="submit" class="primary start-button">进入北京 · 开始游玩 <span>↗</span></button>
+      <p id="setup-error" class="error" role="alert"></p>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+/* 《地球：现实人生》独立离线试玩引擎 · 所有人物与偶遇事件均为S级模拟。
+   仅在用户操作后结算游戏时间；不修改artifacts/v14/official_world_state_frozen_v13.json。 */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.EarthGame = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const VERSION = 1;
+  const BASE_DAY = "2026-10-09";
+  const HOUR = 3600000, MINUTE = 60000, DAY = 24 * HOUR, OFFSET = 8 * HOUR;
+  const DISTRICTS = ["东城","西城","朝阳","海淀","丰台","石景山","门头沟","房山","通州","顺义","昌平","大兴","怀柔","平谷","密云","延庆"];
+  const GROUPS = {
+    F01: "陈国平家庭关系组", F02: "李文浩家庭关系组",
+    F03: "周明家庭及异地亲属", F04: "吴晓宁朋友同事", F05: "维修合作",
+    E01: "商业候选", E02: "制造业候选", E03: "物流生活服务候选", E04: "教育医疗家庭候选"
+  };
+  // 顺序、年龄和职业来源：docs/NPC_ROSTER.md。不是现实人物名录。
+  const RAW = [
+    ["陈国平",54,"F01","农业生产及经营事务"],["刘桂芳",51,"F01","生活用品商店经营"],
+    ["陈雨",25,"F01","顺义城区行政工作"],["陈建民",78,"F01","退休"],
+    ["李文浩",36,"F02","制造企业设备技术工作"],["赵倩",34,"F02","企业会计"],
+    ["李晨",8,"F02","在学儿童"],["周明",30,"F03","物流工作；北京租住"],
+    ["孙丽",29,"F03","服务业工作"],["周玉兰",57,"F03","外省生活；具体省份未知"],
+    ["吴晓宁",27,"F04","教师"],["黄琳",28,"F04","朝阳区工作；行业未知"],
+    ["唐洁",31,"F04","吴晓宁同事；已婚"],["马志强",43,"F05","维修业务经营"],
+    ["高鹏",32,"F05","维修技术合作"],["郑文芳",64,"E01","退休"],
+    ["韩超",38,"E01","农产品批发经营"],["王祺",26,"E01","配送司机"],
+    ["吕倩",33,"E01","个体经营"],["宋学峰",47,"E02","制造业班组管理"],
+    ["郭媛",32,"E02","企业人事"],["彭超",29,"E02","质量检验技术"],
+    ["张树立",52,"E02","货运"],["董航",39,"E03","物流调度"],
+    ["崔月",26,"E03","餐饮值班管理"],["杨珂",44,"E03","设施维护"],
+    ["孟蕾",37,"E03","客户服务"],["郭敏",42,"E04","教师；单位未知"],
+    ["陆琪",30,"E04","护士；机构未知"],["许国忠",66,"E04","退休职工"],
+    ["范晴",35,"E04","在职家长"]
+  ];
+  const NPCS = RAW.map((row, i) => Object.freeze({
+    id: "P" + String(i+1).padStart(3,"0"), name: row[0], age:row[1],
+    group:row[2], occupation:row[3], grade:"S"
+  }));
+  const AREAS = {
+    东城:"街巷、公共机构与老城生活交织；具体营业与服务状态未知。",
+    西城:"传统住区与商务办公并置；个人住址、租金和名额需要逐一核实。",
+    朝阳:"就业、商业及居住活动密集；陌生人仍有自己的日程和关系。",
+    海淀:"学校、园区与社区相邻；身份和工作资格不因到访而获得。",
+    丰台:"住宅、商贸与多种交通需求并存；跨片区移动需要时间。",
+    石景山:"工业转型与居民日常并行；具体岗位与营业时间未知。",
+    门头沟:"山地地形影响出行；不能假设道路无阻或任意穿越。",
+    房山:"区域尺度较大，跨区通勤和服务可达性并非理所当然。",
+    通州:"行政办公与居民日常并存，制度服务需要具体权限和材料。",
+    顺义:"本世界书的前礼务村观察样本位于顺义，但不是你的默认住所。",
+    昌平:"居住、产业与跨区往返交错；行程耗时须由你确认。",
+    大兴:"城市社区与区域产业并存；并非所有路程都可短时抵达。",
+    怀柔:"山地、社区和区域产业各有约束；服务供给不凭空出现。",
+    平谷:"村镇与城区空间分散；具体路况与事件仍属未知。",
+    密云:"距离和地形是真实约束；本试玩没有实时交通数据。",
+    延庆:"山地和区域边界会影响旅程；未知道路不能当作已验证通路。"
+  };
+  function assert(ok, msg) { if (!ok) throw new Error(msg); }
+  function validText(s, max) { return String(s ?? "").trim().slice(0,max); }
+  function clock(ms) { return new Date(ms).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}); }
+  function dayNumber(ms) { return Math.floor((ms+OFFSET)/DAY); }
+  function localDay(ms) { return new Date(dayNumber(ms)*DAY).toISOString().slice(0,10); }
+  function pseudorand(seed) { let x = (seed >>> 0) + 0x6D2B79F5; x = Math.imul(x ^ x>>>15,x|1); x ^= x + Math.imul(x ^ x>>>7,x|61); return ((x ^ x>>>14)>>>0)/4294967296; }
+  function event(state, at, message, kind="scene", visible=true, grade="S") {
+    state.sequence++;
+    const item={id:state.sequence,at,kind,text:message,grade,visible};
+    state.journal.push(item);
+    if(state.journal.length>3000) state.journal.shift();
+    return item;
+  }
+  function makeGame(options) {
+    assert(options && typeof options==="object","必须提交角色资料");
+    const name=validText(options.name,30);
+    assert(name.length>0,"请填写角色姓名");
+    const age=Number(options.age);
+    assert(Number.isInteger(age)&&age>=16&&age<=100,"角色年龄须在16至100岁之间");
+    const district=validText(options.district,10);
+    assert(DISTRICTS.includes(district),"请选择北京市的一个区作为开局所在区");
+    const start=validText(options.start,5)||"09:00";
+    assert(/^([01]\d|2[0-3]):[0-5]\d$/.test(start),"时间须采用24小时制");
+    const time=Date.parse(BASE_DAY+"T"+start+":00+08:00");
+    const cash=options.cash===""||options.cash===null||options.cash===undefined ? null : Number(options.cash);
+    assert(cash===null||(Number.isSafeInteger(cash)&&cash>=0&&cash<=1000000000),"初始可支配现金必须为非负整数元，或留空表示未知");
+    const occupation=validText(options.occupation,60);
+    const goal=validText(options.goal,100);
+    const state={
+      schema:VERSION, mode:"S_INDEPENDENT_PLAYTHROUGH", started:true,
+      time, sequence:0,
+      player:{name,age,district,homeDistrict:district,occupation:occupation||null,goal:goal||null,cash,energy:80,contacts:[],knowledge:[]},
+      npc:Object.fromEntries(NPCS.map(n=>[n.id,{lastActivity:null,knowledge:[]}])),
+      queue:[], messages:[], journal:[], world:[], cycles:0
+    };
+    event(state,time,"你为这一条独立S级游戏分支创建了角色。正式世界书原始存档仍冻结；现有资料不足以宣称实时地球模拟。","system");
+    event(state,time,"2026年10月9日，"+name+"从北京"+district+"区开始自己的第一天。你可以探索、安排事务、结识人物或前往其他区。","scene");
+    return state;
+  }
+  function validateGame(s) {
+    assert(s && s.schema===VERSION && s.mode==="S_INDEPENDENT_PLAYTHROUGH","存档版本或模式不受支持");
+    assert(s.started===true && s.player && typeof s.player.name==="string","存档角色无效");
+    assert(Number.isFinite(s.time) && s.time>=Date.parse(BASE_DAY+"T00:00:00+08:00"),"时间字段不合法");
+    assert(DISTRICTS.includes(s.player.district)&&DISTRICTS.includes(s.player.homeDistrict),"地点无效");
+    assert(Number.isInteger(s.sequence)&&s.sequence>=0,"日志序号无效");
+    assert(Array.isArray(s.queue)&&Array.isArray(s.messages)&&Array.isArray(s.journal)&&Array.isArray(s.world),"事件结构无效");
+    assert(s.npc && NPCS.every(n=>s.npc[n.id]&&Array.isArray(s.npc[n.id].knowledge)),"NPC索引不完整");
+    assert(s.player.cash===null||(Number.isSafeInteger(s.player.cash)&&s.player.cash>=0),"资金字段无效");
+    assert(Number.isInteger(s.player.energy)&&s.player.energy>=0&&s.player.energy<=100,"精力字段无效");
+    assert(Array.isArray(s.player.contacts)&&s.player.contacts.every(id=>NPCS.some(n=>n.id===id)),"联系人列表无效");
+    assert(s.queue.every(q=>Number.isFinite(q.at)&&q.at>=s.time&&typeof q.type==="string"),"待办队列有过期或非法事件");
+    return s;
+  }
+  function dueEvents(s, until) {
+    // A delivered message may generate a reply before 'until'.
+    // Drain recursively in chronological order so no past-due event remains.
+    let processed=0;
+    while(s.queue.length){
+      s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
+      if(s.queue[0].at>until) break;
+      assert(++processed<=2000,"单轮待办事件过多");
+      const q=s.queue.shift();
+      if(q.type==="deliver"){
+        const n=NPCS.find(x=>x.id===q.to);
+        if(!n) continue;
+        s.npc[n.id].knowledge.push({at:q.at,topic:q.text,source:"player"});
+        event(s,q.at,"发送给"+n.name+"的消息已经送达，但不意味着对方同意任何请求。","message");
+        if(pseudorand(q.seed)>0.49){
+          const responseAt=q.at+(15+Math.floor(pseudorand(q.seed+17)*90))*MINUTE;
+          s.queue.push({type:"reply",at:responseAt,from:n.id,order:s.sequence+1});
+        }
+      } else if(q.type==="reply"){
+        const n=NPCS.find(x=>x.id===q.from);
+        if(!n) continue;
+        const text=n.name+"：消息收到了。我还得处理自己的事情，具体情况之后再商量。";
+        s.messages.push({at:q.at,from:n.id,content:text,grade:"S"});
+        event(s,q.at,"你收到来自"+n.name+"的一条消息。","message");
+      }
+    }
+    s.queue.sort((a,b)=>a.at-b.at||a.order-b.order);
+  }
+  function autonomousWorld(s, start, end) {
+    const from=dayNumber(start), to=dayNumber(end);
+    for(let day=from;day<=to;day++){
+      for(let i=0;i<NPCS.length;i++){
+        const n=NPCS[i], fraction=pseudorand(day*131+i*104729);
+        const hour=7+Math.floor(fraction*11);
+        const minute=Math.floor(pseudorand(day*79+i*4391)*60);
+        const at=day*DAY-OFFSET+hour*HOUR+minute*MINUTE;
+        if(at<=start||at>end) continue;
+        const possibilities=[
+          "围绕既有职业与责任整理一项待办（具体结果未知）",
+          "为家庭或个人生活安排一段时间（具体细节未知）",
+          "因既有约定调整计划（内容不自动公开）",
+          "判断眼前事务尚无足够信息，暂不作出决定"
+        ];
+        const text=n.name+"："+possibilities[Math.floor(pseudorand(i+day*97)*possibilities.length)];
+        s.npc[n.id].lastActivity={at,text,grade:"S"};
+        s.world.push({at,npcId:n.id,text,grade:"S",visibility:"out_of_character"});
+      }
+    }
+    if(s.world.length>1500) s.world=s.world.slice(-1500);
+  }
+  function advance(s, minutes) {
+    assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=480,"每次推进必须为1至480分钟");
+    const old=s.time, next=old+minutes*MINUTE;
+    autonomousWorld(s,old,next);
+    dueEvents(s,next);
+    s.time=next;
+    s.cycles++;
+  }
+  function act(s, kind, payload={}) {
+    validateGame(s);
+    assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
+    const p=s.player, at=s.time;
+    if(kind==="travel"){
+      const to=validText(payload.destination,10), minutes=Number(payload.minutes);
+      const fare=payload.fare===""||payload.fare===undefined?0:Number(payload.fare);
+      assert(DISTRICTS.includes(to)&&to!==p.district,"请选择不同的目的区");
+      assert(Number.isInteger(minutes)&&minutes>=15&&minutes<=480,"请输入15至480分钟的规划行程");
+      assert(Number.isSafeInteger(fare)&&fare>=0,"交通支出必须为非负整数元");
+      assert(fare===0||p.cash!==null,"现金未知，无法登记已支付交通费");
+      assert(fare===0||p.cash>=fare,"资金不足，不能登记这笔支出");
+      assert(p.energy>=8,"精力不足，请先休息");
+      const from=p.district;
+      event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
+      advance(s,minutes);
+      p.district=to;p.energy=Math.max(0,p.energy-8);
+      if(fare>0) {p.cash-=fare;event(s,s.time,"你登记了交通支出 ¥"+fare+"。此为单人账本，不表示外部银行已过账。","finance");}
+      event(s,s.time,"到达北京"+to+"区。新地点在行程完成后才更新。","arrival");
+    }else if(kind==="explore"){
+      assert(p.energy>=6,"精力不足，请先休息");
+      advance(s,35);p.energy-=6;
+      event(s,s.time,"你在"+p.district+"区观察日常环境、留意公开告示。具体营业状态、新闻和服务资格仍需核实。","scene");
+    }else if(kind==="study"){
+      assert(p.energy>=12,"精力不足，请先休息");
+      advance(s,60);p.energy-=12;
+      event(s,s.time,"你用一小时整理公开信息与下一步计划。这不构成对非公开事实的自动获知。","scene");
+    }else if(kind==="work"){
+      assert(p.occupation,"尚未声明职业或业务，不能凭空结算工作");
+      assert(p.energy>=22,"精力不足，请先休息");
+      advance(s,120);p.energy-=22;
+      event(s,s.time,"你投入两小时处理“"+p.occupation+"”相关事务；本系统没有可靠工资、客户和合同数据，因此不自动生成收入。","work");
+    }else if(kind==="rest"){
+      advance(s,60);p.energy=Math.min(100,p.energy+25);
+      event(s,s.time,"你休息了一个小时。精力是S级游戏数值，不代表医学测量。","scene");
+    }else if(kind==="wait"){
+      const mins=Number(payload.minutes);
+      advance(s,mins);
+      event(s,s.time,"你按自己的决定等待了"+mins+"分钟。等待期间，部分独立NPC事务已在后台结算，但不会自动进入你的认知。","scene");
+    }else if(kind==="social"){
+      assert(p.energy>=9,"精力不足，请先休息");
+      advance(s,45);p.energy-=9;
+      const unknown=NPCS.filter(n=>!p.contacts.includes(n.id));
+      if(!unknown.length){event(s,s.time,"你参加了一场S级公共活动。31名档案角色都已成为你的可联系对象。","scene");}
+      else{
+        const index=Math.floor(pseudorand(s.sequence*9137+dayNumber(s.time))*unknown.length);
+        const n=unknown[index];
+        p.contacts.push(n.id);
+        p.knowledge.push({at:s.time,npc:n.id,topic:"在模拟公共活动中认识",grade:"S"});
+        event(s,s.time,"模拟场景：你在"+p.district+"区的公共活动中认识"+n.name+"（"+n.occupation+"）。这次偶遇是新生成的S级情节，不能据此推断其现实住址或当日行踪。","contact");
+      }
+    }else if(kind==="message"){
+      const to=validText(payload.recipient,8), text=validText(payload.text,200);
+      assert(p.contacts.includes(to),"主角尚未建立该联系人关系");
+      assert(text.length>0,"消息不能为空");
+      assert(p.energy>=1,"精力不足");
+      advance(s,5);p.energy-=1;
+      const n=NPCS.find(x=>x.id===to);
+      const delay=10+Math.floor(pseudorand(s.sequence*83+to.length)*35);
+      s.queue.push({type:"deliver",at:s.time+delay*MINUTE,to,text,order:s.sequence+1,seed:s.sequence*83+to.charCodeAt(1)});
+      event(s,s.time,"你向"+n.name+"发出：“"+text+"”。已发出但尚未送达，对方尚未知情。","message");
+    }else{
+      throw new Error("未实现的玩家行动");
+    }
+    validateGame(s);
+    return s;
+  }
+  function summary(s) {
+    validateGame(s);
+    return {
+      timestamp:clock(s.time),district:s.player.district,
+      contacts:s.player.contacts.length,events:s.journal.length,
+      worldEvents:s.world.length,queued:s.queue.length,
+      cash:s.player.cash,energy:s.player.energy
+    };
+  }
+  return Object.freeze({VERSION,BASE_DAY,DISTRICTS,GROUPS,NPCS,AREAS,clock,
+    makeGame,validateGame,act,summary,dayNumber,localDay});
+});
+
+</script>
+  <script>
+/* Offline UI. Browser localStorage is the only automatic persistence layer.
+   No network APIs, no cloud accounts, and no write access to the canonical worldbook. */
+(() => {
+  "use strict";
+  const E=window.EarthGame;
+  const KEY="earth-realism-playable-v1";
+  let state=null, activeTab="life", toastTimeout=null;
+  const $=(id)=>document.getElementById(id);
+  const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmt=(n)=>n===null?"未知（U）":"¥"+Number(n).toLocaleString("zh-CN");
+  const NPC=(id)=>E.NPCS.find(n=>n.id===id);
+  function toast(message,error=false){
+    const el=$("toast");el.textContent=message;el.style.borderColor=error?"#b86868":"#5d806e";el.classList.add("show");
+    clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove("show"),3600);
+  }
+  function save(silent=false){
+    if(!state)return;
+    try{E.validateGame(state);localStorage.setItem(KEY,JSON.stringify(state));if(!silent)toast("已保存到本机浏览器。");}
+    catch(err){toast("无法自动保存：" +err.message,true);}
+  }
+  function restore(){
+    try{const raw=localStorage.getItem(KEY);return raw?E.validateGame(JSON.parse(raw)):null;}
+    catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
+  }
+  function selectTab(tab){
+    activeTab=tab;
+    document.querySelectorAll(".nav-btn").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
+    document.querySelectorAll(".tab-panel").forEach(el=>el.hidden=el.id!=="tab-"+tab);
+    if(tab==="world")renderWorld();
+    if(tab==="archive")renderArchive();
+    if(tab==="people")renderPeople();
+  }
+  function logs(items,limit=20){
+    if(!items.length)return '<p class="micro">暂无记录。行动或推进时间后，这里会更新。</p>';
+    return items.slice(-limit).reverse().map(it=>
+      '<article class="log-line"><div class="meta">'+escapeHTML(E.clock(it.at))+' · '+escapeHTML(it.grade||"S")+' · '+escapeHTML(it.kind||"NPC活动")+'</div><p>'+escapeHTML(it.text)+'</p></article>'
+    ).join("");
+  }
+  function render(){
+    if(!state)return;
+    $("play-layout").hidden=false;
+    const p=state.player;
+    $("avatar").textContent=p.name.slice(0,1);
+    $("player-name").textContent=p.name;
+    $("player-job").textContent=p.occupation||"职业未设定（U）";
+    $("stat-time").textContent=E.clock(state.time);
+    $("stat-district").textContent="北京 · "+p.district;
+    $("stat-cash").textContent=fmt(p.cash);
+    $("stat-energy").textContent=p.energy+"/100";
+    $("scene-title").textContent=p.district+"区 · 你所在的城市";
+    $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
+    $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
+    $("travel-destination").value=E.DISTRICTS.find(d=>d!==p.district);
+    const recent=state.journal.filter(x=>x.visible).slice(-7).reverse();
+    $("recent-log").innerHTML=recent.map(x=>'<div class="log-item"><time>'+escapeHTML(E.clock(x.at))+'</time><span class="log-kind">'+escapeHTML(x.kind)+' · '+escapeHTML(x.grade)+'</span><p>'+escapeHTML(x.text)+'</p></div>').join("");
+    document.querySelector('[data-kind="work"]').disabled=!p.occupation;
+    if(activeTab==="people")renderPeople();
+    if(activeTab==="world")renderWorld();
+    if(activeTab==="archive")renderArchive();
+  }
+  function renderPeople(){
+    const p=state.player;
+    $("contact-count").textContent=p.contacts.length;
+    const to=$("message-to"),selected=to.value;
+    to.innerHTML=p.contacts.length?p.contacts.map(id=>'<option value="'+escapeHTML(id)+'">'+escapeHTML(NPC(id).name)+'</option>').join(""):'<option value="">尚无可联系人物</option>';
+    if(p.contacts.includes(selected))to.value=selected;
+    $("people-list").innerHTML=E.NPCS.map(n=>{
+      const known=p.contacts.includes(n.id);
+      return '<div class="person"><div><div class="person-id">'+escapeHTML(n.id)+' · '+escapeHTML(E.GROUPS[n.group])+'</div><strong>'+escapeHTML(n.name)+' <small style="display:inline">· '+n.age+'岁</small></strong><small>'+escapeHTML(n.occupation)+'</small></div><span class="'+(known?"known":"")+'">'+(known?"● 已认识":"○ 尚未认识")+'</span></div>';
+    }).join("");
+    $("inbox").innerHTML=state.messages.length?state.messages.slice().reverse().map(m=>'<article class="inbox-item"><time>'+escapeHTML(E.clock(m.at))+' · S级模拟回复</time><p>'+escapeHTML(m.content)+'</p></article>').join(""):'<p class="micro">还没有收到模拟消息。发送后需等待送达，对方可能不回复。</p>';
+    $("message-to").disabled=!p.contacts.length;
+    $("message-text").disabled=!p.contacts.length;
+    $("message-form").querySelector("button").disabled=!p.contacts.length;
+  }
+  function renderWorld(){
+    $("world-total").textContent=state.world.length;
+    $("world-list").innerHTML=logs(state.world.map(x=>({...x,kind:x.npcId+" · 后台"})),120);
+  }
+  function renderArchive(){
+    $("archive-player").textContent=state.player.name+"（"+state.player.age+"岁）";
+    $("archive-time").textContent=E.clock(state.time);
+    $("archive-events").textContent=state.journal.length+"条玩家可见记录";
+    $("full-log").innerHTML=logs(state.journal.filter(x=>x.visible),250);
+  }
+  function execute(kind,payload={}){
+    if(!state)return;
+    try{E.act(state,kind,payload);save(true);render();toast("行动完成 · 时间已推进");}
+    catch(err){toast(err.message,true);}
+  }
+  function setup(){
+    $("new-district").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
+    $("new-district").value="海淀";
+    $("travel-destination").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
+    $("setup-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      try{
+        const form=new FormData(ev.currentTarget);
+        state=E.makeGame(Object.fromEntries(form.entries()));
+        save(true);
+        $("setup").close();
+        selectTab("life");render();
+        toast("新游戏已创建。世界时钟开始按你的行动推进。");
+      }catch(err){$("setup-error").textContent=err.message;}
+    });
+    document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
+    document.querySelectorAll(".action-card").forEach(b=>b.addEventListener("click",()=>{
+      const kind=b.dataset.kind;
+      if(kind!=="wait"){execute(kind);return;}
+      const input=window.prompt("本次等待多少分钟？（1—480，时间不会在后台自行流逝）","60");
+      if(input===null)return;
+      execute("wait",{minutes:Number(input)});
+    }));
+    $("travel-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      execute("travel",{destination:$("travel-destination").value,minutes:$("travel-minutes").value,fare:$("travel-fare").value});
+    });
+    $("message-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      execute("message",{recipient:$("message-to").value,text:$("message-text").value});
+      $("message-text").value="";
+    });
+    $("btn-save").addEventListener("click",()=>save(false));
+    $("btn-export").addEventListener("click",()=>{
+      if(!state){toast("尚无游戏存档",true);return;}
+      try{
+        const file=new Blob([JSON.stringify(state,null,2)],{type:"application/json;charset=utf-8"});
+        const url=URL.createObjectURL(file),a=document.createElement("a");
+        a.href=url;a.download="earth-realism-"+E.localDay(state.time)+".json";
+        document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+        toast("存档JSON已生成；请自行妥善保存。");
+      }catch(err){toast(err.message,true);}
+    });
+    $("btn-import").addEventListener("click",()=>$("import-file").click());
+    $("import-file").addEventListener("change",async ev=>{
+      const file=ev.target.files?.[0];if(!file)return;
+      try{
+        if(file.size>3*1024*1024)throw new Error("存档超过3MB，拒绝导入");
+        const candidate=E.validateGame(JSON.parse(await file.text()));
+        if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
+        state=candidate;save(true);$("setup").close();selectTab("life");render();
+        toast("已导入并验证存档结构。");
+      }catch(err){toast("导入失败："+err.message,true);}
+      finally{ev.target.value="";}
+    });
+    $("btn-reset").addEventListener("click",()=>{
+      if(state&&!window.confirm("创建新游戏将替换当前本地存档。请先导出旧存档，确认继续？"))return;
+      state=null;localStorage.removeItem(KEY);$("play-layout").hidden=true;$("setup-error").textContent="";
+      $("setup-form").reset();$("new-district").value="海淀";$("setup").showModal();
+    });
+    state=restore();
+    if(state){selectTab("life");render();}
+    else{$("setup").showModal();}
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
+})();
+</script>
+</body>
+</html>
