@@ -1,0 +1,105 @@
+name: Validate and archive worldbook v17 through v26
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'artifacts/v17_26/*.py'
+      - 'scripts/build_v17_26_bundle.py'
+      - '.github/workflows/test-v17-v26.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worldbook-v17-26-archive
+  cancel-in-progress: false
+jobs:
+  test-ingest-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify official frozen world, real OSM and WDI source checksums
+        run: python scripts/check_data_manifest.py
+      - name: Install pinned OSM parser for actual local transit and facility node extract
+        run: python -m pip install osmium==4.3.1
+      - name: Derive actual 2026-10-01 OSM stop and civic node inventory
+        run: python artifacts/v17_26/extract_osm_pois.py
+      - name: v14 original event engine regression 14 tests
+        run: python artifacts/v14/test_v14.py
+      - name: v15 original decision planner regression 18 tests
+        run: python artifacts/v15/test_v15.py
+      - name: v16 original grounded OSM routing regression 18 tests
+        run: python artifacts/v16/test_v16.py
+      - name: v17 through v26 all 45 invariants
+        run: python artifacts/v17_26/test_realism_layers.py
+      - name: Produce a cross-domain S-only scenario and frozen state signature
+        run: python artifacts/v17_26/scenario.py
+      - name: Record source graph hashes, testing summary and public decision validations
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          ROOT=Path(".")
+          folder=ROOT/"artifacts/v17_26"
+          before=Path("artifacts/v14/official_world_state_frozen_v13.json").read_bytes()
+          state=json.loads(before)
+          assert state["game_clock_time"] is None
+          assert state["player_character"] is None and state["actual_game_events"]==[]
+          assert len(state["people"])==31
+          source=json.loads(Path("data/manifest.json").read_text())["datasets"]
+          osm=next(x for x in source if x["id"]=="beijing_osm_2026_10_01")
+          report=json.loads((folder/"osm_poi_extract_report.json").read_text())
+          summary=json.loads((folder/"simulation_summary.json").read_text())
+          assert report["source_sha256"]==osm["sha256"]
+          assert summary["official_sha256"]==hashlib.sha256(before).hexdigest()
+          assert summary["official_game_events_written"]==0
+          assert summary["versions_completed"]==list(range(17,27))
+          derived={
+           "schema_version":1,"status":"COMMITTED_OSM_SOURCE_DERIVED",
+           "source":{"id":osm["id"],"path":osm["dest"],"bytes":osm["bytes"],"sha256":osm["sha256"]},
+           "snapshot_date":"2026-10-01","game_date":"2026-10-09",
+           "license":"© OpenStreetMap contributors; ODbL 1.0",
+           "center":{"place_name":"前礼务村","osm_node_id":"6410843713","latitude":40.1880155,"longitude":116.7077492},
+           "radius_m":2800,
+           "outputs":report["records"],
+           "coverage":"node-tagged OSM stops and civic facilities only; ways/areas not indexed",
+           "timetables":"U_NOT_INGESTED","hours_and_capacities":"U_NOT_INGESTED",
+           "private_personal_information_included":False,
+           "original_official_state_sha256":summary["official_sha256"]}
+          Path("data/derived/manifest_v17_26.json").write_text(
+              json.dumps(derived,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          names={17:"transit",18:"places",19:"housing",20:"commerce",21:"employment",
+                 22:"services",23:"administration",24:"information",25:"macroeconomy",26:"integration"}
+          for version,slug in names.items():
+              p=Path(f"docs/decisions/2026-10-10-v{version}-{slug}.md")
+              s=p.read_text(encoding="utf-8")
+              marker="\n## GitHub Actions实际验收\n"
+              if marker in s: s=s.split(marker)[0]
+              s+=marker
+              s+=f"- v{version}子系统测试随v17—v26共同测试套件通过；旧版v14/v15/v16测试共50项，加上新45项，共95项回归检查通过。\n"
+              s+=f"- 本层输入资料的真实或模拟等级继续按各章说明，不暗示已取得北京实时班次、个人账本或医疗资料。\n"
+              s+=f"- 正式世界状态SHA256: {summary['official_sha256']}，正式游戏历史新增0。\n"
+              s+=f"- 真实OSM节点数据的数量及SHA256见data/derived/manifest_v17_26.json；无法取得的资料仍为U。\n"
+              p.write_text(s,encoding="utf-8")
+          PY
+      - name: Pack ten audited worldbook layers into a versioned ZIP
+        run: python scripts/build_v17_26_bundle.py
+      - name: Push real derived OSM node snapshots, reports and all ten ADRs
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/v17_26/*.json data/derived/manifest_v17_26.json artifacts/earth_realism_v17_to_v26_bundle.zip docs/decisions/2026-10-10-v*.md
+          if ! git diff --cached --quiet; then
+            git commit -m "data(test,v17-v26): archive OSM nodes, 95 test results and 10 decisions"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
