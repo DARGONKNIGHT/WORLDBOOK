@@ -49,6 +49,16 @@ test("自主NPC在时间推进后独立决策且不自动分享秘密",()=>{
  assert.ok(s.npc.P003.decisions.length>0);
  assert.equal(s.npc.P003.stage.kind,"work");
 });
+test("已有家庭与同事网络自主联络，但消息不向玩家自动共享",()=>{
+ const s=create({district:"顺义",start:"17:00"});
+ E.act(s,"wait",{minutes:240}); // 17:00 → 21:00, family changes and sends peer messages
+ const initiated=s.world.filter(x=>x.kind==="coordination");
+ const delivered=s.world.filter(x=>x.kind==="peerDelivered");
+ assert.ok(initiated.length>0);
+ assert.ok(delivered.length>0);
+ assert.ok(s.npc.P002.knowledge.some(x=>x.source==="P001")||s.npc.P006.knowledge.some(x=>x.source==="P005"));
+ assert.equal(s.player.knowledge.length,0);
+});
 test("NPC开关与审计详细程度可控制，设置不消耗时间",()=>{
  const s=create(),at=s.time;
  E.act(s,"npc_autonomy",{enabled:false,detail:"detailed"});
