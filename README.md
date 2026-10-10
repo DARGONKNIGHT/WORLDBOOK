@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前版本：**v15.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
+> 当前版本：**v16.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
 
 本仓库归档从真实地球世界背景（v2）到中国、北京、顺义区北小营镇前礼务村观察样本以及全国/全球社会联动的世界书。人物、家庭、企业、公共机构均具有独立目标、限制和信息边界；不引入超自然、不预设主角特殊待遇。
 
@@ -16,7 +16,7 @@
 | 内容 | 链接 |
 |---|---|
 | 世界书总纲 | [docs/WORLDBOOK_MASTER.md](docs/WORLDBOOK_MASTER.md) |
-| v2—v14版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
+| v2—v16版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
 | v2—v12整理版章节 | [worldbook/](worldbook/) |
 | 31名模拟NPC索引 | [docs/NPC_ROSTER.md](docs/NPC_ROSTER.md) |
 | v13审计资料 | [artifacts/v13/](artifacts/v13/) |
@@ -64,3 +64,9 @@ python scripts/build_archives.py
 [v15规则](worldbook/v15.md) · [决策引擎](artifacts/v15/planner_v15.py) · [18项测试](artifacts/v15/test_v15.py) · [决策记录](artifacts/v15/sandbox_v15_decisions.json) · [执行日志](artifacts/v15/sandbox_v15_journal.json) · [汇总](artifacts/v15/sandbox_v15_summary.json) · [v15 ZIP](artifacts/earth_realism_v15_bundle.zip) · [公开设计依据](docs/decisions/2026-10-10-v15-limited-agent-scheduling.md)
 
 沿用v14事件引擎新增候选评分、承诺优先、信息先决、日程与位置预约、技能/未知资金约束和合理不作为。原v14 14项回归测试与v15 18项测试全部通过；18个候选9项进入队列、9项拒绝或不作为，最终13条实际执行事件，无资金付款。以上仅为显式S级沙盒输入，不代表31名NPC真实全天生活或正式历史发生变化。
+
+## v16：前礼务村真实OSM路网实验图
+
+[世界书规则](worldbook/v16.md) · [提取器](artifacts/v16/extract_v16.py) · [路由引擎](artifacts/v16/network_v16.py) · [实际派生路网](artifacts/v16/osm_graph_sample.json) · [详细提取报告](artifacts/v16/osm_graph_report.json) · [独立沙盒日志](artifacts/v16/route_sandbox_journal.json) · [可再建ZIP](artifacts/earth_realism_v16_bundle.zip) · [数据来源/哈希/许可清单](data/derived/manifest.json) · [GitHub测试](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38038500429)。
+
+OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）；2.8公里范围实验图包含1,244节点与3,923条有向边。v14/v15/v16自动测试50/50通过。地图几何不等于真实可通行导航：未处理转向限制、障碍、动态交通，耗时只是S级假设。地图中心不是玩家或NPC住址，正式世界没有推进。
