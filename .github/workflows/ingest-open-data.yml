@@ -1,0 +1,38 @@
+name: Ingest dated open-data snapshots
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ingest_open_data.py'
+      - '.github/workflows/ingest-open-data.yml'
+permissions:
+  contents: write
+concurrency:
+  group: fixed-baseline-dataset
+  cancel-in-progress: false
+jobs:
+  fetch-verify-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch fixed pre-baseline Beijing OSM and World Bank raw JSON
+        run: python scripts/ingest_open_data.py --osm --wdi
+      - name: Validate bytes against manifest and frozen official state
+        run: python scripts/check_data_manifest.py
+      - name: Commit verified raw datasets and manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/raw/ data/manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: archive baseline Beijing OSM and China WDI source bytes"
+            git push origin HEAD:main
+          fi
