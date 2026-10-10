@@ -1,0 +1,107 @@
+name: v31-v33 OSM relation geometry, barriers and source gate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'artifacts/v31_33/*.py'
+      - 'scripts/build_v31_33_bundle.py'
+      - '.github/workflows/test-v31-v33.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worldbook-v31-v33
+  cancel-in-progress: false
+jobs:
+  verify-source-and-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify real OSM, WDI and existing derived datasets
+        run: python scripts/check_data_manifest.py
+      - name: Install known OSM parser
+        run: python -m pip install osmium==4.3.1
+      - name: Extract v31 public multipolygon areas
+        run: python artifacts/v31_33/areas_v31.py
+      - name: Extract v32 road-graph tagged barriers
+        run: python artifacts/v31_33/barriers_v32.py
+      - name: Regression v14-v16 50 tests
+        shell: bash
+        run: |
+          python artifacts/v14/test_v14.py
+          python artifacts/v15/test_v15.py
+          python artifacts/v16/test_v16.py
+      - name: Regression v17-v26 45 tests
+        run: python artifacts/v17_26/test_realism_layers.py
+      - name: Regression v27-v30 22 tests
+        run: python artifacts/v27_30/test_v27_30.py
+      - name: v31-v33 13 source and route tests
+        shell: bash
+        run: |
+          set -o pipefail
+          python artifacts/v31_33/test_v31_33.py 2>&1 | tee artifacts/v31_33/test_run_v31_33.txt
+      - name: Source-gated milestone with unchanged official game history
+        run: python artifacts/v31_33/closure_v33.py
+      - name: Validate outputs, source SHA256 and add public ADR evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          raw=json.loads(Path("data/manifest.json").read_text())["datasets"]
+          src=next(x for x in raw if x["id"]=="beijing_osm_2026_10_01")
+          p=Path("artifacts/v31_33")
+          outputs={}
+          for key,filename in [("multipolygons","area_report.json"),("barriers","barrier_report.json")]:
+              report=json.loads((p/filename).read_text())
+              f=Path(report["output"])
+              assert report["source_sha256"]==src["sha256"]
+              assert f.is_file()
+              assert len(f.read_bytes())==report["bytes"]
+              assert hashlib.sha256(f.read_bytes()).hexdigest()==report["sha256"]
+              outputs[key]=report
+          checkpoint=json.loads((p/"milestone_v33.json").read_text())
+          assert checkpoint["official_history_written"]==0
+          manifest={"schema":1,"source_id":src["id"],"source_sha256":src["sha256"],
+            "date":"2026-10-01","game_cutoff":"2026-10-09","scope":"Qianliwu 2800m OSM sample",
+            "license":"© OpenStreetMap contributors; ODbL 1.0",
+            "outputs":outputs,"real_navigation_verified":False,"actual_private_NPC_data":False,
+            "remaining_evidence_blockers":checkpoint["open_dependency_ids"],
+            "official_world_sha256":checkpoint["official_frozen_sha256"]}
+          Path("data/derived/manifest_v31_33.json").write_text(
+            json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          for version,slug in [(31,"multipolygon-public-facilities"),(32,"road-barriers"),(33,"source-gated-audit")]:
+              adr=Path(f"docs/decisions/2026-10-10-v{version}-{slug}.md")
+              t=adr.read_text()
+              marker="\n## GitHub Actions实际验收\n"
+              if marker in t:t=t.split(marker)[0]
+              t+=marker
+              t+="- 旧版v14—v30 117项测试回归＋v31—v33新增13项测试，共130项通过。\n"
+              t+=f"- 本地OSM relation公共多边形数量：{outputs['multipolygons']['count']}；局部路网上实际带barrier标签节点数量：{outputs['barriers']['on_local_road_graph']}。\n"
+              t+=f"- 正式世界SHA256：{checkpoint['official_frozen_sha256']}；正式历史0条。\n"
+              t+="- 源于单个2026-10-01 OSM众包快照；现实交通通行、学校医疗容量和私人生活仍未验证。\n"
+              adr.write_text(t)
+          print(json.dumps({"polygons":outputs["multipolygons"]["count"],
+            "barriers":outputs["barriers"]["on_local_road_graph"]},ensure_ascii=False))
+          PY
+      - name: Bundle actually checked source, data, tests and decisions
+        run: python scripts/build_v31_33_bundle.py
+      - name: Submit and protect actual GitHub derived bytes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/v31_33/*.json artifacts/v31_33/test_run_v31_33.txt data/derived/manifest_v31_33.json artifacts/earth_realism_v31_to_v33_bundle.zip docs/decisions/2026-10-10-v3{1,2,3}-*.md
+          if ! git diff --cached --quiet; then
+            git commit -m "data(test,v31-v33): archive multipolygon/barrier bytes and source-gated release"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
