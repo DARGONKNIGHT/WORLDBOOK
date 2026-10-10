@@ -7,11 +7,17 @@ on:
     paths:
       - ".github/workflows/build-worldbook.yml"
       - "scripts/build_archives.py"
-      - "artifacts/v13/**"
+      - "artifacts/v13/world_state_v13.json"
+      - "artifacts/v13/validate_v13.py"
+      - "artifacts/v13/audit_report_v13.md"
       - "artifacts/v14/engine_v14.py"
       - "artifacts/v14/scenario_v14.py"
       - "artifacts/v14/test_v14.py"
       - "artifacts/v14/official_world_state_frozen_v13.json"
+
+concurrency:
+  group: worldbook-archive-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -34,6 +40,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add artifacts/earth_realism_v13_bundle.zip artifacts/earth_realism_v14_bundle.zip artifacts/v14/sandbox_30day_journal.json artifacts/v14/sandbox_30day_final_state.json artifacts/v14/sandbox_30day_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m "ci: regenerate v13/v14 archives and journal [skip ci]"
-            git push
+            git commit -m "ci: regenerate worldbook bundles [skip ci]"
+            for attempt in 1 2 3; do
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              echo "Concurrent update; rebasing (attempt $attempt)"
+              git fetch origin main
+              git rebase origin/main
+            done
+            echo "Unable to update main after three retries" >&2
+            exit 1
           fi
