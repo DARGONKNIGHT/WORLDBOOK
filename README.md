@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前版本：**v26.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
+> 当前版本：**v33.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
 
 本仓库归档从真实地球世界背景（v2）到中国、北京、顺义区北小营镇前礼务村观察样本以及全国/全球社会联动的世界书。人物、家庭、企业、公共机构均具有独立目标、限制和信息边界；不引入超自然、不预设主角特殊待遇。
 
@@ -16,7 +16,7 @@
 | 内容 | 链接 |
 |---|---|
 | 世界书总纲 | [docs/WORLDBOOK_MASTER.md](docs/WORLDBOOK_MASTER.md) |
-| v2—v26版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
+| v2—v33版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
 | v2—v12整理版章节 | [worldbook/](worldbook/) |
 | 31名模拟NPC索引 | [docs/NPC_ROSTER.md](docs/NPC_ROSTER.md) |
 | v13审计资料 | [artifacts/v13/](artifacts/v13/) |
@@ -78,3 +78,16 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 [十层源码](artifacts/v17_26/realism_layers.py)、[45项新测试](artifacts/v17_26/test_realism_layers.py)、[12条S级审计记录](artifacts/v17_26/simulation_evidence.json)、[完整ZIP](artifacts/earth_realism_v17_to_v26_bundle.zip)、[真实OSM站点节点数据](artifacts/v17_26/osm_transit_nodes.json)、[设施节点数据](artifacts/v17_26/osm_civic_poi_nodes.json)、[SHA256数据血缘](data/derived/manifest_v17_26.json)、[GitHub Actions 95/95成功验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38039469845)。
 
 本次OSM 2026-10-01前礼务村2.8km节点样本：交通相关节点40个，设施/商业相关节点1个（**只计OSM nodes，不包括areas或ways**）。这不是公交班次、实时导航、学校或医院合法资质数据；其他社会过程为明确的S级模拟，不代表31名NPC实际经历。
+
+## v27—v33：实际开放地理对象与来源准入（本轮暂停点）
+
+[公共设施way v27](worldbook/v27.md) · [受限转向关系 v28](worldbook/v28.md) · [GTFS日历 v29](worldbook/v29.md) · [资料缺口审计 v30](worldbook/v30.md) · [OSM多边形关系 v31](worldbook/v31.md) · [道路障碍 v32](worldbook/v32.md) · [证据门槛 v33](worldbook/v33.md)。
+
+- 真实2026-10-01北京OSM PBF局部2.8公里样本：v27额外发现**11个带公共类标签的闭合ways**，v28在现有裁切图中**0个可直接采用的受限简式node-via转向记录**；[源数据+SHA256](data/derived/manifest_v27_30.json)。
+- v31完成OSM multipolygon area组装：全北京PBF公共类别初筛42个、本地最终0个；v32定位**3个位于局部OSM路网的barrier标签节点**，均无经核实的实时通行状态；[来源和文件哈希](data/derived/manifest_v31_33.json)。
+- v29 GTFS服务日例外和跨日时刻支持，只在明确构造的S级时刻表上测试，没有真实北京2026历史车次。
+- v33保留[机器可读证据缺口](artifacts/v31_33/milestone_v33.json)、v2—v12原文缺失、法律/经济版本与个人状态未知。不宣称全地球数字孪生完成。
+- [v27—v30源码和日志](artifacts/v27_30/) · [v31—v33源码和日志](artifacts/v31_33/) · [v27—v30 ZIP](artifacts/earth_realism_v27_to_v30_bundle.zip) · [v31—v33 ZIP](artifacts/earth_realism_v31_to_v33_bundle.zip)。
+- [117项自动验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38040692649)及[后续130项回归全部通过](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38040928956)。
+
+**当前停止原因**：新增可信真实生活事件需要可以合法使用、时点明确的真实GTFS、经济指标历史发布版本、权威服务/法律资料或用户的原始聊天导出；进一步建设可继续，但不应为自动延长版本号而伪造资料。正式游戏继续冻结。

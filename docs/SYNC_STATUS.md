@@ -61,3 +61,16 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [ ] v2—v12原始聊天逐字全文仍未补齐，当前为整理摘要，不能冒充完整逐字档案
 
 本轮达到用户上限10层，终止于v26；正式游戏仍冻结于2026-10-09，未创建玩家、正式事件历史为空。
+
+## v27—v33增量已同步（2026-10-10）
+
+- [x] [世界书v27—v33](../worldbook/)与逐层设计证据、取舍记录[ADRs](decisions/)；
+- [x] [OSM闭合way样本11条](../artifacts/v27_30/osm_public_way_features.json)、[局部node-via restriction候选0条与过滤统计](../artifacts/v27_30/turn_restrictions_report.json)；
+- [x] [OSM multipolygon区域relation本地0个、全北京候选42个](../artifacts/v31_33/area_report.json)、[本地barrier节点3项](../artifacts/v31_33/osm_barrier_nodes.json)；
+- [x] [v27—v30数据来源、SHA256](../data/derived/manifest_v27_30.json)、[v31—v33数据来源、SHA256](../data/derived/manifest_v31_33.json)；
+- [x] [v29 GTFS日历源码](../artifacts/v27_30/calendar_v29.py)，尚无北京真实2026公交班次；
+- [x] [完整4层ZIP](../artifacts/earth_realism_v27_to_v30_bundle.zip)、[完整3层ZIP](../artifacts/earth_realism_v31_to_v33_bundle.zip)、[v33阶段审计](../artifacts/v31_33/milestone_v33.json)；
+- [x] [实际CI 117项](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38040692649)及[累计130项通过](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38040928956)。
+- [ ] 原始v2—v12聊天全文、当时真实公交时刻、统计历史发布版本、具体机构容量、法律通行资格及私人NPC财务仍未知或缺合法来源。
+
+当前版本v33.0。这次自动迭代到达**数据准入暂停点**，没有宣称所有后续层均已穷尽。正式游戏钟点未确定，玩家未创建，事件历史为空。
