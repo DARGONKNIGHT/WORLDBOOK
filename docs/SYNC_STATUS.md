@@ -31,3 +31,12 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [ ] 其余地图数据、北京市完整统计、学校医疗/住房/实时交通原始数据及许可审计
 
 **数据采集成功并不意味着现实地球“全量数据”已入库**。统计数据首次发布日期仍需核查；真实个人信息不得写入公开仓库。
+
+## v15.0自主决策与日程调度（2026-10-10）
+- [x] [v15规则](../worldbook/v15.md)、[规划器](../artifacts/v15/planner_v15.py)、[18项新测试](../artifacts/v15/test_v15.py)
+- [x] [决策日志](../artifacts/v15/sandbox_v15_decisions.json)、[执行日志](../artifacts/v15/sandbox_v15_journal.json)、[汇总JSON](../artifacts/v15/sandbox_v15_summary.json)和[可再建ZIP](../artifacts/earth_realism_v15_bundle.zip)
+- [x] [GitHub Actions验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38037749491)：旧版14/14＋新版18/18，合计32项测试通过
+- [x] S级沙盒18次候选，9次预排、9次拒绝或不作为；底层执行13条，转账0笔，正式历史0条
+- [ ] 31名NPC的完整实际日程/个人财务/认知和长期行为校准未完成；原v2-v12仍缺逐字原文
+
+此处的“自主”指人工明确给定需求和候选情况下的有限决策，不代表智能体可以独立发现并完整处理所有现实生活需求。正式游戏继续冻结。
