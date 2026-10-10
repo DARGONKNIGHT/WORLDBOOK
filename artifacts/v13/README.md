@@ -1,7 +1,9 @@
-# v13 GitHub迁移清单
+# v13 审计与存档文件
 
-已上传原始文本：`world_state_v13.json`、`validate_v13.py`、`audit_report_v13.md`、`validation_run.txt`。
+- [world_state_v13.json](world_state_v13.json)：世界冻结状态，31名S级人物。
+- [validate_v13.py](validate_v13.py)：基础结构和冻结校验。
+- [audit_report_v13.md](audit_report_v13.md)：审计报告。
+- [validation_run.txt](validation_run.txt)：运行记录。
+- [重新生成的v13 ZIP](../earth_realism_v13_bundle.zip)。
 
-未上传：完整二进制包`earth_realism_v13_bundle.zip`。此前测试摘要：0结构错误、4待补全提示、7/7基础自动校验通过；正式历史为空。
-
-文档来自聊天生成附件的文本提取。原ZIP字节完整性尚未在GitHub验证。
+**说明**：GitHub ZIP由仓库文件打包生成，并非聊天附件的字节级复制；原始世界时间仍冻结，任何沙盒数据不得回写。
