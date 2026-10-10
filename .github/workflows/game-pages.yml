@@ -1,0 +1,57 @@
+name: Game · Test and Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "game/**"
+      - "scripts/build_standalone_game.py"
+      - ".github/workflows/game-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages-game
+  cancel-in-progress: true
+
+jobs:
+  game:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Syntax check
+        run: |
+          node --check game/engine.js
+          node --check game/app.js
+          node --check game/tests/engine.test.cjs
+      - name: Offline engine tests
+        run: node --test game/tests/engine.test.cjs
+      - name: Verify standalone build is current
+        run: python3 scripts/build_standalone_game.py --check
+      - name: Prepare static site
+        run: |
+          mkdir -p public
+          cp game/earth-realism.html public/index.html
+          printf '' > public/.nojekyll
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: game
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
