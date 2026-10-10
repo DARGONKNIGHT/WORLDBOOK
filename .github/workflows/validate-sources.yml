@@ -1,0 +1,24 @@
+name: Validate data source registry
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/validate-sources.yml"
+      - "sources/**"
+      - "scripts/validate_sources.py"
+
+permissions:
+  contents: read
+
+jobs:
+  source-index-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check source IDs, required metadata and frozen-world cutoff
+        run: python scripts/validate_sources.py
