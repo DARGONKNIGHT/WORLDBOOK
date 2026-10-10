@@ -84,3 +84,5 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [x] 独立 S_INDEPENDENT_PLAYTHROUGH 试玩分支；正式世界状态JSON不改，开局无预设玩家；人物与事件R/S/U边界明确。
 - [ ] Pages是否能通过公开网址访问，需要确认真实部署运行成功；不能用提交工作流代替部署验证。
 - [ ] 该网页尚未与v14—v33全部Python事件模型融合，不具备实时导航、法律、银行、全面人口或后台持续运行能力。
+
+2026-10-10补充验证：GitHub Actions首次Game工作流实测Node回归12项通过、0失败，单文件构建一致性通过；**Pages未启用**使上线步骤失败。现已分离为自动测试工作流与需仓库管理员先启用Pages的手动部署工作流；不能声称在线站点已经公开可用。
