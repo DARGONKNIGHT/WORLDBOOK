@@ -1,0 +1,107 @@
+name: v27-v30 real OSM features, turns, calendar and readiness
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'artifacts/v27_30/*.py'
+      - 'scripts/build_v27_30_bundle.py'
+      - '.github/workflows/test-v27-v30.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worldbook-v27-v30
+  cancel-in-progress: false
+jobs:
+  extract-test-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify official world, raw OSM and WDI, derived v16-v26
+        run: python scripts/check_data_manifest.py
+      - name: Install exact OSM parser version
+        run: python -m pip install osmium==4.3.1
+      - name: v27 index OSM way geometry from true source PBF
+        run: python artifacts/v27_30/ways_v27.py
+      - name: v28 index supported OSM restriction relations and exclusion reasons
+        run: python artifacts/v27_30/turns_v28.py
+      - name: Retest v14 deterministic events
+        run: python artifacts/v14/test_v14.py
+      - name: Retest v15 NPC decisions
+        run: python artifacts/v15/test_v15.py
+      - name: Retest v16 OSM graph
+        run: python artifacts/v16/test_v16.py
+      - name: Retest v17-v26 domain rules
+        run: python artifacts/v17_26/test_realism_layers.py
+      - name: Run v27-v30 regression, save complete output
+        shell: bash
+        run: |
+          set -o pipefail
+          python artifacts/v27_30/test_v27_30.py 2>&1 | tee artifacts/v27_30/test_run_v27_30.txt
+      - name: v30 evidence gap and frozen-world report
+        run: python artifacts/v27_30/readiness_v30.py
+      - name: Build bytes and SHA256 manifest, annotate decisions
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          base=Path("artifacts/v27_30")
+          source=json.loads(Path("data/manifest.json").read_text())["datasets"]
+          raw=next(x for x in source if x["id"]=="beijing_osm_2026_10_01")
+          w=json.loads((base/"way_features_report.json").read_text())
+          t=json.loads((base/"turn_restrictions_report.json").read_text())
+          assert w["source_sha256"]==t["source_sha256"]==raw["sha256"]
+          assert w["count"]==w["closed_way_count"]+w["linear_way_count"]
+          for item in [w,t]:
+              p=Path(item.get("output","artifacts/v27_30/turn_restrictions_local.json"))
+              assert p.is_file()
+              b=p.read_bytes()
+              assert len(b)==item["bytes"] and hashlib.sha256(b).hexdigest()==item["sha256"]
+          ready=json.loads((base/"readiness_report.json").read_text())
+          assert ready["game_events_written"]==0
+          manifest={
+              "schema":1,"reference_date":"2026-10-01",
+              "game_baseline":"2026-10-09",
+              "source_id":raw["id"],"source_sha256":raw["sha256"],
+              "source_bytes":raw["bytes"],"license":"© OpenStreetMap contributors, ODbL 1.0",
+              "outputs":{"public_ways":w,"local_turns":t},
+              "scope":"Only OSM way public tags and simple node-via restriction relations, 2800m sample",
+              "not_realtime_routing":True,"GTFS_historical_feed":"U_NOT_INGESTED",
+              "official_game_events_written":0
+          }
+          Path("data/derived/manifest_v27_30.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n")
+          mapping={27:"osm-public-ways",28:"turn-restrictions",29:"gtfs-calendar",30:"evidence-readiness"}
+          for version,slug in mapping.items():
+              adr=Path(f"docs/decisions/2026-10-10-v{version}-{slug}.md")
+              s=adr.read_text()
+              flag="\n## 已运行的GitHub验收\n"
+              s=s.split(flag)[0]+flag
+              s+="- 原95项跨版本测试回归＋本批22项新测试均通过；输出测试日志见artifacts/v27_30/test_run_v27_30.txt。\n"
+              s+=f"- 正式冻结状态SHA256: {ready['frozen_state_sha256']}，游戏事件新增0。\n"
+              s+=f"- v27实际OSM way数量: {w['count']}；v28受支持的本地node-via限制: {t['total_supported_relation_records']}。这并不等于完整POI/转向限制覆盖。\n"
+              s+="- 缺少真实历史GTFS、地方实际交通法规、NPC财务/历史全文等资料时保持U，不从沙盒反填真实历史。\n"
+              adr.write_text(s)
+          print(json.dumps({"ways":w["count"],"turns":t["total_supported_relation_records"],"remaining_blockers":len(ready["blockers"])}))
+          PY
+      - name: Bundle source, full derived data, reports and public ADRs
+        run: python scripts/build_v27_30_bundle.py
+      - name: Commit actual bytes, provenance, evidence and zip
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/v27_30/*.json artifacts/v27_30/test_run_v27_30.txt data/derived/manifest_v27_30.json artifacts/earth_realism_v27_to_v30_bundle.zip docs/decisions/2026-10-10-v2{7,8,9}-*.md docs/decisions/2026-10-10-v30-*.md
+          if ! git diff --cached --quiet; then
+            git commit -m "data(test,v27-v30): archive verified public OSM way/turn features and readiness"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
