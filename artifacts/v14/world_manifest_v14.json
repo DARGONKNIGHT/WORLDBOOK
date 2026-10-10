@@ -1,0 +1,50 @@
+{
+  "schema_version": "14.0",
+  "world_id": "EARTH-REALITY-BJ-2026",
+  "parent_schema_version": "13.0",
+  "baseline_game_date": "2026-10-09",
+  "canonical_phase": "worldbuilding_frozen",
+  "canonical_clock_time": null,
+  "player_created": false,
+  "game_started": false,
+  "official_events_written": 0,
+  "canonical_world_state_file": "official_world_state_frozen_v13.json",
+  "canonical_sha256": "cf3df3f39c5b251a965b274866fe9b5525971d65a051f0331d283e3328b02233",
+  "observe_region": [
+    "北京市",
+    "顺义区",
+    "北小营镇",
+    "前礼务村"
+  ],
+  "observation_only": true,
+  "people_core_count": 15,
+  "people_candidate_count": 16,
+  "sandbox_test_clock": "2026-10-09T09:00:00+08:00",
+  "sandbox_duration_days": 30,
+  "sandbox_synthetic_facts_grade": "S",
+  "implemented": [
+    "time_priority_event_queue",
+    "immutable_effect_log",
+    "hash_chain",
+    "replay",
+    "money_double_entry",
+    "no_overdraft",
+    "transaction_idempotency",
+    "travel_arrival",
+    "actor_busy_conflict",
+    "message_delivery",
+    "limited_policy_response",
+    "scope_permission",
+    "frozen_archive_guard"
+  ],
+  "not_implemented": [
+    "live_realworld_simulation",
+    "actual_route_provider",
+    "real_NPC_bank_accounts",
+    "national_population_agents",
+    "legal_compliance_engine",
+    "clinical_model",
+    "full_economic_budget_simulator",
+    "unbounded_NPC_autonomy"
+  ]
+}
