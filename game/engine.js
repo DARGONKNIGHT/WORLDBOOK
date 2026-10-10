@@ -279,7 +279,7 @@
     let t=Math.ceil(at/(30*MINUTE))*30*MINUTE;
     for(let i=0;i<72;i++,t+=30*MINUTE){
       const c=choice(s,n,t),h=hourOf(t);
-      if(h>=8&&h<=22 && !["work","sleep","school"].includes(c.kind) && !(c.kind==="family"&&pseudorand(dayNumber(t)*89+n.id.charCodeAt(3))<0.5))return t;
+      if(h>=8&&h<=22 && c.kind!=="school" && c.kind!=="sleep" && (c.kind!=="work"||h===12) && (c.kind!=="family"||h===20||h===21))return t;
     }
     return null;
   }
