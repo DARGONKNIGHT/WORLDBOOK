@@ -7,3 +7,9 @@
 - **程序与数据**：`artifacts/v27_30/calendar_v29.py`，共享测试`artifacts/v27_30/test_v27_30.py`；实际字节必须由GitHub Actions写回并核对SHA256。
 - **资料依据**：GTFS Schedule规范（calendar.txt/calendar_dates.txt/stop_times.txt）https://gtfs.org/documentation/schedule/reference/
 - **验收状态**：待GitHub CI实际运行；正式世界仍冻结。
+
+## 已运行的GitHub验收
+- 原95项跨版本测试回归＋本批22项新测试均通过；输出测试日志见artifacts/v27_30/test_run_v27_30.txt。
+- 正式冻结状态SHA256: 75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087，游戏事件新增0。
+- v27实际OSM way数量: 11；v28受支持的本地node-via限制: 0。这并不等于完整POI/转向限制覆盖。
+- 缺少真实历史GTFS、地方实际交通法规、NPC财务/历史全文等资料时保持U，不从沙盒反填真实历史。

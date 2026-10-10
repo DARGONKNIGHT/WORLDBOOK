@@ -1,0 +1,244 @@
+{
+  "schema": 27,
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "snapshot": "2026-10-01",
+  "center": {
+    "name": "前礼务村",
+    "osm_node_id": "6410843713",
+    "lat": 40.1880155,
+    "lon": 116.7077492
+  },
+  "radius_m": 2800,
+  "osm_object_type": "way",
+  "features": [
+    {
+      "osm_type": "way",
+      "osm_id": "404570804",
+      "category": "amenity:school",
+      "name": "仇家店中心小学",
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1930143,
+      "representative_lon": 116.7401817,
+      "bbox": [
+        40.1924669,
+        116.7394019,
+        40.1938435,
+        116.7413599
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "932245035",
+      "category": "amenity:bus_station",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1675817,
+      "representative_lon": 116.692696,
+      "bbox": [
+        40.1662793,
+        116.6919691,
+        40.1684664,
+        116.693766
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "994836296",
+      "category": "amenity:school",
+      "name": "顺义区第十三中学",
+      "geometry_type": "closed_way",
+      "representative_lat": 40.204841,
+      "representative_lon": 116.7229125,
+      "bbox": [
+        40.2032049,
+        116.7215688,
+        40.2067259,
+        116.7243384
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1070214666",
+      "category": "amenity:fire_station",
+      "name": "北小营消防救援站",
+      "geometry_type": "closed_way",
+      "representative_lat": 40.2066286,
+      "representative_lon": 116.7242749,
+      "bbox": [
+        40.2063229,
+        116.7238984,
+        40.2067929,
+        116.7247244
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1070214670",
+      "category": "amenity:kindergarten",
+      "name": "北小营中心幼儿园",
+      "geometry_type": "closed_way",
+      "representative_lat": 40.2037021,
+      "representative_lon": 116.7216179,
+      "bbox": [
+        40.2032049,
+        116.7212182,
+        40.2040443,
+        116.722223
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1082502176",
+      "category": "amenity:marketplace",
+      "name": "北小营市场",
+      "geometry_type": "closed_way",
+      "representative_lat": 40.2012972,
+      "representative_lon": 116.7205151,
+      "bbox": [
+        40.2008353,
+        116.7183754,
+        40.2015539,
+        116.7223608
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1430834372",
+      "category": "amenity:parking",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1972921,
+      "representative_lon": 116.6851625,
+      "bbox": [
+        40.1970588,
+        116.6849635,
+        40.1974477,
+        116.685331
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1430834374",
+      "category": "amenity:parking",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1966801,
+      "representative_lon": 116.6876312,
+      "bbox": [
+        40.1964858,
+        116.6875465,
+        40.1967828,
+        116.6876914
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1430834375",
+      "category": "amenity:parking",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1965418,
+      "representative_lon": 116.6883108,
+      "bbox": [
+        40.1961311,
+        116.6880963,
+        40.1968156,
+        116.6884722
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1431211350",
+      "category": "amenity:parking",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.198852,
+      "representative_lon": 116.685051,
+      "bbox": [
+        40.1987168,
+        116.6848496,
+        40.198974,
+        116.6851165
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    },
+    {
+      "osm_type": "way",
+      "osm_id": "1431211352",
+      "category": "amenity:parking",
+      "name": null,
+      "geometry_type": "closed_way",
+      "representative_lat": 40.1961669,
+      "representative_lon": 116.6856279,
+      "bbox": [
+        40.1959728,
+        116.6854209,
+        40.1962963,
+        116.6858512
+      ],
+      "geometry_quality": "VERTEX_MEAN_NOT_ENTRANCE_OR_TRUE_CENTROID",
+      "operation_hours": "U",
+      "current_operator": "U",
+      "legal_eligibility": "U",
+      "grade": "R_OSM_CROWDSOURCED_NOT_VERIFIED_OFFICIAL"
+    }
+  ],
+  "excluded": [
+    "multipolygon relations",
+    "private residential houses",
+    "detailed parcel title",
+    "service hours",
+    "precise legal eligibility",
+    "entrance positions"
+  ],
+  "attribution": "© OpenStreetMap contributors; ODbL 1.0"
+}

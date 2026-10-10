@@ -1,0 +1,17 @@
+{
+  "schema": 28,
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "road_graph_sha256": "2232370320a11d83c2017a58d5fc8859ae82793719b31893814d0c228784fd95",
+  "snapshot": "2026-10-01",
+  "subset": "OSM node-via restrictions only",
+  "restrictions": [],
+  "excluded_reason_counts": {
+    "exception_or_conditional_unsupported": 63,
+    "outside_local_graph": 323,
+    "via_way_or_invalid_member": 150,
+    "multi_member_unsupported": 88,
+    "unknown_type": 21
+  },
+  "legal_navigation_authorized": false,
+  "attribution": "© OpenStreetMap contributors; ODbL 1.0"
+}

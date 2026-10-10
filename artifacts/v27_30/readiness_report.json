@@ -1,0 +1,52 @@
+{
+  "frozen_state_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
+  "blocked_new_R_personal_histories": true,
+  "game_events_written": 0,
+  "blockers": [
+    {
+      "id": "B01",
+      "scope": "v2-v12 exact transcripts",
+      "status": "NEEDS_USER_EXPORT",
+      "reason": "Original older chat text was not fully archived; summaries cannot prove verbatim fidelity."
+    },
+    {
+      "id": "B02",
+      "scope": "Beijing GTFS historical schedule",
+      "status": "NEEDS_AUTHORIZED_DATED_DATA",
+      "reason": "40 OSM transit points do not contain trips, service calendars, fare or operational status."
+    },
+    {
+      "id": "B03",
+      "scope": "OSM polygon multipolygon and public transport geometry coverage",
+      "status": "TECHNICALLY_EXPANDABLE",
+      "reason": "v27 closed ways added, but relation polygons and all building entrances remain unresolved."
+    },
+    {
+      "id": "B04",
+      "scope": "Turn restrictions and navigable routes",
+      "status": "TECHNICALLY_EXPANDABLE",
+      "reason": "v28 supports simple node-via records only. Local laws, barriers and conditional restrictions not proven."
+    },
+    {
+      "id": "B05",
+      "scope": "Actual 31 synthetic NPC private accounts and schedules",
+      "status": "REQUIRES_EXPLICIT_SIMULATION_STATE",
+      "reason": "No player created, no invented private facts allowed; cannot infer from census."
+    },
+    {
+      "id": "B06",
+      "scope": "2026-10-09 published macroeconomic vintages",
+      "status": "NEEDS_HISTORICAL_RELEASE_SNAPSHOT",
+      "reason": "World Bank values may have been revised or released after baseline."
+    },
+    {
+      "id": "B07",
+      "scope": "Real schools, health facilities, provider capacity, law decisions",
+      "status": "NEEDS_EVIDENCE_PERMISSION_AND_ELIGIBILITY",
+      "reason": "OSM geometry cannot prove facilities are operating or accessible."
+    }
+  ],
+  "technical_scope_complete": false,
+  "automatic_iteration_status": "STOP_WHEN_REMAINING_REQUESTED_WORK_REQUIRES_NEW_SOURCE_OR_AUTHORIZATION",
+  "claims": "Not a complete Earth digital twin; partial reproducible sandbox"
+}

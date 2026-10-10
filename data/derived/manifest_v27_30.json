@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "reference_date": "2026-10-01",
+  "game_baseline": "2026-10-09",
+  "source_id": "beijing_osm_2026_10_01",
+  "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "source_bytes": 36823056,
+  "license": "© OpenStreetMap contributors, ODbL 1.0",
+  "outputs": {
+    "public_ways": {
+      "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+      "count": 11,
+      "closed_way_count": 11,
+      "linear_way_count": 0,
+      "output": "artifacts/v27_30/osm_public_way_features.json",
+      "bytes": 6965,
+      "sha256": "8f5351b4f76a6af05bbdafe97b2380a39b05d284db9e02c62f142c5cdfbfc5fa",
+      "multipolygon_relations_indexed": false,
+      "real_service_hours_verified": false
+    },
+    "local_turns": {
+      "total_supported_relation_records": 0,
+      "source_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+      "counts_excluded": {
+        "exception_or_conditional_unsupported": 63,
+        "outside_local_graph": 323,
+        "via_way_or_invalid_member": 150,
+        "multi_member_unsupported": 88,
+        "unknown_type": 21
+      },
+      "bytes": 605,
+      "sha256": "b2dc87916f50cd4a861f09b3fe606004cce9be4e13f292bbca8e0f9299e97135",
+      "graph_road_segments_complete": false,
+      "real_navigation_safe": false
+    }
+  },
+  "scope": "Only OSM way public tags and simple node-via restriction relations, 2800m sample",
+  "not_realtime_routing": true,
+  "GTFS_historical_feed": "U_NOT_INGESTED",
+  "official_game_events_written": 0
+}
