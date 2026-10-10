@@ -1,0 +1,31 @@
+name: Enforce worldbook change records
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Validate canonical frozen state and raw data if present
+        run: python scripts/check_data_manifest.py
+      - name: Require evidence and decision log for authored worldbook changes
+        shell: bash
+        run: |
+          if ! git rev-parse HEAD^ >/dev/null 2>&1; then
+            echo "No previous commit to compare"
+            exit 0
+          fi
+          changed="$(git diff --name-only HEAD^ HEAD)"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(worldbook/|docs/WORLDBOOK_MASTER[.]md$|docs/NPC_ROSTER[.]md$|sources/catalog[.]json$|artifacts/v[0-9]+/)' ; then
+            if ! printf '%s\n' "$changed" | grep -Eq '^docs/decisions/.*[.]md$'; then
+              echo "::error::Authored worldbook changes require a docs/decisions/ ADR with evidence and rationale"
+              exit 1
+            fi
+          fi
