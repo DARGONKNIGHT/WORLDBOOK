@@ -1,6 +1,6 @@
 # ADR-0002：v15有限理性决策与日程预约
 
-**日期**：2026-10-10 · **状态**：接受，须通过CI验收后关闭测试事项
+**日期**：2026-10-10 · **状态**：已通过GitHub Actions 32项回归测试（14项旧版 + 18项新版）
 
 ## 仓库依据
 基线提交`a706a04cdca9225a63c7cd0848c20bfd92bf76be`，已有v14事件引擎、正式v13冻结世界状态、31人虚构名册、5份真实原始数据及2026-10-01 OSM路网数据清单。实际读取`AGENTS.md`、`docs/WORLDBOOK_MASTER.md`、`docs/NPC_ROSTER.md`、`docs/SYNC_STATUS.md`、`data/manifest.json`、v14源码和测试。
