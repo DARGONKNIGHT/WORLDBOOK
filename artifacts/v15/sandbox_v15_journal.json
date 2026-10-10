@@ -1,0 +1,204 @@
+[
+  {
+    "event_id": "V15:store_stocktake",
+    "at": "2026-10-09T09:05:00+08:00",
+    "kind": "activity",
+    "actor": "P002",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P002",
+        "value": "2026-10-09T09:45:00+08:00"
+      }
+    ],
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "e4ec0547ec07500b4fde105df3bd175b359b943f3512727dbcaa8b8d72734518"
+  },
+  {
+    "event_id": "V15:workshop_prior_commitment",
+    "at": "2026-10-09T09:10:00+08:00",
+    "kind": "activity",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P014",
+        "value": "2026-10-09T10:15:00+08:00"
+      }
+    ],
+    "prev_hash": "e4ec0547ec07500b4fde105df3bd175b359b943f3512727dbcaa8b8d72734518",
+    "hash": "101ae16f226c6d8e112979fd383a4f12d2c7074410de5e2971613f35440c7951"
+  },
+  {
+    "event_id": "V15:shop_repair_question",
+    "at": "2026-10-09T09:12:00+08:00",
+    "kind": "message_send",
+    "actor": "P002",
+    "status": "completed",
+    "reason": "已发送，接收者尚未知情",
+    "effects": [],
+    "prev_hash": "101ae16f226c6d8e112979fd383a4f12d2c7074410de5e2971613f35440c7951",
+    "hash": "dcc7c4e20d6e762285daee0565b08cad25a576d26bf44d203cb339a91a6dd664"
+  },
+  {
+    "event_id": "V15:technician_shift_notice",
+    "at": "2026-10-09T09:12:00+08:00",
+    "kind": "message_send",
+    "actor": "P005",
+    "status": "completed",
+    "reason": "已发送，接收者尚未知情",
+    "effects": [],
+    "prev_hash": "dcc7c4e20d6e762285daee0565b08cad25a576d26bf44d203cb339a91a6dd664",
+    "hash": "0f71abd0c89ccec509c3fbd8af7fd49fb8773e3f2467e500b807cc7861e5ed82"
+  },
+  {
+    "event_id": "V15:school_prep",
+    "at": "2026-10-09T09:15:00+08:00",
+    "kind": "activity",
+    "actor": "P011",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P011",
+        "value": "2026-10-09T09:45:00+08:00"
+      }
+    ],
+    "prev_hash": "0f71abd0c89ccec509c3fbd8af7fd49fb8773e3f2467e500b807cc7861e5ed82",
+    "hash": "3d5d73da09bc25f9364929961eec6b4b22c0bd81f6a5fe05056e743be1c1b1b8"
+  },
+  {
+    "event_id": "V15:technician_shift_notice:deliver",
+    "at": "2026-10-09T09:32:00+08:00",
+    "kind": "message_deliver",
+    "actor": "P005",
+    "status": "completed",
+    "reason": "接收者实际获得信息",
+    "effects": [
+      {
+        "op": "add_knowledge",
+        "person": "P006",
+        "item": "test_shift_notice"
+      }
+    ],
+    "prev_hash": "3d5d73da09bc25f9364929961eec6b4b22c0bd81f6a5fe05056e743be1c1b1b8",
+    "hash": "ee1283a68ec7caaebc4c98d80c9590432e63d4e5a89d5b62dda9ed913784fbf7"
+  },
+  {
+    "event_id": "V15:shop_repair_question:deliver",
+    "at": "2026-10-09T09:40:00+08:00",
+    "kind": "message_deliver",
+    "actor": "P002",
+    "status": "completed",
+    "reason": "接收者实际获得信息",
+    "effects": [
+      {
+        "op": "add_knowledge",
+        "person": "P014",
+        "item": "test_repair_question"
+      }
+    ],
+    "prev_hash": "ee1283a68ec7caaebc4c98d80c9590432e63d4e5a89d5b62dda9ed913784fbf7",
+    "hash": "fe44b3f01b5cfcd19ddd841dd7b671fff43287db0455984179389b7c0eefdffb"
+  },
+  {
+    "event_id": "V15:family_ack_after_delivery",
+    "at": "2026-10-09T09:55:00+08:00",
+    "kind": "message_send",
+    "actor": "P006",
+    "status": "completed",
+    "reason": "已发送，接收者尚未知情",
+    "effects": [],
+    "prev_hash": "fe44b3f01b5cfcd19ddd841dd7b671fff43287db0455984179389b7c0eefdffb",
+    "hash": "59981cc5541c97ca0f30a675e01519f8872c215710a4c1ff76bf97d96b4113c7"
+  },
+  {
+    "event_id": "V15:family_ack_after_delivery:deliver",
+    "at": "2026-10-09T10:05:00+08:00",
+    "kind": "message_deliver",
+    "actor": "P006",
+    "status": "completed",
+    "reason": "接收者实际获得信息",
+    "effects": [
+      {
+        "op": "add_knowledge",
+        "person": "P005",
+        "item": "test_shift_ack"
+      }
+    ],
+    "prev_hash": "59981cc5541c97ca0f30a675e01519f8872c215710a4c1ff76bf97d96b4113c7",
+    "hash": "6f83e04411525893ce6b9e73568f5cc76f002cf3a334f6fc11b099bb3e3bfb70"
+  },
+  {
+    "event_id": "V15:quote_after_delivery",
+    "at": "2026-10-09T10:20:00+08:00",
+    "kind": "message_send",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "已发送，接收者尚未知情",
+    "effects": [],
+    "prev_hash": "6f83e04411525893ce6b9e73568f5cc76f002cf3a334f6fc11b099bb3e3bfb70",
+    "hash": "10cf9fcfaf1b21d160945476b19f4497195485acebc28720f9da839d74664569"
+  },
+  {
+    "event_id": "V15:technician_ack_review",
+    "at": "2026-10-09T10:35:00+08:00",
+    "kind": "activity",
+    "actor": "P005",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P005",
+        "value": "2026-10-09T10:55:00+08:00"
+      }
+    ],
+    "prev_hash": "10cf9fcfaf1b21d160945476b19f4497195485acebc28720f9da839d74664569",
+    "hash": "33253f540fbec2b69a6b4cfca85ae37b855e2edcdbda69bb4085b54bbdc35dff"
+  },
+  {
+    "event_id": "V15:quote_after_delivery:deliver",
+    "at": "2026-10-09T10:40:00+08:00",
+    "kind": "message_deliver",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "接收者实际获得信息",
+    "effects": [
+      {
+        "op": "add_knowledge",
+        "person": "P002",
+        "item": "test_repair_quote"
+      }
+    ],
+    "prev_hash": "33253f540fbec2b69a6b4cfca85ae37b855e2edcdbda69bb4085b54bbdc35dff",
+    "hash": "eba57805f7b1e9a3548f0d93b4193087901910e8b7c3cf92bc21f3b23ba87d12"
+  },
+  {
+    "event_id": "V15:quote_review_after_receipt",
+    "at": "2026-10-09T11:00:00+08:00",
+    "kind": "activity",
+    "actor": "P002",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P002",
+        "value": "2026-10-09T11:25:00+08:00"
+      }
+    ],
+    "prev_hash": "eba57805f7b1e9a3548f0d93b4193087901910e8b7c3cf92bc21f3b23ba87d12",
+    "hash": "08bb2e3fac6858f4327bcd74c32c14c0c425c300d19e09f032bf43627dc0ba77"
+  }
+]

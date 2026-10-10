@@ -1,0 +1,200 @@
+[
+  {
+    "candidate_id": "workshop_prior_commitment",
+    "actor": "P014",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:10:00+08:00",
+    "utility": 36,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "store_stocktake",
+    "actor": "P002",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:05:00+08:00",
+    "utility": 48,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "school_prep",
+    "actor": "P011",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:15:00+08:00",
+    "utility": 31,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "store_break_conflict",
+    "actor": "P002",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:20:00+08:00",
+    "utility": 30,
+    "choice": "declined",
+    "reason": "reservation_conflict",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "no_unauthorized_purchase",
+    "actor": "P002",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T10:40:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "unsupported_action_requires_separate_approval",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "shop_repair_question",
+    "actor": "P002",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:12:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "technician_shift_notice",
+    "actor": "P005",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:12:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "premature_family_reply",
+    "actor": "P006",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:20:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "missing_knowledge",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "cash_unknown_course",
+    "actor": "P011",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T10:05:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "balance_unknown",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "premature_quote",
+    "actor": "P014",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T09:25:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "missing_knowledge",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "low_value_no_action",
+    "actor": "P005",
+    "decision_at": "2026-10-09T09:00:00+08:00",
+    "proposed_start": "2026-10-09T10:30:00+08:00",
+    "utility": -5,
+    "choice": "declined",
+    "reason": "low_priority_no_action",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "excess_cost",
+    "actor": "P002",
+    "decision_at": "2026-10-09T09:45:00+08:00",
+    "proposed_start": "2026-10-09T11:00:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "insufficient_sandbox_balance",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "family_ack_after_delivery",
+    "actor": "P006",
+    "decision_at": "2026-10-09T09:45:00+08:00",
+    "proposed_start": "2026-10-09T09:55:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "unconfirmed_saturday_school",
+    "actor": "P011",
+    "decision_at": "2026-10-09T09:45:00+08:00",
+    "proposed_start": "2026-10-10T10:00:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "calendar_unconfirmed",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "quote_after_delivery",
+    "actor": "P014",
+    "decision_at": "2026-10-09T09:45:00+08:00",
+    "proposed_start": "2026-10-09T10:20:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "too_early_quote_review",
+    "actor": "P002",
+    "decision_at": "2026-10-09T10:30:00+08:00",
+    "proposed_start": "2026-10-09T10:35:00+08:00",
+    "utility": 26,
+    "choice": "declined",
+    "reason": "missing_knowledge",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "technician_ack_review",
+    "actor": "P005",
+    "decision_at": "2026-10-09T10:30:00+08:00",
+    "proposed_start": "2026-10-09T10:35:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  },
+  {
+    "candidate_id": "quote_review_after_receipt",
+    "actor": "P002",
+    "decision_at": "2026-10-09T10:45:00+08:00",
+    "proposed_start": "2026-10-09T11:00:00+08:00",
+    "utility": 26,
+    "choice": "scheduled",
+    "reason": "prerequisites_satisfied",
+    "fixture_grade": "S",
+    "reservation_only": true
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "test_only": true,
+  "planner_version": "15.0",
+  "choices": {
+    "scheduled": 9,
+    "declined": 9
+  },
+  "decision_count": 18,
+  "decision_sha256": "306eaf56466e5a7ebd7cbce7817d5e0b99983b4750d47b20d9c139b698b4503f",
+  "event_report": {
+    "test_only": true,
+    "sandbox_anchor": "2026-10-09T09:00:00+08:00",
+    "sandbox_end": "2026-10-10T09:00:00+08:00",
+    "records": 13,
+    "completed": 13,
+    "rejected": 0,
+    "rejection_examples": [],
+    "transfers": 0,
+    "knowledge_records": 4,
+    "approved_actions": 0,
+    "initial_internal_total_cents": 210000,
+    "final_internal_total_cents": 210000,
+    "audit_violations": [],
+    "state_sha256": "6febd28d7146c20c51a59857a64dc61dcb5e5e60b82e068d6e326511dd2c510e",
+    "journal_final_sha256": "08bb2e3fac6858f4327bcd74c32c14c0c425c300d19e09f032bf43627dc0ba77"
+  },
+  "audit_violations": [],
+  "no_automatic_payment": true,
+  "source_class": "S synthetic profile; no actual NPC life inferred",
+  "official_frozen_sha256": "75d97ad9960e195f1ce21f23424c784682e5f635456277647166a66829299087",
+  "official_game_events_written": 0,
+  "notes": "Plans/messages/locations/inventory/balances are S-only fixture; neither historical acts nor verified schedules."
+}
