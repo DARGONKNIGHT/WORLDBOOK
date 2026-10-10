@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前版本：**v16.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
+> 当前版本：**v26.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
 
 本仓库归档从真实地球世界背景（v2）到中国、北京、顺义区北小营镇前礼务村观察样本以及全国/全球社会联动的世界书。人物、家庭、企业、公共机构均具有独立目标、限制和信息边界；不引入超自然、不预设主角特殊待遇。
 
@@ -16,7 +16,7 @@
 | 内容 | 链接 |
 |---|---|
 | 世界书总纲 | [docs/WORLDBOOK_MASTER.md](docs/WORLDBOOK_MASTER.md) |
-| v2—v16版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
+| v2—v26版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
 | v2—v12整理版章节 | [worldbook/](worldbook/) |
 | 31名模拟NPC索引 | [docs/NPC_ROSTER.md](docs/NPC_ROSTER.md) |
 | v13审计资料 | [artifacts/v13/](artifacts/v13/) |
@@ -70,3 +70,11 @@ python scripts/build_archives.py
 [世界书规则](worldbook/v16.md) · [提取器](artifacts/v16/extract_v16.py) · [路由引擎](artifacts/v16/network_v16.py) · [实际派生路网](artifacts/v16/osm_graph_sample.json) · [详细提取报告](artifacts/v16/osm_graph_report.json) · [独立沙盒日志](artifacts/v16/route_sandbox_journal.json) · [可再建ZIP](artifacts/earth_realism_v16_bundle.zip) · [数据来源/哈希/许可清单](data/derived/manifest.json) · [GitHub测试](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38038500429)。
 
 OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）；2.8公里范围实验图包含1,244节点与3,923条有向边。v14/v15/v16自动测试50/50通过。地图几何不等于真实可通行导航：未处理转向限制、障碍、动态交通，耗时只是S级假设。地图中心不是玩家或NPC住址，正式世界没有推进。
+
+## v17—v26：连续10层已完成、GitHub验证
+
+[公共交通v17](worldbook/v17.md) · [地理设施v18](worldbook/v18.md) · [家庭住房v19](worldbook/v19.md) · [企业商业v20](worldbook/v20.md) · [劳动工资v21](worldbook/v21.md) · [教育医疗v22](worldbook/v22.md) · [行政法律v23](worldbook/v23.md) · [信息传播v24](worldbook/v24.md) · [宏观经济v25](worldbook/v25.md) · [综合审计v26](worldbook/v26.md)。
+
+[十层源码](artifacts/v17_26/realism_layers.py)、[45项新测试](artifacts/v17_26/test_realism_layers.py)、[12条S级审计记录](artifacts/v17_26/simulation_evidence.json)、[完整ZIP](artifacts/earth_realism_v17_to_v26_bundle.zip)、[真实OSM站点节点数据](artifacts/v17_26/osm_transit_nodes.json)、[设施节点数据](artifacts/v17_26/osm_civic_poi_nodes.json)、[SHA256数据血缘](data/derived/manifest_v17_26.json)、[GitHub Actions 95/95成功验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38039469845)。
+
+本次OSM 2026-10-01前礼务村2.8km节点样本：交通相关节点40个，设施/商业相关节点1个（**只计OSM nodes，不包括areas或ways**）。这不是公交班次、实时导航、学校或医院合法资质数据；其他社会过程为明确的S级模拟，不代表31名NPC实际经历。
