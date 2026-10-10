@@ -1,0 +1,78 @@
+[
+  {
+    "event_id": "v16-route-travel",
+    "at": "2026-10-09T09:00:00+08:00",
+    "kind": "travel",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "已出发，位置在抵达事件后更新",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P014",
+        "value": "2026-10-09T09:03:00+08:00"
+      },
+      {
+        "op": "set",
+        "field": "transit",
+        "key": "P014",
+        "value": "osm_node:9830512758"
+      }
+    ],
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "efcdc0eb3025de99b0eac90d6613d49ff36d6990e06645d306f0b0398f2c9841"
+  },
+  {
+    "event_id": "v16-premature-arrival-activity",
+    "at": "2026-10-09T09:01:00+08:00",
+    "kind": "activity",
+    "actor": "P014",
+    "status": "rejected",
+    "reason": "时间被其他活动占用",
+    "effects": [],
+    "prev_hash": "efcdc0eb3025de99b0eac90d6613d49ff36d6990e06645d306f0b0398f2c9841",
+    "hash": "e48922bb27ec1240933f5d7a8254c4948f2d0ecbd0121e4e6f1891c433f789c4"
+  },
+  {
+    "event_id": "v16-route-travel:arrive",
+    "at": "2026-10-09T09:03:00+08:00",
+    "kind": "travel_arrive",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "实际到达后改变地点",
+    "effects": [
+      {
+        "op": "set",
+        "field": "locations",
+        "key": "P014",
+        "value": "osm_node:9830512758"
+      },
+      {
+        "op": "remove",
+        "field": "transit",
+        "key": "P014"
+      }
+    ],
+    "prev_hash": "e48922bb27ec1240933f5d7a8254c4948f2d0ecbd0121e4e6f1891c433f789c4",
+    "hash": "175a576ae79a55dc96fda79b79ff13f96a387e7357e94589d3b971e5020b821d"
+  },
+  {
+    "event_id": "v16-post-arrival-activity",
+    "at": "2026-10-09T09:04:00+08:00",
+    "kind": "activity",
+    "actor": "P014",
+    "status": "completed",
+    "reason": "活动登记",
+    "effects": [
+      {
+        "op": "set",
+        "field": "busy_until",
+        "key": "P014",
+        "value": "2026-10-09T09:09:00+08:00"
+      }
+    ],
+    "prev_hash": "175a576ae79a55dc96fda79b79ff13f96a387e7357e94589d3b971e5020b821d",
+    "hash": "500bd00126d8d0f3c053a0e5f3f307e9531b845893f4945baf71f5c0ea78bac5"
+  }
+]

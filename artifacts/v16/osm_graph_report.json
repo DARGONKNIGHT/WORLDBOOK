@@ -1,0 +1,73 @@
+{
+  "test_only": true,
+  "anchor": {
+    "name": "前礼务村",
+    "target": "前礼务村",
+    "lat": 40.1880155,
+    "lon": 116.7077492,
+    "osm_node": "6410843713",
+    "grade": "R_OSM_PLACE_NODE"
+  },
+  "sample_radius_m": 2800,
+  "graph": {
+    "nodes": 1244,
+    "directed_edges": 3923,
+    "walk_edges": 2018,
+    "drive_edges": 1905
+  },
+  "mode_examples": {
+    "walk": {
+      "status": "candidate_only",
+      "mode": "walk",
+      "origin_node": "11133406167",
+      "destination_node": "9830512758",
+      "node_ids": [
+        "11133406167",
+        "9830512758"
+      ],
+      "way_ids": [
+        "1200751131"
+      ],
+      "distance_m": 72.96,
+      "illustrative_minutes": 0.97,
+      "illustrative_speed_kmh": 4.5,
+      "travel_time_grade": "S_UNCALIBRATED",
+      "distance_grade": "R_DERIVED_FROM_OSM_GEOMETRY",
+      "excluded": "turn restrictions, conditional tags, barriers, closures, traffic, local laws, crossings",
+      "source_dataset_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d"
+    },
+    "drive": {
+      "status": "candidate_only",
+      "mode": "drive",
+      "origin_node": "11133406167",
+      "destination_node": "9830512758",
+      "node_ids": [
+        "11133406167",
+        "9830512758"
+      ],
+      "way_ids": [
+        "1200751131"
+      ],
+      "distance_m": 72.96,
+      "illustrative_minutes": 0.18,
+      "illustrative_speed_kmh": 25.0,
+      "travel_time_grade": "S_UNCALIBRATED",
+      "distance_grade": "R_DERIVED_FROM_OSM_GEOMETRY",
+      "excluded": "turn restrictions, conditional tags, barriers, closures, traffic, local laws, crossings",
+      "source_dataset_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d"
+    }
+  },
+  "graph_json_bytes": 308692,
+  "graph_json_sha256": "2232370320a11d83c2017a58d5fc8859ae82793719b31893814d0c228784fd95",
+  "source_verified_sha256": "945a6b7967c10dbd40a6e5c59bcae771a9dd44112ee4e37e868e5c544b34762d",
+  "unmodeled": [
+    "turn restrictions",
+    "barrier nodes",
+    "conditional restrictions",
+    "junction design",
+    "traffic",
+    "closures",
+    "real travel-time"
+  ],
+  "official_game_events_written": 0
+}
