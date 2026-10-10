@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""42+ cross-domain invariants for v17-v26, no actual world clock changes."""
+"""45 cross-domain invariants for v17-v26, no actual world clock changes."""
 import json, unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -33,7 +33,7 @@ class Tests17Transit(unittest.TestCase):
 class Tests18Places(unittest.TestCase):
     def setUp(self):
         self.p=PlacesV18()
-        self.p.add("O1","school",40.1880155,116.7077492,"R_OSM","osm:6410843713","OSM test node")
+        self.p.add("O1","school",40.1880155,116.7077492,"S_TEST","fixture:fictional-school","SCHOOL S fixture")
     def test_01_grounded_identity(self):
         self.assertEqual(1,len(self.p.query("school")))
     def test_02_unknown_open(self):
