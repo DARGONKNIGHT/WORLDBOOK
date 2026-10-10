@@ -6,11 +6,15 @@ on:
     paths:
       - "game/**"
       - "scripts/build_standalone_game.py"
+      - "scripts/check_changelog.py"
+      - "CHANGELOG.md"
       - ".github/workflows/game-tests.yml"
   pull_request:
     paths:
       - "game/**"
       - "scripts/build_standalone_game.py"
+      - "scripts/check_changelog.py"
+      - "CHANGELOG.md"
       - ".github/workflows/game-tests.yml"
   workflow_dispatch:
 
@@ -30,5 +34,7 @@ jobs:
           node --check game/tests/engine.test.cjs
       - name: Run game engine regression tests
         run: node --test game/tests/engine.test.cjs
+      - name: Verify changelog newest-first order
+        run: python3 scripts/check_changelog.py
       - name: Verify reproducible self-contained HTML build
         run: python3 scripts/build_standalone_game.py --check
