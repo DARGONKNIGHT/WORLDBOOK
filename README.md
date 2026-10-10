@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前版本：**v14.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
+> 当前版本：**v15.0** · 完全现实社会模拟世界书 · 冻结基准：2026-10-09
 
 本仓库归档从真实地球世界背景（v2）到中国、北京、顺义区北小营镇前礼务村观察样本以及全国/全球社会联动的世界书。人物、家庭、企业、公共机构均具有独立目标、限制和信息边界；不引入超自然、不预设主角特殊待遇。
 
@@ -58,3 +58,9 @@ python scripts/build_archives.py
 请先阅读[AGENTS.md](AGENTS.md)和[全量数据缺口清单](docs/FULL_DATA_GAP_REGISTER.md)。每次建设先读取仓库已有档案及最后提交，再以可审计的[设计决策记录](docs/decisions/)保存证据、取舍、变更和测试。模型内部未输出的推理过程不是可导出材料；可核验的公开分析与结论必须入库。
 
 实际数据快照可以通过[GitHub Actions采集任务](.github/workflows/ingest-open-data.yml)和校验器重复获取；不属于已有许可的官方地图影像或真实私密记录不能直接复制入公开仓库。
+
+## v15.0 NPC自主调度（沙盒）
+
+[v15规则](worldbook/v15.md) · [决策引擎](artifacts/v15/planner_v15.py) · [18项测试](artifacts/v15/test_v15.py) · [决策记录](artifacts/v15/sandbox_v15_decisions.json) · [执行日志](artifacts/v15/sandbox_v15_journal.json) · [汇总](artifacts/v15/sandbox_v15_summary.json) · [v15 ZIP](artifacts/earth_realism_v15_bundle.zip) · [公开设计依据](docs/decisions/2026-10-10-v15-limited-agent-scheduling.md)
+
+沿用v14事件引擎新增候选评分、承诺优先、信息先决、日程与位置预约、技能/未知资金约束和合理不作为。原v14 14项回归测试与v15 18项测试全部通过；18个候选9项进入队列、9项拒绝或不作为，最终13条实际执行事件，无资金付款。以上仅为显式S级沙盒输入，不代表31名NPC真实全天生活或正式历史发生变化。
