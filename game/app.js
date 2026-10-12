@@ -217,7 +217,7 @@
       const output=Sim.syncLive(state,Date.now());
       if(state.live?.running&&state.agentAI.mode==="ollama"&&tickCount%10===0)void runOneModel();
       tickCount++;
-      if(tickCount%10===0&&output.advancedMinutes>0)save(true);
+      if(tickCount%10===0)save(true);
       render();
     }catch(err){
       modelStatus="世界同步受阻："+err.message;
