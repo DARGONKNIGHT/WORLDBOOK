@@ -24,6 +24,10 @@ from game.agent_server import Handler
 APP_NAME="地球：现实人生"
 APP_PORT=8765
 
+def game_version():
+    folder=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).resolve().parent)/"game"
+    return (folder/"VERSION").read_text(encoding="utf-8").strip()
+
 MAX_SAVE=3*1024*1024
 class DesktopHandler(Handler):
     """Desktop-only save endpoint; fixed Work/saves location and atomic writes."""
@@ -96,7 +100,7 @@ def self_test():
     root=prepare_directories()
     logging.basicConfig(filename=root/"logs"/"launcher.log",level=logging.INFO,format="%(asctime)s %(levelname)s %(message)s",encoding="utf-8",force=True)
     assets=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).parent)/"game"
-    for name in ("index.html","engine.js","society.js","agent_ai.js","app.js"):
+    for name in ("index.html","engine.js","society.js","agent_ai.js","app.js","VERSION"):
         if not (assets/name).is_file():
             raise RuntimeError(f"Bundled asset missing: {name}")
     service=ThreadingHTTPServer(("127.0.0.1",0),DesktopHandler)
@@ -127,7 +131,7 @@ def main():
     window.configure(bg="#121d26")
     panel=tk.Frame(window,bg="#121d26",padx=24,pady=18)
     panel.pack(fill="both",expand=True)
-    tk.Label(panel,text=APP_NAME+"  v4",font=("Microsoft YaHei",18,"bold"),
+    tk.Label(panel,text=APP_NAME+"  v"+game_version(),font=("Microsoft YaHei",18,"bold"),
              bg="#121d26",fg="#e3eecf").pack(anchor="w")
     tk.Label(panel,text="31名S级自主人物 · 家庭与工作协商 · 本地AI可选",
              font=("Microsoft YaHei",10),bg="#121d26",fg="#aac3c9",pady=10).pack(anchor="w")
