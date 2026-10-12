@@ -9,7 +9,7 @@
   const Sim=window.EarthSimulation;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
-  let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
+  let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="离线有限决策器 · 世界钟不依赖玩家操作";
   let diskQueue=Promise.resolve();
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -40,7 +40,7 @@
     }catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);if(F.audit(loaded).length)throw Error("经济账本未通过核验");loaded.agentAI.realtime=false;return loaded;}
+    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);if(F.audit(loaded).length)throw Error("经济账本未通过核验");Sim.ensureLive(loaded,Date.now());return loaded;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -68,6 +68,10 @@
     $("stat-district").textContent="北京 · "+p.district;
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
+    const task=state.live?.task;
+    $("live-state").textContent=state.live?.running?"世界连续运行 · "+state.live.rate+"×现实时间":"世界已被管理员冻结";
+    $("player-task").textContent=task?"当前行动："+task.kind+" · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
+    $("interrupt-task").disabled=!task;
     $("scene-title").textContent=p.district+"区 · 你所在的城市";
     $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
     $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
@@ -111,8 +115,8 @@
     $("autonomy-enabled").value=String(state.autonomy.enabled);
     const ai=A.ensure(state);
     $("ai-provider").value=ai.mode;
-    $("ai-speed").value=String(ai.speed);
-    $("ai-status").textContent=(ai.realtime?"运行中":"已暂停")+" · "+(ai.mode==="ollama"?"Ollama模型":"离线有限决策器")+" · "+modelStatus;
+    $("ai-speed").value=String(state.live?.rate||1);
+    $("ai-status").textContent=(state.live?.running?"世界时钟持续流动":"模拟已冻结")+" · "+(ai.mode==="ollama"?"Ollama模型":"离线决策器")+" · "+modelStatus;
     $("autonomy-detail").value=state.autonomy.detail;
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
@@ -156,16 +160,29 @@
   function execute(kind,payload={}){
     if(!state)return;
     try{
-      if(kind==="wait")Sim.advance(state,Number(payload.minutes));
-      else {E.act(state,kind,payload);if(kind!=="npc_autonomy"&&state.autonomy.enabled)A.runRules(state,31);}
-      save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");
-    }
-    catch(err){toast(err.message,true);}
+      Sim.syncLive(state,Date.now());
+      if(kind==="npc_autonomy"){E.act(state,kind,payload);}
+      else if(kind==="wait")throw Error("连续世界没有等待/结束回合，时间自然流逝");
+      else {
+        if(state.live?.task){
+          if(!window.confirm("目前正在执行 "+state.live.task.kind+"。要现在中断，并开始新的行动吗？已花费时间不会倒流。"))return;
+          Sim.interruptTask(state,Date.now());
+        }
+        Sim.startTask(state,kind,payload,Date.now());
+      }
+      save(true);render();toast(kind==="npc_autonomy"?"NPC设置已更新":"已开始行动；世界不会暂停，你可以随时介入或打断。");
+    }catch(err){toast(err.message,true);}
+  }
+  function startWorldTimer(){
+    if(autoClock!==null)clearInterval(autoClock);
+    autoClock=setInterval(pulse,1000);
+    window.addEventListener("focus",pulse);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)pulse();});
   }
   function stopRealtime(){
-    if(autoClock!==null){clearInterval(autoClock);autoClock=null;}
-    if(state)A.settings(state,{realtime:false});
-    if(state){save(true);render();}
+    if(!state)return;
+    try{Sim.stopLive(state,Date.now());save(true);render();}
+    catch(err){toast(err.message,true);}
   }
   async function runOneModel(){
     if(modelBusy||!state||!state.agentAI.realtime||state.agentAI.mode!=="ollama")return;
@@ -195,43 +212,36 @@
     }
   }
   function pulse(){
-    if(!state||!state.agentAI.realtime)return;
+    if(!state)return;
     try{
-      const speed=state.agentAI.speed;
-      E.act(state,"background_tick",{minutes:speed});
-      A.runRules(state,31); // all 31 local agents replan when due; model results are separate audited refinements
-      if(state.agentAI.mode==="ollama")void runOneModel();
+      const output=Sim.syncLive(state,Date.now());
+      if(state.live?.running&&state.agentAI.mode==="ollama"&&tickCount%10===0)void runOneModel();
       tickCount++;
-      if(tickCount%5===0)save(true);
+      if(tickCount%10===0&&output.advancedMinutes>0)save(true);
       render();
     }catch(err){
-      modelStatus="实时模拟停止："+err.message;
-      stopRealtime();
+      modelStatus="世界同步受阻："+err.message;
       toast(modelStatus,true);
     }
   }
   async function startRealtime(){
     if(!state)return;
-    const mode=$("ai-provider").value,speed=Number($("ai-speed").value);
-    if(mode==="ollama"){
-      if(speed!==1){toast("本地大模型请使用每秒推进1游戏分钟，以免推理期间的日程过期。",true);return;}
-      if(location.protocol==="file:"){
-        toast("大模型模式需要运行 python3 game/agent_server.py，并打开本地服务的网址。",true);
-        return;
-      }
-      try{
+    try{
+      const mode=$("ai-provider").value,rate=Number($("ai-speed").value);
+      if(mode==="ollama"){
+        if(!desktopServer()){
+          toast("真实模型推理需要运行本机服务，普通静态网页仍可用规则模式",true);return;
+        }
         const response=await fetch("/api/health",{cache:"no-store"});
-        if(!response.ok)throw Error("没有本地模型服务");
-        const status=await response.json();
-        if(status.provider!=="ollama")throw Error("不是Ollama代理");
-        modelStatus="代理已连接；请确保Ollama和模型已启动";
-      }catch(err){toast("无法连接本地模型代理："+err.message,true);return;}
-    }else modelStatus="规则模拟正常；不调用语言模型";
-    A.settings(state,{realtime:true,mode,speed});
-    if(autoClock!==null)clearInterval(autoClock);
-    tickCount=0;
-    autoClock=setInterval(pulse,1000);
-    save(true);render();toast("已启动31名NPC实时模拟，关闭网页后停止。");
+        const info=await response.json();
+        if(!response.ok||info.provider!=="ollama")throw Error("本机Ollama代理不可用");
+        modelStatus="代理已连接，模型调用会异步进行";
+      }else modelStatus="31名NPC采用有限决策规则";
+      Sim.setRate(state,rate,Date.now());
+      A.settings(state,{mode,realtime:true,speed:1});
+      Sim.resumeLive(state,Date.now());
+      save(true);render();toast("世界持续运行中；切换模式无需结束回合。");
+    }catch(err){toast(err.message,true);}
   }
   async function setup(){
     $("new-district").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
@@ -242,20 +252,17 @@
       try{
         const form=new FormData(ev.currentTarget);
         state=E.makeGame(Object.fromEntries(form.entries()));
-        A.ensure(state);
+        A.ensure(state);Sim.ensureLive(state,Date.now());
         save(true);
         $("setup").close();
         selectTab("life");render();
-        toast("新游戏已创建。世界时钟开始按你的行动推进。");
+        toast("新游戏已创建。世界现在连续流动；你可以随时参与。");
       }catch(err){$("setup-error").textContent=err.message;}
     });
     document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
     document.querySelectorAll(".action-card").forEach(b=>b.addEventListener("click",()=>{
       const kind=b.dataset.kind;
-      if(kind!=="wait"){execute(kind);return;}
-      const input=window.prompt("本次等待多少分钟？（1—480，时间不会在后台自行流逝）","60");
-      if(input===null)return;
-      execute("wait",{minutes:Number(input)});
+      execute(kind);
     }));
     $("travel-form").addEventListener("submit",ev=>{
       ev.preventDefault();
@@ -292,9 +299,9 @@
     });
     $("world-npc").addEventListener("change",()=>renderWorld());
     $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
-    $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("实时世界已暂停。");});
-    $("world-step-60").addEventListener("click",()=>execute("wait",{minutes:60}));
-    $("world-step-240").addEventListener("click",()=>execute("wait",{minutes:240}));
+    $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("管理员已冻结本地模拟（正常游玩无需此操作）。");});
+    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast("当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
       execute("message",{recipient:$("message-to").value,text:$("message-text").value});
@@ -319,7 +326,7 @@
         const candidate=E.upgradeGame(JSON.parse(await file.text()));
         if(F.audit(candidate).length)throw Error("导入账本金额不守恒，无法恢复");
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
-        state=candidate;A.ensure(state);state.agentAI.realtime=false;save(true);$("setup").close();selectTab("life");render();
+        state=candidate;A.ensure(state);Sim.ensureLive(state,Date.now());save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
       }catch(err){toast("导入失败："+err.message,true);}
       finally{ev.target.value="";}
@@ -338,13 +345,14 @@
         const res=await fetch("/api/save",{cache:"no-store"});
         if(res.ok){
           const candidate=E.upgradeGame(await res.json());
-          A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");candidate.agentAI.realtime=false;
+          A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");Sim.ensureLive(candidate,Date.now());
           state=candidate;localStorage.setItem(KEY,JSON.stringify(state));
         }
       }catch(err){console.warn("Work/saves恢复不可用，回退浏览器存档：",err);}
     }
-    if(state){selectTab("life");render();}
+    if(state){Sim.syncLive(state,Date.now());selectTab("life");render();}
     else{$("setup").showModal();}
+    startWorldTimer();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
 })();
