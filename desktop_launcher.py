@@ -14,6 +14,7 @@ from pathlib import Path
 import sys
 import threading
 import webbrowser
+import urllib.request
 import tkinter as tk
 from tkinter import messagebox
 from http.server import ThreadingHTTPServer
@@ -90,6 +91,30 @@ def prepare_directories(root=None):
         (root/name).mkdir(parents=True,exist_ok=True)
     return root
 
+def self_test():
+    """Headless smoke test of the actual frozen .exe's bundled local web service."""
+    root=prepare_directories()
+    assets=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).parent)/"game"
+    for name in ("index.html","engine.js","society.js","agent_ai.js","app.js"):
+        if not (assets/name).is_file():
+            raise RuntimeError(f"Bundled asset missing: {name}")
+    service=ThreadingHTTPServer(("127.0.0.1",0),DesktopHandler)
+    thread=threading.Thread(target=service.serve_forever,daemon=True)
+    thread.start()
+    try:
+        base=f"http://127.0.0.1:{service.server_port}"
+        with urllib.request.urlopen(base+"/api/health",timeout=5) as response:
+            if response.status!=200:raise RuntimeError("Local health check failed")
+        with urllib.request.urlopen(base+"/index.html",timeout=5) as response:
+            page=response.read(300000)
+            if b'<script src="./society.js"></script>' not in page:
+                raise RuntimeError("Local frontend missing society wiring")
+        logging.info("Frozen executable self-test passed; assets=%s",assets)
+    finally:
+        service.shutdown()
+        service.server_close()
+    return 0
+
 def main():
     root=prepare_directories()
     logging.basicConfig(filename=root/"logs"/"launcher.log",level=logging.INFO,
@@ -131,6 +156,8 @@ def main():
 
 if __name__=="__main__":
     try:
+        if "--self-test" in sys.argv:
+            raise SystemExit(self_test())
         raise SystemExit(main())
     except Exception:
         root=prepare_directories()
