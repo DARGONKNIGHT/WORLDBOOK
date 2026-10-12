@@ -129,6 +129,14 @@ test("余额单方篡改即使历史借贷平衡也会被发现并拒绝继续�
  assert.throws(()=>F.settle(s,{quoteId:id,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"}),/审计失败/);
  assert.equal(F.ensure(s).ledger.length,0);
 });
+test("结算前预检接收方余额上限，失败不得单方扣款",()=>{
+ const s=setup();stage(s,1,500,10000000);const id=reported(s);
+ F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
+ const original=JSON.stringify(F.ensure(s).accounts);
+ assert.throws(()=>F.settle(s,{quoteId:id,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"}),/账本上限/);
+ assert.equal(JSON.stringify(F.ensure(s).accounts),original);
+ assert.equal(F.ensure(s).ledger.length,0);
+});
 test("即使双方账本守恒，篡改交易价格或收款身份仍被审计拒绝",()=>{
  const s=setup();stage(s,120,500,50);const id=reported(s);
  F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
