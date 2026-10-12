@@ -33,6 +33,7 @@ jobs:
         run: |
           node --check game/engine.js
           node --check game/society.js
+          node --check game/economy.js
           node --check game/agent_ai.js
           node --check game/app.js
           node --check game/tests/engine.test.cjs
