@@ -115,3 +115,14 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - 正式世界书v33与2026-10-09的冻结状态无修改；世界书版本未因EXE发行而虚增。
 
 - [x] [最终Windows EXE按game/VERSION=4.0.0自动命名并成功交付](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38195105942)：构建产物 EarthRealism-Windows-v4.0.0-Work，已通过真实打包、目录校验与运行期EXE --self-test。今后版本须同时更新game/VERSION、CHANGELOG顶层版本并重新构建；EXE没有直接存入git源码树。
+
+
+## 2026-10-12 世界书v34 / Game5.0.0 · 经济链与Windows EXE交付
+
+- [x] [v34世界书](../worldbook/v34.md)及主档案、版本索引：把已知亲属/同事社交状态拓展为报价→延迟送达→独立接受/拒绝→履约报告→外视角模拟核验→双向会计分录，严格继承R/S/U及正式冻结条件。
+- [x] [Game5经济状态机](../game/economy.js)与[连续时间引擎](../game/simulation.js)：明确的S级测试余额与报价，逐10游戏分钟结算31人可行动作、消息队列及因果顺序；NPC的本机模型只可见自己的测试余额及已经送达的报价。正式私人财产及银行余额仍是U。
+- [x] 账本支持报价核验、余额不足与上限阻断、成对一借一贷、不可重复支付、与开局余额及报价金额/当事人重新核对；保存/导入亦拒绝审计失衡账本。未知现实交易不自动生成。
+- [x] [最终GitHub离线测试](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38197439202)：53项JavaScript测试和5项Python本地模型代理契约测试全部通过；更新日志倒序、EXE构建规划和HTML可重复构建通过。
+- [x] [Windows 5.0真实EXE构建成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38197439111)：已打包Work/EarthRealism.exe及Work/_internal、工作目录验证、运行打包后EXE的--self-test、桌面本地存档测试全部成功；下载产物EarthRealism-Windows-v5.0.0-Work（GitHub Artifact有限期保留）。
+- [ ] 后续需要独立执行真实库存和订单、企业/个人核实的余额及授权、法律合规税费、实际维修或其它现场工作与验收、可靠北京路由和更深层31人人物长期记忆。当前仅是工作合作伙伴的S级经济沙盒案例，不是现实款项支付。
+- 正式游戏仍以2026-10-09为冻结基准，未创建玩家与正式事件，顺义前礼务村仍只是区域观察样本。
