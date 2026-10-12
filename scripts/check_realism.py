@@ -19,7 +19,13 @@ master=content("docs/WORLDBOOK_MASTER.md")
 version=content("game/VERSION").strip()
 readme=content("README.md")
 changelog=content("CHANGELOG.md")
-world=content("worldbook/v36.md")
+match=re.search(r"统一世界书主档案 v([1-9]\\d*)\\.0",master)
+assert match,"Missing authoritative worldbook version in master"
+world_version=int(match.group(1))
+world=content(f"worldbook/v{world_version}.md")
+versions_index=content("docs/VERSIONS.md")
+assert f"| v{world_version} |" in versions_index, "Worldbook version missing from index"
+assert f"**v{world_version}.0**" in readme, "README worldbook version out of sync"
 sim=content("game/simulation.js")
 engine=content("game/engine.js")
 tests=content("game/tests/realism.test.cjs")
@@ -43,4 +49,4 @@ for name,workflow in [("Linux",linux),("Windows",win)]:
     assert "realism.test.cjs" in workflow or "game/tests/*.test.cjs" in workflow,f"{name} CI must run physical realism regression"
     assert "AGENTS.md" in workflow and "docs/REALISM_CONSTITUTION.md" in workflow, f"{name} CI must trigger on core policy changes"
 assert "Build Windows EXE entirely within Work" in win and "Smoke-test the frozen Windows EXE" in win
-print(f"Realism-first gate passed: Game {version}; charter, physical-action regression, worldbook, EXE layout and dual CI workflows")
+print(f"Realism-first gate passed: Worldbook v{world_version} / Game {version}; charter, physical-action regression, EXE containment and dual CI")
