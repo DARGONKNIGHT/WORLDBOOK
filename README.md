@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前世界书：**v34.0** · 当前试玩游戏：**5.0.0** · 冻结基准：2026-10-09
+> 当前世界书：**v35.0** · 当前试玩游戏：**6.0.0** · 冻结基准：2026-10-09
 >
 > **[查看最新更新日志（最新条目在最上方）](CHANGELOG.md)** · [Windows EXE主交付与操作说明](game/README.md)
 
@@ -18,7 +18,7 @@
 | 内容 | 链接 |
 |---|---|
 | 世界书总纲 | [docs/WORLDBOOK_MASTER.md](docs/WORLDBOOK_MASTER.md) |
-| v2—v34版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
+| v2—v35版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
 | v2—v12整理版章节 | [worldbook/](worldbook/) |
 | 31名模拟NPC索引 | [docs/NPC_ROSTER.md](docs/NPC_ROSTER.md) |
 | v13审计资料 | [artifacts/v13/](artifacts/v13/) |
@@ -113,3 +113,8 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 ## v34 / Game5.0：NPC自主经济活动与有证据的记账
 
 已新增[世界书v34](worldbook/v34.md)，明确既有工作合作关系中的协商→延迟送达→S级报价→接受/拒绝→报告→核验→**双方同额反向模拟记账**。网页社会后台须由用户显式提供S级假设价格与两位已知合作者的测试余额。没有证据就不会凭空生成交易、工资和真实银行余额。Game5新版交付仍使用Windows EXE，版本产物由[Windows打包工作流](.github/workflows/windows-exe.yml)产生，所有中间文件按原规则置于Work/下；旧HTML仅为兼容入口。
+
+
+## v35 / Game6.0：取消回合的持续运转世界
+
+已新增[世界书v35](worldbook/v35.md)，为全部31名NPC与玩家统一连续时钟。角色创建后世界自动运行，无须按“等待”推进；玩家的工作、出行、探索等先开始、再按耗时完成，并可随时中断以投入其他活动，不强制轮流行动。网页未激活时按墙钟补算，最多单次480游戏分钟，无法验证的额外离线时间明确记录未模拟，不能宣称真正24小时持续运行。Windows EXE仍为新版主交付，所有中间文件限制在Work/目录。
