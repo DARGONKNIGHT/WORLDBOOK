@@ -1,0 +1,94 @@
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const E=require("../engine.js"),Sim=require("../simulation.js");
+const START=2000000000000;
+const game=(over={})=>E.makeGame({name:"物理真实性测试",age:27,district:"顺义",cash:"100",occupation:"服务业",start:"09:00",...over});
+test("途中位置标为U，仍保留最后确认区与目的地而不伪造具体GPS",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"海淀",minutes:60,fare:12},START);
+ assert.equal(s.player.district,"顺义");
+ assert.equal(s.player.mobility.status,"en_route");
+ assert.equal(s.player.mobility.positionGrade,"U");
+ assert.equal(s.player.mobility.lastKnownDistrict,"顺义");
+ assert.equal(s.player.mobility.to,"海淀");
+ Sim.syncLive(s,START+20*60000);
+ assert.equal(s.player.mobility.status,"en_route");
+ assert.equal(s.player.district,"顺义");
+ assert.equal(s.player.cash,100);
+ assert.throws(()=>E.act(s,"social"),/途中/);
+});
+test("中途取消绝不瞬移回出发地，不得在未知地点参加本地活动",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"海淀",minutes:60,fare:12},START);
+ Sim.syncLive(s,START+30*60000);Sim.interruptTask(s,START+30*60000);
+ assert.equal(s.player.mobility.status,"stranded");
+ assert.equal(s.player.mobility.remainingMs,30*60000);
+ assert.equal(s.player.district,"顺义"); // only last-confirmed, NOT present physical location
+ assert.equal(s.player.cash,100);
+ assert.throws(()=>Sim.startTask(s,"social",{},START+30*60000),/当前位置未知|行程仍在途中/);
+ assert.throws(()=>Sim.startTask(s,"travel",{destination:"丰台",minutes:15,fare:0},START+30*60000),/当前位置未知|行程仍在途中/);
+ assert.throws(()=>E.act(s,"work"),/途中/);
+ assert.doesNotThrow(()=>E.validateGame(s));
+});
+test("恢复既有行程只花费剩余时间，原价不重复扣，体力合计不超过8",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"海淀",minutes:60,fare:12},START);
+ Sim.syncLive(s,START+30*60000);
+ Sim.interruptTask(s,START+30*60000);
+ assert.equal(s.player.energy,76);
+ const begun=Sim.resumeTravel(s,START+30*60000);
+ assert.equal(begun.endsAt-s.time,30*60000);
+ assert.equal(s.player.mobility.status,"en_route");
+ Sim.syncLive(s,START+60*60000);
+ assert.equal(s.player.mobility,null);
+ assert.equal(s.player.district,"海淀");
+ assert.equal(s.player.energy,72);
+ assert.equal(s.player.cash,88);
+ assert.equal(s.journal.filter(j=>j.kind==="arrival").length,1);
+ assert.ok(s.journal.some(j=>j.kind==="journey_resumed"));
+});
+test("暂停途中再继续两次也不能重复报销、重复消耗体力或自动告知GPS",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"朝阳",minutes:60,fare:8},START);
+ Sim.syncLive(s,START+10*60000);Sim.interruptTask(s,START+10*60000);
+ assert.equal(s.player.mobility.travelEnergySpent,1);
+ Sim.resumeTravel(s,START+10*60000);
+ Sim.syncLive(s,START+30*60000);Sim.interruptTask(s,START+30*60000);
+ assert.equal(s.player.mobility.remainingMs,30*60000);
+ assert.equal(s.player.mobility.travelEnergySpent,4);
+ Sim.resumeTravel(s,START+30*60000);
+ Sim.syncLive(s,START+60*60000);
+ assert.equal(s.player.district,"朝阳");
+ assert.equal(s.player.energy,72);
+ assert.equal(s.player.cash,92);
+ assert.equal(s.player.mobility,null);
+});
+test("未中断直接抵达，仍需完整耗时才改变已知所在地",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"丰台",minutes:15,fare:0},START);
+ Sim.syncLive(s,START+14*60000);
+ assert.equal(s.player.mobility.status,"en_route");
+ assert.equal(s.player.district,"顺义");
+ Sim.syncLive(s,START+15*60000);
+ assert.equal(s.player.district,"丰台");
+ assert.equal(s.player.mobility,null);
+});
+test("在途或中断位置的存档损坏被拒绝；未知地点不准冒充现实事实",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"朝阳",minutes:50,fare:0},START);
+ const copy=JSON.parse(JSON.stringify(s));
+ E.validateGame(copy);
+ copy.player.mobility.positionGrade="R";
+ assert.throws(()=>E.validateGame(copy),/行程时长、未知位置/);
+ copy.player.mobility.positionGrade="U";
+ copy.player.district="朝阳";
+ assert.throws(()=>E.validateGame(copy),/最后确认行政区/);
+});
+test("原有无在途字段存档可向后兼容，不能无原因创造旅行",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ const copy=JSON.parse(JSON.stringify(s));
+ delete copy.player.mobility;
+ assert.doesNotThrow(()=>E.upgradeGame(copy));
+ assert.equal(copy.player.mobility,undefined);
+ assert.throws(()=>Sim.resumeTravel(copy,START),/没有可恢复/);
+});
