@@ -19,7 +19,7 @@ master=content("docs/WORLDBOOK_MASTER.md")
 version=content("game/VERSION").strip()
 readme=content("README.md")
 changelog=content("CHANGELOG.md")
-match=re.search(r"统一世界书主档案 v([1-9]\\d*)\\.0",master)
+match=re.search(r"统一世界书主档案 v([1-9][0-9]*)[.]0",master)
 assert match,"Missing authoritative worldbook version in master"
 world_version=int(match.group(1))
 world=content(f"worldbook/v{world_version}.md")
