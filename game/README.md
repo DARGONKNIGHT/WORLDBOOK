@@ -10,6 +10,37 @@
 
 **源代码方法**：下载本仓库 ZIP，解压后双击 game/index.html；该入口会引用同目录 engine.js、app.js、style.css。两个入口都可离线玩。
 
+## Game 4.0 · Windows EXE（今后版本主要交付）
+
+**标准下载方式：** 打开[Windows EXE构建工作流](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/workflows/windows-exe.yml)，选择最近一个成功的运行，从 Artifacts 下载 `EarthRealism-Windows-v4-Work`。解压到一个叫 `Work` 的目录，使目录结构如下：
+
+```text
+Work/
+├── EarthRealism.exe      ← 双击启动
+├── _internal/            ← Python依赖、网页引擎（必须和exe同目录）
+├── README.txt
+├── logs/                 ← 运行日志（首次启动时创建）
+├── saves/                ← 本地游戏存储预留目录
+└── tmp/                  ← 本地临时数据
+```
+
+点击 `Work/EarthRealism.exe` 会在本机启动`127.0.0.1:8765`游戏服务和你的默认浏览器。Windows不能有另一个程序占用该端口。**不需要Python或命令行，游戏核心在EXE打包依赖中**；可选真实AI语言模型依然需自行安装Ollama（不自动下载模型），见下方Game 3.0步骤。
+
+**构建与目录约束：** 在Windows环境中安装PyInstaller后从仓库根目录运行：
+
+```powershell
+python -m pip install "pyinstaller>=6.10,<7"
+python scripts/build_windows_exe.py --output Work
+python scripts/build_windows_exe.py --output Work --verify-layout
+```
+
+构建中间文件均存储于同一 `Work/` 下：`.build/`、`.spec/`、`.cache/`、`tmp/`、`.stage/`；运行依赖为 `_internal/`，运行日志在`logs/`。使用`--onedir`形式，所以程序运行时不会把自身解压到系统临时目录。`Work/`被.gitignore排除，EXE通过GitHub Actions产物交付，不将二进制直接提交到源码仓库。后续版本继续遵循此相对路径规则。
+
+**新增社会事件：** 游戏运行时，已知家人或同事可基于当前工作/家庭日程主动提出协商，消息到达后另一方才有机会独立审阅和回复；角色的岗位责任、已有消息、S级时间和事件状态都会影响结果。在「社会后台」查看状态与审计。这是有限事务链，**不等于已经核实或完成工作合同、劳资支付、社会福利审批或财务结算**。
+
+**旧版游戏与存档：** 旧网页单文件仍保留用于兼容、测试和历史导入，但不再是新版主要发行方式。启动器内的游戏仍在浏览器本地存储中保存，**请定期导出JSON**；`Work/saves/`当前仅是预留目录，不能误称自动存档已经迁移到那里。
+
+
 ## 游戏 3.0：31名自主智能体、实时模拟与可选真实AI
 
 **建议先使用离线模式试玩。** 进入「社会后台」→「31名独立NPC · 持续思考模式」，选择「离线 · 有限决策器」，选择游戏时钟倍率后点击「启动实时世界」。页面打开且运行时，31名NPC维护自己的目标、需求、私有记忆和计划，约每30游戏分钟重新做出自主选择。点击「暂停实时世界」停止。所有自主事件为玩家外视角，不会自动变成主角已知信息。**离线决策器不是语言模型。**
