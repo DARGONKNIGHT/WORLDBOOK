@@ -98,6 +98,17 @@
             <div class="autonomy-steps"><button type="button" class="ghost" id="world-step-60">所有NPC自主运行 1 小时</button><button type="button" class="ghost" id="world-step-240">所有NPC自主运行 4 小时</button><span class="micro">会推进游戏时间；暂停时按钮只推进时间，不生成活动</span></div>
             <div class="autonomy-focus"><label>观察单个人物（玩家外视角）<select id="world-npc"></select></label><div id="npc-preview" class="npc-preview"></div></div>
           </section>
+          <section class="panel autonomy-controls" id="ai-control-panel">
+            <div class="panel-head"><span>31名独立NPC · 持续思考模式</span><span class="tag">S · 实时仅在页面打开时</span></div>
+            <p class="panel-desc">每个NPC有自己的需求、目标、私有记忆、候选行动与决策记录。规则模式离线运行；真实AI模式需自己在电脑上启动Ollama及本地服务，无法在普通GitHub Pages直接运行。</p>
+            <form id="ai-form" class="autonomy-form">
+              <label>思考引擎<select id="ai-provider"><option value="rules">离线 · 有限决策器（不是大模型）</option><option value="ollama">本机 · Ollama语言模型</option></select></label>
+              <label>时间速度<select id="ai-speed"><option value="1">每秒推进1游戏分钟</option><option value="5">每秒推进5游戏分钟</option><option value="10">每秒推进10游戏分钟</option></select></label>
+              <button class="primary" type="submit" id="ai-start">启动实时世界</button>
+            </form>
+            <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
+            <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
+          </section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
             <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
           </section>
@@ -148,6 +159,7 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./engine.js"></script>
+  <script src="./agent_ai.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
