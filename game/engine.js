@@ -352,6 +352,11 @@
     const p=s.player, at=s.time, noAdvance=payload.__realtimeComplete===true;
     if(p.mobility&&["en_route","stranded"].includes(p.mobility.status)){
       const completing=kind==="travel"&&noAdvance&&p.mobility.status==="en_route";
+      if(completing){
+        assert(payload.destination===p.mobility.to&&Number(payload.minutes)*60000===p.mobility.plannedMs
+          &&Number(payload.fare??0)===Number(p.mobility.fare??0),
+          "恢复行程必须兑现原始目的地、时长与费用，不得途中偷换路线或金额");
+      }
       assert(completing||kind==="background_tick"||kind==="npc_autonomy",
         "角色正在途中且当前所在区未知；请先继续完成原行程，不得在出发区或目的区凭空行动");
     }
