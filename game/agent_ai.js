@@ -99,8 +99,8 @@
   function commit(s,id,result,observedAt=s.time){
     const ai=ensure(s),m=ai.minds[id];
     guard(typeof result==="object"&&result!==null,"模型输出无效");
-    guard(within(observedAt,s.time-15*MINUTE,s.time),"过期决策不写入世界");
-    guard(m.lastAt===null||observedAt>=m.lastAt,"不接受倒序决策");
+    guard(within(observedAt,s.time-60*MINUTE,s.time),"过期决策不写入世界");
+    guard(E.plan(s,id,observedAt).kind===E.plan(s,id,s.time).kind,"人物当前日程已变化，旧模型结果已丢弃");
     const allowed=choices(s,id,s.time).options.map(x=>x.id);
     guard(allowed.includes(result.choice),"候选行动之外的命令被拒绝");
     const source=result.provider==="ollama"?"ollama":"rules";
