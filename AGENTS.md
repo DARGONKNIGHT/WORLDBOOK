@@ -22,6 +22,7 @@
 - **中间文件必须与EXE同根目录**：例如 `Work/EarthRealism.exe`，则运行依赖为 `Work/_internal/`，编译/缓存/规格/临时文件分别放在 `Work/.build/`、`Work/.cache/`、`Work/.spec/`、`Work/tmp/`；临时日志与存档在 `Work/logs/` 和 `Work/saves/`。不能把构建中间文件零散写入仓库根目录、其他游戏目录或系统临时文件夹。
 - 可变更输出目录，但所有上述路径须以指定输出目录为同一根。示例：`python scripts/build_windows_exe.py --output Work`。使用PyInstaller `--onedir`避免打包程序再次在系统TEMP解压。
 - 每次游戏功能变更同时触发 `.github/workflows/windows-exe.yml`，在验收报告中单独列出 **EXE打包成功/失败** 和可下载产物位置，不能把JavaScript测试通过冒充EXE构建成功。
+- 发布新版时同时更新 `game/VERSION`（SemVer）、`CHANGELOG.md` 顶部Game版本及游戏说明；Windows Actions按此版本自动命名EXE构建产物，CI检查版本与更新日志必须一致。
 
 ## 永久冻结条件
 - 游戏基准2026-10-09、具体游戏钟点未知；正式游戏没有开始，正式事件账本为空。
