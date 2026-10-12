@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前世界书：**v33.0** · 当前试玩游戏：**2.0.0** · 冻结基准：2026-10-09
+> 当前世界书：**v33.0** · 当前试玩游戏：**3.0.0** · 冻结基准：2026-10-09
 >
 > **[查看最新更新日志（最新条目在最上方）](CHANGELOG.md)** · [立即下载可玩的单文件游戏](game/earth-realism.html)
 
@@ -96,6 +96,8 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 
 
 ## 可直接游玩的浏览器游戏 · 独立试玩层
+
+**游戏3.0新增实时NPC模式**：31名NPC各自维护目标、需求、记忆与有限行动选择；游戏页面打开期间可按时间倍率持续推进。额外提供可选的本机Ollama真实语言模型决策，需自行运行本地服务（见[启动说明](game/README.md)），不支持GitHub Pages免安装直接运行LLM。此功能仍为独立S级分支，不修改正式冻结世界。
 
 新增 [《地球：现实人生》离线单文件](game/earth-realism.html)（在GitHub文件页面下载后双击即可玩）、[游戏启动与操作说明](game/README.md)、[多文件源码](game/)、[自动化测试](game/tests/engine.test.cjs)、[自动测试](.github/workflows/game-tests.yml)及[手动Pages发布工作流](.github/workflows/game-pages.yml)。Pages实际启用和部署成功后可从 https://dargonknight.github.io/WORLDBOOK/ 访问；如果Pages尚未启用，本地单文件不受影响。
 
