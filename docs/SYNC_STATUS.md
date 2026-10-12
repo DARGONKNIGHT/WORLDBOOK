@@ -113,3 +113,5 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [x] [35项JavaScript用例及5项Python代理用例成功验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38194902953)；倒序更新日志、单HTML兼容版本可重复构建检查通过。另Windows工作流包含本地桌面存档测试。
 - [ ] 尚缺完整受证据约束的劳资合同/工资与双边银行账本、住房服务与机构资格、北京市完整现实交通、真正24小时独立模型常驻、人工在用户设备上的图形交互验收。Game 4.0是下一阶段的有限可玩事务链，不是完整真实地球。
 - 正式世界书v33与2026-10-09的冻结状态无修改；世界书版本未因EXE发行而虚增。
+
+- [x] [最终Windows EXE按game/VERSION=4.0.0自动命名并成功交付](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38195105942)：构建产物 EarthRealism-Windows-v4.0.0-Work，已通过真实打包、目录校验与运行期EXE --self-test。今后版本须同时更新game/VERSION、CHANGELOG顶层版本并重新构建；EXE没有直接存入git源码树。
