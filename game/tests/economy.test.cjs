@@ -121,6 +121,14 @@ test("有明确工作事务但无经济假设仍只可以协商，不得自动�
  assert.equal(F.ensure(s).transfers.length,0);
  assert.equal(s.player.cash,null);
 });
+test("余额单方篡改即使历史借贷平衡也会被发现并拒绝继续结算",()=>{
+ const s=setup();stage(s);const id=reported(s);
+ F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
+ F.ensure(s).accounts.P014+=100;
+ assert.ok(F.audit(s).some(x=>x.includes("does not reconcile")));
+ assert.throws(()=>F.settle(s,{quoteId:id,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"}),/审计失败/);
+ assert.equal(F.ensure(s).ledger.length,0);
+});
 test("审计能检测存档篡改造成的失衡条目",()=>{
  const s=setup();stage(s);const id=reported(s);
  F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
