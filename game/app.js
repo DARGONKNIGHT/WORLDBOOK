@@ -128,7 +128,8 @@
     if(quotes.some(q=>q.id===oldQuote))quoteSelect.value=oldQuote;
     const balance=(id)=>economy.accounts[id]===undefined?"未知（U）":"¥"+(economy.accounts[id]/100).toLocaleString("zh-CN")+"（S）";
     $("economy-status").innerHTML='<p class="micro">马志强测试余额：'+balance("P014")+'；高鹏测试余额：'+balance("P015")+'。该余额仅属游戏试验，与现实财产及玩家资产无关。</p>'+
-      (quotes.length?quotes.slice(-10).reverse().map(q=>'<article class="log-line"><div class="meta">'+escapeHTML(q.id)+' · '+escapeHTML(q.status)+' · S级模拟</div><p>价格：¥'+(q.priceCents/100).toLocaleString("zh-CN")+'；'+escapeHTML(q.caseId)+' · '+(q.verifiedAt?"已核验模拟交付；":"真实履约未证明；")+(q.paidAt?"已S级成对记账":"未付款")+'</p></article>').join(""):'<p class="micro">暂无报价。须先完成工作协商并建立显式S级测试条件。</p>');
+      (quotes.length?quotes.slice(-10).reverse().map(q=>'<article class="log-line"><div class="meta">'+escapeHTML(q.id)+' · '+escapeHTML(q.status)+' · S级模拟</div><p>价格：¥'+(q.priceCents/100).toLocaleString("zh-CN")+'；'+escapeHTML(q.caseId)+' · '+(q.verifiedAt?"已核验模拟交付；":"真实履约未证明；")+(q.paidAt?"已S级成对记账":"未付款")+'</p></article>').join(""):'<p class="micro">暂无报价。须先完成工作协商并建立显式S级测试条件。</p>')+
+      economy.transfers.slice(-15).reverse().map(t=>'<article class="log-line"><div class="meta">'+escapeHTML(t.id)+' · 成对账本 · '+escapeHTML(E.clock(t.at))+'</div><p>¥'+(t.amountCents/100).toLocaleString("zh-CN")+' · P014减少 / P015增加，均为S级测试；分录数：'+economy.ledger.filter(l=>l.txId===t.id).length+'</p></article>').join("");
     $("society-count").textContent=society.cases.length;
     $("society-list").innerHTML=society.cases.length?society.cases.slice(-35).reverse().map(x=>
       '<article class="log-line"><div class="meta">'+escapeHTML(E.clock(x.createdAt))+' · '+escapeHTML(x.id)+' · '+escapeHTML(x.status)+'</div><p>'+escapeHTML(x.title)+' · '+escapeHTML(NPC(x.from)?.name||x.from)+' → '+escapeHTML(NPC(x.to)?.name||x.to)+(x.result?'；'+escapeHTML(x.result):'；等待对方知情并决定')+'</p></article>').join(""):'<p class="micro">尚无模拟协商事务。开启自主NPC模拟、推进游戏时间后，既有家人/同事才可能发起事务。</p>';
