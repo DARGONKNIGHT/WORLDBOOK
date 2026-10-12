@@ -340,7 +340,11 @@
     validateGame(s);
     assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
     const p=s.player, at=s.time;
-    if(kind==="travel"){
+    if(kind==="background_tick"){
+      const minutes=Number(payload.minutes);
+      assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=10,"实时推进每秒只允许1—10游戏分钟");
+      advance(s,minutes);
+    }else if(kind==="travel"){
       const to=validText(payload.destination,10), minutes=Number(payload.minutes);
       const fare=payload.fare===""||payload.fare===undefined?0:Number(payload.fare);
       assert(DISTRICTS.includes(to)&&to!==p.district,"请选择不同的目的区");
