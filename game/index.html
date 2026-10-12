@@ -57,7 +57,8 @@
           <section class="panel"><div class="panel-head"><span>连续世界 · 当前状态</span><span class="tag">无回合</span></div>
           <p class="micro" id="live-state">世界正在初始化…</p><p id="player-task">当前空闲 · 可随时行动</p>
           <button type="button" class="ghost" id="interrupt-task" disabled>随时中断当前行动</button>
-          <p class="micro">行动有实际占用时间；到期后结算结果。你可以在途中中断改做其他事，NPC及消息传播不会因此等待。</p></section>
+          <button type="button" class="primary" id="resume-travel" hidden>继续原行程 · 不凭空定位</button>
+          <p class="micro">现场行动有真实时间与位置占用。途中取消跨区出行不会让人物回到出发区；路线/GPS缺失时位置记为未知(U)，只能继续原S级预计行程。NPC仍按各自日程活动。</p></section>
           <div class="section-head"><h2>任何时刻，你都可以介入。</h2><span>没有结束回合、等待或轮流行动</span></div>
           <div class="actions-grid">
             <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
@@ -68,7 +69,7 @@
 
           </div>
           <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
-            <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
+            <p class="panel-desc">出行分钟数与费用为玩家显式输入的S级假设，不是实际导航、GPS或票价。行程中显示在途状态；中断后的行政区未知，禁止瞬移、重复出发或当场进行另一项现场活动。</p>
             <form id="travel-form" class="travel-form">
               <label>目的区<select id="travel-destination" required></select></label>
               <label>预计分钟<input id="travel-minutes" type="number" min="15" max="480" step="1" value="60" required></label>
