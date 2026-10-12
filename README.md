@@ -1,6 +1,6 @@
 # 地球：现实人生 · Earth Realism Worldbook
 
-> 当前世界书：**v33.0** · 当前试玩游戏：**4.0.0** · 冻结基准：2026-10-09
+> 当前世界书：**v34.0** · 当前试玩游戏：**5.0.0** · 冻结基准：2026-10-09
 >
 > **[查看最新更新日志（最新条目在最上方）](CHANGELOG.md)** · [Windows EXE主交付与操作说明](game/README.md)
 
@@ -18,7 +18,7 @@
 | 内容 | 链接 |
 |---|---|
 | 世界书总纲 | [docs/WORLDBOOK_MASTER.md](docs/WORLDBOOK_MASTER.md) |
-| v2—v33版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
+| v2—v34版本与内容保真 | [docs/VERSIONS.md](docs/VERSIONS.md) |
 | v2—v12整理版章节 | [worldbook/](worldbook/) |
 | 31名模拟NPC索引 | [docs/NPC_ROSTER.md](docs/NPC_ROSTER.md) |
 | v13审计资料 | [artifacts/v13/](artifacts/v13/) |
@@ -108,3 +108,8 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 新增 [《地球：现实人生》离线单文件](game/earth-realism.html)（在GitHub文件页面下载后双击即可玩）、[游戏启动与操作说明](game/README.md)、[多文件源码](game/)、[自动化测试](game/tests/engine.test.cjs)、[自动测试](.github/workflows/game-tests.yml)及[手动Pages发布工作流](.github/workflows/game-pages.yml)。Pages实际启用和部署成功后可从 https://dargonknight.github.io/WORLDBOOK/ 访问；如果Pages尚未启用，本地单文件不受影响。
 
 当前已支持玩家自行创建角色、北京区际出行、工作/休息/等待、31名虚构NPC有限后台活动、消息发送/送达、浏览器存档与JSON导入导出。**本游戏是S级独立分支**，不是全量真实地球模拟、不是v14 Python沙盒的全模块网页移植；世界书v33与冻结正式世界未被修改。设计决策记录见 [ADR](docs/decisions/2026-10-10-playable-offline-game.md)。
+
+
+## v34 / Game5.0：NPC自主经济活动与有证据的记账
+
+已新增[世界书v34](worldbook/v34.md)，明确既有工作合作关系中的协商→延迟送达→S级报价→接受/拒绝→报告→核验→**双方同额反向模拟记账**。网页社会后台须由用户显式提供S级假设价格与两位已知合作者的测试余额。没有证据就不会凭空生成交易、工资和真实银行余额。Game5新版交付仍使用Windows EXE，版本产物由[Windows打包工作流](.github/workflows/windows-exe.yml)产生，所有中间文件按原规则置于Work/下；旧HTML仅为兼容入口。
