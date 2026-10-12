@@ -6,6 +6,7 @@
   const A=window.EarthAgents;
   const S=window.EarthSociety;
   const F=window.EarthEconomy;
+  const Sim=window.EarthSimulation;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
@@ -153,7 +154,11 @@
   }
   function execute(kind,payload={}){
     if(!state)return;
-    try{E.act(state,kind,payload);save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");}
+    try{
+      if(kind==="wait")Sim.advance(state,Number(payload.minutes));
+      else {E.act(state,kind,payload);if(kind!=="npc_autonomy"&&state.autonomy.enabled)A.runRules(state,31);}
+      save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");
+    }
     catch(err){toast(err.message,true);}
   }
   function stopRealtime(){
