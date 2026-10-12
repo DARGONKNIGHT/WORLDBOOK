@@ -126,3 +126,14 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [x] [Windows 5.0真实EXE构建成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38197439111)：已打包Work/EarthRealism.exe及Work/_internal、工作目录验证、运行打包后EXE的--self-test、桌面本地存档测试全部成功；下载产物EarthRealism-Windows-v5.0.0-Work（GitHub Artifact有限期保留）。
 - [ ] 后续需要独立执行真实库存和订单、企业/个人核实的余额及授权、法律合规税费、实际维修或其它现场工作与验收、可靠北京路由和更深层31人人物长期记忆。当前仅是工作合作伙伴的S级经济沙盒案例，不是现实款项支付。
 - 正式游戏仍以2026-10-09为冻结基准，未创建玩家与正式事件，顺义前礼务村仍只是区域观察样本。
+
+
+## 2026-10-12 世界书v35 / Game6.0.0 · 去回合化持续世界已验收
+
+- [x] [v35完整世界书](../worldbook/v35.md)、[新决策记录](decisions/2026-10-12-v35-game6-continuous-time.md)及主档案/版本索引：NPC与玩家共享统一单调时钟，默认1×真实时间，玩家中途介入与行动占用，中断具部分体力成本与结果复核；非整分钟开始也应经过完整行动时长。
+- [x] [持续模拟执行器](../game/simulation.js)、[游戏入口](../game/app.js)、[UI](../game/index.html)：角色创建后自动运行，清除等待/结束回合和所有NPC手动推进按钮。离线有限决策器始终与玩家共享模拟时间，Ollama本地模型可选；经济、消息和人物私人认知边界未被绕过。
+- [x] 关闭标签页/电脑时无永久AI后台进程；恢复时按最新合法本地存档墙钟有界追算，单次至多480模拟分钟，超限缺失段标为U。浏览器计时器被节流时也按实际经过的墙钟差额重放；主机时钟向后调整不得使模拟历史逆行。桌面版仍Work/saves自动保存/恢复，与浏览器缓存比较最新时间版本。
+- [x] [GitHub Game6离线CI成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38200683190)：JavaScript 66/66通过，Python本地AI代理5/5通过，更新日志顺序与单HTML源文件一致性通过。
+- [x] [Windows Game6 EXE实际编译并自检成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38200683072)：Artifact **EarthRealism-Windows-v6.0.0-Work**，打包exe和依赖位于同一Work根目录，构建缓存/中间物限制Work，冻结EXE --self-test、桌面本地存档契约及资源完整性通过。GitHub Actions下载件为有限期保留，未进行用户本人设备的GUI交互测试。
+- [ ] 尚未实现exe进程在浏览器彻底关闭期间独立实时计算NPC或完全24小时AI社会；超出480模拟分钟不编造离线生活。NPC行为仍为有限自主状态机，并非31个并行真人水平大模型。真实企业、金融、交通、合同、劳动和医疗资料仍缺。
+- 正式世界书基准2026-10-09、具体钟点U、玩家未创建、真实历史为空、前礼务村仅为观察样本，正式档案不受影响。
