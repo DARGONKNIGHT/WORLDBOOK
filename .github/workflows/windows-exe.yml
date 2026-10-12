@@ -39,10 +39,18 @@ jobs:
           python -m unittest discover -s game/tests -p "test_*server*.py" -v
           python scripts/check_changelog.py
           python scripts/build_standalone_game.py --check
+      - name: Test EXE-local disk saves
+        run: python -m unittest discover -s game/tests -p "test_desktop*.py" -v
       - name: Build Windows EXE entirely within Work
         run: python scripts/build_windows_exe.py --output Work
       - name: Check EXE and co-located assets
         run: python scripts/build_windows_exe.py --output Work --verify-layout
+      - name: Smoke-test the frozen Windows EXE
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath (Resolve-Path "Work/EarthRealism.exe") -ArgumentList "--self-test" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "Frozen EXE smoke test failed with exit code $($proc.ExitCode)" }
+          if (-not (Test-Path "Work/logs/launcher.log")) { throw "EXE self-test did not create Work/logs/launcher.log" }
       - name: Upload Work directory (EXE plus runtime files)
         uses: actions/upload-artifact@v4
         with:
