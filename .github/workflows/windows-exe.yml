@@ -10,6 +10,11 @@ on:
       - "scripts/build_standalone_game.py"
       - ".github/workflows/windows-exe.yml"
       - "CHANGELOG.md"
+      - "AGENTS.md"
+      - "docs/REALISM_CONSTITUTION.md"
+      - "docs/WORLDBOOK_MASTER.md"
+      - "worldbook/**"
+      - "scripts/check_realism.py"
   workflow_dispatch:
 
 permissions:
@@ -19,6 +24,8 @@ jobs:
   windows-executable:
     runs-on: windows-latest
     timeout-minutes: 30
+    env:
+      PYTHONPYCACHEPREFIX: Work/.pycache
     steps:
       - uses: actions/checkout@v4
       - name: Install Python
@@ -35,10 +42,11 @@ jobs:
           node --check game/agent_ai.js
           node --check game/simulation.js
           node --check game/app.js
-          node --test game/tests/engine.test.cjs game/tests/agents.test.cjs game/tests/society.test.cjs game/tests/economy.test.cjs game/tests/simulation.test.cjs game/tests/live.test.cjs
+          node --test game/tests/engine.test.cjs game/tests/agents.test.cjs game/tests/society.test.cjs game/tests/economy.test.cjs game/tests/simulation.test.cjs game/tests/live.test.cjs game/tests/realism.test.cjs
       - name: Verify Python and changelog
         run: |
           python -m unittest discover -s game/tests -p "test_*server*.py" -v
+          python scripts/check_realism.py
           python scripts/check_changelog.py
           python scripts/build_standalone_game.py --check
       - name: Test EXE-local disk saves
