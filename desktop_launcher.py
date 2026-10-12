@@ -100,7 +100,7 @@ def self_test():
     root=prepare_directories()
     logging.basicConfig(filename=root/"logs"/"launcher.log",level=logging.INFO,format="%(asctime)s %(levelname)s %(message)s",encoding="utf-8",force=True)
     assets=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).parent)/"game"
-    for name in ("index.html","engine.js","society.js","economy.js","agent_ai.js","app.js","VERSION"):
+    for name in ("index.html","engine.js","society.js","economy.js","agent_ai.js","simulation.js","app.js","VERSION"):
         if not (assets/name).is_file():
             raise RuntimeError(f"Bundled asset missing: {name}")
     service=ThreadingHTTPServer(("127.0.0.1",0),DesktopHandler)
