@@ -4,6 +4,7 @@
   "use strict";
   const E=window.EarthGame;
   const A=window.EarthAgents;
+  const S=window.EarthSociety;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
@@ -97,6 +98,10 @@
     $("autonomy-detail").value=state.autonomy.detail;
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
+    const society=S.ensure(state);
+    $("society-count").textContent=society.cases.length;
+    $("society-list").innerHTML=society.cases.length?society.cases.slice(-35).reverse().map(x=>
+      '<article class="log-line"><div class="meta">'+escapeHTML(E.clock(x.createdAt))+' · '+escapeHTML(x.id)+' · '+escapeHTML(x.status)+'</div><p>'+escapeHTML(x.title)+' · '+escapeHTML(NPC(x.from)?.name||x.from)+' → '+escapeHTML(NPC(x.to)?.name||x.to)+(x.result?'；'+escapeHTML(x.result):'；等待对方知情并决定')+'</p></article>').join(""):'<p class="micro">尚无模拟协商事务。开启自主NPC模拟、推进游戏时间后，既有家人/同事才可能发起事务。</p>';
     $("world-total").textContent=records.length;
     $("world-list").innerHTML=logs(records.map(x=>({...x,kind:x.kind||"自主活动"})),150);
     if(id==="all"){
