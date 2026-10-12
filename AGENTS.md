@@ -16,6 +16,13 @@
 - **新的更新条目必须写在现有条目上方**，日期倒序；同日则按游戏版本倒序。记录实际完成的代码范围、破坏性变化/存档迁移、测试状态与未实现事项，不将未通过CI写成完成。
 - 自动检查 `python3 scripts/check_changelog.py` 应保持通过。世界书分层详细变化仍在 `docs/VERSIONS.md`。
 
+## 新版游戏与可执行文件交付的强制约定（自Game 4.0起）
+
+- **之后的新版游戏一律以Windows `.exe`为主交付**。不可将HTML/脚本更名为.exe冒充可执行程序；须由Windows机器实际构建、通过校验并将可下载的二进制产物公开在GitHub Actions Artifact或Release。旧HTML仅供兼容和调试。
+- **中间文件必须与EXE同根目录**：例如 `Work/EarthRealism.exe`，则运行依赖为 `Work/_internal/`，编译/缓存/规格/临时文件分别放在 `Work/.build/`、`Work/.cache/`、`Work/.spec/`、`Work/tmp/`；临时日志与存档在 `Work/logs/` 和 `Work/saves/`。不能把构建中间文件零散写入仓库根目录、其他游戏目录或系统临时文件夹。
+- 可变更输出目录，但所有上述路径须以指定输出目录为同一根。示例：`python scripts/build_windows_exe.py --output Work`。使用PyInstaller `--onedir`避免打包程序再次在系统TEMP解压。
+- 每次游戏功能变更同时触发 `.github/workflows/windows-exe.yml`，在验收报告中单独列出 **EXE打包成功/失败** 和可下载产物位置，不能把JavaScript测试通过冒充EXE构建成功。
+
 ## 永久冻结条件
 - 游戏基准2026-10-09、具体游戏钟点未知；正式游戏没有开始，正式事件账本为空。
 - 玩家角色尚未创建，住所、职业、财产和家庭均未知。
