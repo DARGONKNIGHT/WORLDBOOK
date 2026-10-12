@@ -6,6 +6,8 @@ on:
     paths:
       - "game/**"
       - "scripts/build_standalone_game.py"
+      - "scripts/build_windows_exe.py"
+      - "desktop_launcher.py"
       - "scripts/check_changelog.py"
       - "CHANGELOG.md"
       - ".github/workflows/game-tests.yml"
@@ -30,6 +32,7 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check game/engine.js
+          node --check game/society.js
           node --check game/agent_ai.js
           node --check game/app.js
           node --check game/tests/engine.test.cjs
@@ -39,6 +42,8 @@ jobs:
         run: python3 -m py_compile game/agent_server.py
       - name: Verify local Ollama proxy contract
         run: python3 -m unittest discover -s game/tests -p "test_*server*.py" -v
+      - name: Check exe build layout plan
+        run: python3 scripts/build_windows_exe.py --output Work --dry-run
       - name: Verify changelog newest-first order
         run: python3 scripts/check_changelog.py
       - name: Verify reproducible self-contained HTML build
