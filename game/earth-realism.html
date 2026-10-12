@@ -89,7 +89,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <section class="panel"><div class="panel-head"><span>连续世界 · 当前状态</span><span class="tag">无回合</span></div>
           <p class="micro" id="live-state">世界正在初始化…</p><p id="player-task">当前空闲 · 可随时行动</p>
           <button type="button" class="ghost" id="interrupt-task" disabled>随时中断当前行动</button>
-          <p class="micro">行动有实际占用时间；到期后结算结果。你可以在途中中断改做其他事，NPC及消息传播不会因此等待。</p></section>
+          <button type="button" class="primary" id="resume-travel" hidden>继续原行程 · 不凭空定位</button>
+          <p class="micro">现场行动有真实时间与位置占用。途中取消跨区出行不会让人物回到出发区；路线/GPS缺失时位置记为未知(U)，只能继续原S级预计行程。NPC仍按各自日程活动。</p></section>
           <div class="section-head"><h2>任何时刻，你都可以介入。</h2><span>没有结束回合、等待或轮流行动</span></div>
           <div class="actions-grid">
             <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
@@ -100,7 +101,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
           </div>
           <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
-            <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
+            <p class="panel-desc">出行分钟数与费用为玩家显式输入的S级假设，不是实际导航、GPS或票价。行程中显示在途状态；中断后的行政区未知，禁止瞬移、重复出发或当场进行另一项现场活动。</p>
             <form id="travel-form" class="travel-form">
               <label>目的区<select id="travel-destination" required></select></label>
               <label>预计分钟<input id="travel-minutes" type="number" min="15" max="480" step="1" value="60" required></label>
@@ -417,6 +418,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     assert(Array.isArray(s.player.contacts)&&s.player.contacts.every(id=>NPCS.some(n=>n.id===id)),"联系人列表无效");
     assert(s.autonomy && typeof s.autonomy.enabled==="boolean" && ["balanced","detailed"].includes(s.autonomy.detail),"NPC自主选项无效");
     assert(Array.isArray(s.player.met)&&Array.isArray(s.player.declined),"相遇状态无效");
+    if(s.player.mobility){
+      const m=s.player.mobility;
+      assert(["en_route","stranded"].includes(m.status)&&DISTRICTS.includes(m.from)&&DISTRICTS.includes(m.to)
+        &&m.from!==m.to&&m.lastKnownDistrict===m.from&&s.player.district===m.from,
+        "在途状态损坏或与最后确认行政区不一致");
+      assert(m.positionGrade==="U"&&m.routeGrade==="S_ESTIMATED"&&Number.isFinite(m.remainingMs)
+        &&m.remainingMs>0&&Number.isFinite(m.plannedMs)&&m.plannedMs>=m.remainingMs
+        &&Number.isInteger(m.travelEnergySpent)&&m.travelEnergySpent>=0&&m.travelEnergySpent<=8,
+        "行程时长、未知位置或体力凭证不合法");
+    }
     assert(NPCS.every(n=>Number.isInteger(s.npc[n.id].relation)&&Array.isArray(s.npc[n.id].decisions)),"NPC关系/决策数据无效");
     assert(s.queue.every(q=>Number.isFinite(q.at)&&q.at>=s.time&&typeof q.type==="string"),"待办队列有过期或非法事件");
     return s;
@@ -554,6 +565,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     validateGame(s);
     assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
     const p=s.player, at=s.time, noAdvance=payload.__realtimeComplete===true;
+    if(p.mobility&&["en_route","stranded"].includes(p.mobility.status)){
+      const completing=kind==="travel"&&noAdvance&&p.mobility.status==="en_route";
+      assert(completing||kind==="background_tick"||kind==="npc_autonomy",
+        "角色正在途中且当前所在区未知；请先继续完成原行程，不得在出发区或目的区凭空行动");
+    }
     if(kind==="background_tick"){
       const minutes=Number(payload.minutes);
       assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=10,"实时推进每秒只允许1—10游戏分钟");
@@ -566,13 +582,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       assert(Number.isSafeInteger(fare)&&fare>=0,"交通支出必须为非负整数元");
       assert(fare===0||p.cash!==null,"现金未知，无法登记已支付交通费");
       assert(fare===0||p.cash>=fare,"资金不足，不能登记这笔支出");
-      assert(p.energy>=8,"精力不足，请先休息");
+      const remainingEnergy=noAdvance&&p.mobility?8-p.mobility.travelEnergySpent:8;
+      assert(Number.isInteger(remainingEnergy)&&remainingEnergy>=0&&remainingEnergy<=8,"原行程体力结算数据无效");
+      assert(p.energy>=remainingEnergy,"精力不足以完成剩余行程");
       const from=p.district;
-      event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
+      if(!noAdvance)event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
       if(!noAdvance)advance(s,minutes);
-      p.district=to;p.energy=Math.max(0,p.energy-8);
+      p.district=to;p.energy=Math.max(0,p.energy-remainingEnergy);
       if(fare>0) {p.cash-=fare;event(s,s.time,"你登记了交通支出 ¥"+fare+"。此为单人账本，不表示外部银行已过账。","finance");}
-      event(s,s.time,"到达北京"+to+"区。新地点在行程完成后才更新。","arrival");
+      event(s,s.time,"到达北京"+to+"区。这是S级假设行程的终点；真实GPS坐标、途经道路与时刻表仍未知。","arrival");
+      if(noAdvance)p.mobility=null;
     }else if(kind==="explore"){
       assert(p.energy>=6,"精力不足，请先休息");
       if(!noAdvance)advance(s,35);p.energy-=6;
@@ -1187,6 +1206,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  }
  function canStart(s,kind,payload){
    const p=s.player,energy=p.energy;
+   safe(!p.mobility||p.mobility.status==="onsite","行程仍在途中或已经中断，当前位置未知；请先恢复并完成原行程");
    if(kind==="travel"){
      safe(E.DISTRICTS.includes(payload.destination)&&payload.destination!==p.district,"出行目的区无效");
      const fare=Number(payload.fare??0);
@@ -1218,6 +1238,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
    const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind,payload:JSON.parse(JSON.stringify(payload)),
      startedAt:s.time+s.live.carryMs,endsAt:s.time+s.live.carryMs+minutes*MINUTE,minutes};
    s.live.task=task;
+   if(kind==="travel"){
+     s.player.mobility={status:"en_route",from:s.player.district,to:payload.destination,
+       plannedMs:minutes*MINUTE,remainingMs:minutes*MINUTE,travelEnergySpent:0,
+       lastKnownDistrict:s.player.district,positionGrade:"U",routeGrade:"S_ESTIMATED",
+       fare:payload.fare??0,departedAt:task.startedAt};
+   }
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_started",visible:true,grade:"S",
      text:"你开始"+({travel:"前往其他区",explore:"观察街区",social:"参加公共活动",study:"整理计划",
        work:"处理已有工作",rest:"休息",message:"撰写并发送消息",request_contact:"询问联系方式"}[kind]||kind)+"，预计占用"+minutes+"游戏分钟。期间世界不会暂停。"});
@@ -1228,11 +1254,24 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
    syncLive(s,wallMs);
    const live=ensureLive(s,wallMs),task=live.task;
    safe(task,"当前没有可打断的玩家活动");
-   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((s.time+live.carryMs-task.startedAt)/MINUTE)));
+   const preciseNow=s.time+live.carryMs;
+   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((preciseNow-task.startedAt)/MINUTE)));
    const costs={travel:8,explore:6,social:9,study:12,work:22,message:1,request_contact:2};
    let energyEffect=0;
    if(task.kind==="rest")energyEffect=Math.floor(25*elapsed/task.minutes);
-   else energyEffect=-Math.ceil((costs[task.kind]||0)*elapsed/task.minutes);
+   else if(task.kind==="travel"){
+     const movement=s.player.mobility;
+     safe(movement&&movement.status==="en_route","缺失有效在途记录，不能取消行程");
+     // The elapsed time is knowable; physical progress along an unknown route is not.
+     const remaining=Math.max(1,task.endsAt-preciseNow);
+     movement.remainingMs=remaining;
+     const totalElapsed=Math.max(0,movement.plannedMs-remaining);
+     const charged=Math.min(8,Math.floor(8*totalElapsed/movement.plannedMs));
+     energyEffect=-Math.max(0,charged-movement.travelEnergySpent);
+     movement.travelEnergySpent=charged;
+     movement.status="stranded";
+     movement.interruptedAt=preciseNow;
+   }else energyEffect=-Math.ceil((costs[task.kind]||0)*elapsed/task.minutes);
    s.player.energy=Math.min(100,Math.max(0,s.player.energy+energyEffect));
    live.task=null;live.interrupted++;
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_interrupted",visible:true,grade:"S",
@@ -1247,11 +1286,31 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
    live.task=null;
    try{
      E.act(s,task.kind,{...task.payload,__realtimeComplete:true});
+     if(task.kind==="travel")s.player.mobility=null;
      live.completed++;
    }catch(err){
      s.journal.push({id:++s.sequence,at:s.time,kind:"action_unfulfilled",grade:"S",visible:true,
        text:"行动"+task.kind+"在完成时不再满足条件，未兑现原定结果："+String(err.message).slice(0,120)});
    }
+   return task;
+ }
+ // A broken journey does not teleport the player back to the origin.
+ // Only the original simulated destination and unused duration are available.
+ function resumeTravel(s,wallMs=Date.now()){
+   syncLive(s,wallMs);
+   const live=ensureLive(s,wallMs),mob=s.player.mobility;
+   safe(live.running&&!live.task,"必须有空闲且运行中的模拟时钟");
+   safe(mob&&mob.status==="stranded","目前没有可恢复的中断旅程");
+   safe(Number.isFinite(mob.remainingMs)&&mob.remainingMs>0,"剩余行程时长无效");
+   safe(s.player.energy>=8-mob.travelEnergySpent,"精力不足以完成剩余行程");
+   const at=s.time+live.carryMs;
+   const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind:"travel",
+     payload:{destination:mob.to,minutes:Math.round(mob.plannedMs/MINUTE),fare:mob.fare},
+     startedAt:at,endsAt:at+mob.remainingMs,minutes:mob.remainingMs/MINUTE,resumed:true};
+   mob.status="en_route";
+   live.task=task;
+   s.journal.push({id:++s.sequence,at:s.time,kind:"journey_resumed",visible:true,grade:"S",
+     text:"你重新继续此前的S级跨区行程，余下的是先前预估时间；途中精确位置、换乘与道路仍未知。"});
    return task;
  }
  function syncLive(s,wallMs=Date.now()){
@@ -1292,7 +1351,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
    A.ensure(s).realtime=true;
  }
  function checkAction(s,kind,payload={}){taskDuration(kind,payload);canStart(s,kind,payload);return true;}
- return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,setRate,stopLive,resumeLive,checkAction});
+ return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,resumeTravel,setRate,stopLive,resumeLive,checkAction});
 });
 
 </script>
@@ -1364,7 +1423,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $("player-name").textContent=p.name;
     $("player-job").textContent=p.occupation||"职业未设定（U）";
     $("stat-time").textContent=new Date(state.time+(state.live?.carryMs||0)).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai",hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    $("stat-district").textContent="北京 · "+p.district;
+    const mobility=p.mobility;
+    $("stat-district").textContent=mobility?(mobility.status==="en_route"?"在途 · 实际所在区未知 (U)":"行程中断 · 位置待核实 (U)"):"北京 · "+p.district;
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
     const task=state.live?.task;
@@ -1372,8 +1432,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     const remaining=task?Math.max(0,Math.ceil((task.endsAt-state.time-(state.live?.carryMs||0))/60000)):0;
     $("player-task").textContent=task?"当前行动："+task.kind+" · 剩余约"+remaining+"游戏分钟 · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
     $("interrupt-task").disabled=!task;
-    $("scene-title").textContent=p.district+"区 · 你所在的城市";
-    $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
+    $("resume-travel").hidden=!(mobility?.status==="stranded");
+    $("scene-title").textContent=mobility?(mobility.status==="en_route"?"正在从"+mobility.from+"区前往"+mobility.to+"区":"旅程中断 · 具体所在区未知"):p.district+"区 · 你所在的城市";
+    $("scene-desc").textContent=mobility?
+      ("最后确认位置："+mobility.lastKnownDistrict+"区；原目的地："+mobility.to+"区。由于未核实路线与GPS，不能把出发区或目的区当作你此刻确切的位置。"+
+       (mobility.status==="stranded"?" 请使用「继续原行程」；不允许凭空切换地区或在未知地点进行现场活动。":" 世界继续运行，预计抵达后才能确认目的区。")):
+      (E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。"));
     $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
     $("travel-destination").value=E.DISTRICTS.find(d=>d!==p.district);
     const recent=state.journal.filter(x=>x.visible).slice(-7).reverse();
@@ -1601,7 +1665,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $("world-npc").addEventListener("change",()=>renderWorld());
     $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
     $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("管理员已冻结本地模拟（正常游玩无需此操作）。");});
-    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast("当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast(state.player.mobility?.status==="stranded"?"行程已中断：位置仍未知(U)，不能瞬间返回出发区。":"当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+    $("resume-travel").addEventListener("click",()=>{if(!state)return;try{Sim.resumeTravel(state,Date.now());save(true);render();toast("已继续剩余S级预计行程；实际途中位置仍未知。");}catch(err){toast(err.message,true);}});
 
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
