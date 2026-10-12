@@ -84,6 +84,16 @@ test("在途或中断位置的存档损坏被拒绝；未知地点不准冒充�
  copy.player.district="朝阳";
  assert.throws(()=>E.validateGame(copy),/最后确认行政区/);
 });
+test("直接从行动API修改途中目的地或费用被核心物理守卫拒绝",()=>{
+ const s=game();Sim.ensureLive(s,START);
+ Sim.startTask(s,"travel",{destination:"海淀",minutes:60,fare:6},START);
+ Sim.syncLive(s,START+20*60000);
+ assert.throws(()=>E.act(s,"travel",{destination:"丰台",minutes:60,fare:6,__realtimeComplete:true}),/不得途中偷换/);
+ assert.throws(()=>E.act(s,"travel",{destination:"海淀",minutes:60,fare:0,__realtimeComplete:true}),/不得途中偷换/);
+ assert.equal(s.player.district,"顺义");
+ assert.equal(s.player.mobility.status,"en_route");
+ assert.equal(s.player.cash,100);
+});
 test("原有无在途字段存档可向后兼容，不能无原因创造旅行",()=>{
  const s=game();Sim.ensureLive(s,START);
  const copy=JSON.parse(JSON.stringify(s));
