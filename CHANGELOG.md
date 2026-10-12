@@ -10,7 +10,7 @@
 - **目录约束**：可执行文件和所有构建中间物统一归属同一输出根目录。默认 `Work/EarthRealism.exe`、`Work/_internal/`运行依赖、`Work/.build/`编译产物、`Work/.spec/`规格、`Work/.cache/`缓存、`Work/tmp/`临时文件、`Work/logs/`日志、`Work/saves/`预留用户存档。Win版使用 PyInstaller `--onedir` 打平到 `Work/`，避免 onefile 将运行时文件释放到系统其他临时目录。生成的二进制与依赖通过 Windows Actions Artifact 交付，非把HTML改名为EXE，非在代码仓库提交超大二进制。
 - 新增 `game/society.js`：NPC根据**原世界书明确的家人／同事关系**、工作或家庭时间及已接收消息自主提出和回应S级事务，包含独立事务编号、状态、提出/送达/回复时刻、延迟回执与玩家外审计；不能直接生成真实合同、金额、工资或付款。旧schema=2存档按需建立society新增字段，人物与正式冻结世界不变。
 - `game/agent_ai.js` 新增 `coordinate_work`、`coordinate_family` 和 `review_case` 等有前置条件的模型与规则共用候选动作；玩家可在社会后台查看事务列表、未完成状态和协商结果。真实AI仍只负责受约束的候选行为，不可越权更改钱财或人员信息。
-- 增加事务链测试、Windows构建布局检查，保留旧浏览器单文件仅用于兼容/调试（不再作为今后新版主交付介质）。
+- 增加事务链测试、Windows构建布局检查、打包后EXE自检；桌面版实现本机 `Work/saves/autoplay.json` 自动存档与恢复，写入过程在同目录原子替换，删除存档也只作用于此目录；浏览器存储继续作为兼容备份。保留旧浏览器单文件仅用于兼容/调试。
 
 ### 发布边界
 
