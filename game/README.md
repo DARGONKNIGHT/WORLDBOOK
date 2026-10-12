@@ -1,18 +1,20 @@
-# 《地球：现实人生》· 离线可玩浏览器版
+# 《地球：现实人生》· Windows EXE 无回合持续世界
 
-本项目以 WORLDBOOK v34 为当前规则依据（继承v33证据门槛），新增独立 **S级单机试玩游戏**。这是一个可操作的游戏原型，不是实时地球数字孪生，也不会改动正式冻结状态。原生 HTML / CSS / JS，无需账号或安装依赖。
+本项目以 WORLDBOOK v35 为当前规则依据（继承v33证据门槛与v34经济守恒），实现独立**S级单机连续模拟游戏**。Windows EXE是新版主交付，运行本机服务并打开浏览器界面；不是实时地球数字孪生，不改动正式冻结世界，不内置Ollama模型。
 
 ## 开始游玩
 
-**单文件方法（推荐）**：下载 [earth-realism.html](earth-realism.html)（GitHub 文件页右上角 Download raw file，或从 [raw 地址](https://raw.githubusercontent.com/DARGONKNIGHT/WORLDBOOK/main/game/earth-realism.html)保存为同名 .html），双击用现代浏览器打开，按提示创建角色。
+**旧版兼容HTML（非新版推荐）**：下载 [earth-realism.html](earth-realism.html)（GitHub 文件页右上角 Download raw file，或从 [raw 地址](https://raw.githubusercontent.com/DARGONKNIGHT/WORLDBOOK/main/game/earth-realism.html)保存为同名 .html），双击用现代浏览器打开，按提示创建角色。
 
 **在线部署**：GitHub Pages 成功启用且手动触发发布工作流成功后，预计网址是 https://dargonknight.github.io/WORLDBOOK/ 。实际是否可用须以 GitHub Pages/Actions 状态为准；若发布工作流因为 Pages 尚未启用而失败，先进入 Settings → Pages → Build and deployment，将 Source 设为 GitHub Actions，再手动运行 Game · Publish to Pages (after enablement)。
 
-**源代码方法**：下载本仓库 ZIP，解压后双击 game/index.html；该入口会引用同目录 engine.js、app.js、style.css。两个入口都可离线玩。
+**Windows EXE主交付（推荐）**：前往[Windows构建工作流](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/workflows/windows-exe.yml)，下载最新成功运行的 EarthRealism-Windows-v6.0.0-Work Artifact，解压后双击 Work/EarthRealism.exe。保留 _internal 与exe在同一目录，不用安装Python。GitHub Artifact有保留期限。
+
+**开发用源码启动**：下载仓库后使用本机Python运行 desktop_launcher.py，或直接在浏览器打开game/index.html（后者没有桌面文件自动备份与本地AI代理）。
 
 ## Game 6.0 · 无回合连续世界（Windows EXE）
 
-**新版本取消轮次。** 打开Win游戏并创建角色后，模拟世界默认按**真实时间1:1**连续流动，31名NPC不需要等待玩家点击才能产生决策。你可以在任何时刻启动一个行动，忙碌时也能点击「随时中断当前行动」，先结束旧预约再执行新动作。用户不再需要点“等待60分钟”“NPC运行四小时”，也不存在一人一回合。工作、探索、出行等产生**开始→时间占用→按到期兑现**的过程；旅行完成前位置不会瞬移。
+**新版本取消轮次。** 中途取消工作、探索、休息等行为，会按已消耗的完整模拟分钟结算部分体力损耗/恢复，不会凭空兑现未完成工作。游戏主界面显示到秒的时间与当前任务剩余游戏分钟。 打开Win游戏并创建角色后，模拟世界默认按**真实时间1:1**连续流动，31名NPC不需要等待玩家点击才能产生决策。你可以在任何时刻启动一个行动，忙碌时也能点击「随时中断当前行动」，先结束旧预约再执行新动作。用户不再需要点“等待60分钟”“NPC运行四小时”，也不存在一人一回合。工作、探索、出行等产生**开始→时间占用→按到期兑现**的过程；旅行完成前位置不会瞬移。
 
 外视角可调整观察倍率：1×真实秒、60×（1真实秒=1游戏分钟）或300×（1真实秒=5游戏分钟）。倍率不是回合。NPC活动与玩家意向在同一时间轴结算，模型只看角色已知消息。时间到达由本地浏览器/EXE运行期间按墙钟驱动；操作系统暂停网页定时器时，重新获得焦点会补结算。页面或EXE关闭后没有真正运行的后台NPC大模型服务；重新打开可最多补算480**游戏**分钟，其余未计算时间标记未知（U）而不声称已经真实发生。
 
