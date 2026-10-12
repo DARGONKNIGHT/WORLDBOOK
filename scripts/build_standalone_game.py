@@ -23,6 +23,7 @@ def build():
         ('<script src="./society.js"></script>', "<script>\n" + read("society.js") + "\n</script>"),
         ('<script src="./economy.js"></script>', "<script>\n" + read("economy.js") + "\n</script>"),
         ('<script src="./agent_ai.js"></script>', "<script>\n" + read("agent_ai.js") + "\n</script>"),
+        ('<script src="./simulation.js"></script>', "<script>\n" + read("simulation.js") + "\n</script>"),
         ('<script src="./app.js"></script>', "<script>\n" + read("app.js") + "\n</script>"),
     ]
     for source, replacement in substitutions:
