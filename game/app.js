@@ -64,13 +64,14 @@
     $("avatar").textContent=p.name.slice(0,1);
     $("player-name").textContent=p.name;
     $("player-job").textContent=p.occupation||"职业未设定（U）";
-    $("stat-time").textContent=E.clock(state.time);
+    $("stat-time").textContent=new Date(state.time+(state.live?.carryMs||0)).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai",hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
     $("stat-district").textContent="北京 · "+p.district;
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
     const task=state.live?.task;
     $("live-state").textContent=state.live?.running?"世界连续运行 · "+state.live.rate+"×现实时间":"世界已被管理员冻结";
-    $("player-task").textContent=task?"当前行动："+task.kind+" · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
+    const remaining=task?Math.max(0,Math.ceil((task.endsAt-state.time-(state.live?.carryMs||0))/60000)):0;
+    $("player-task").textContent=task?"当前行动："+task.kind+" · 剩余约"+remaining+"游戏分钟 · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
     $("interrupt-task").disabled=!task;
     $("scene-title").textContent=p.district+"区 · 你所在的城市";
     $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
@@ -346,7 +347,9 @@
         if(res.ok){
           const candidate=E.upgradeGame(await res.json());
           A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");Sim.ensureLive(candidate,Date.now());
-          state=candidate;localStorage.setItem(KEY,JSON.stringify(state));
+          const localWall=state?.live?.lastWallMs||0, diskWall=candidate.live?.lastWallMs||0;
+          if(!state||diskWall>=localWall){state=candidate;localStorage.setItem(KEY,JSON.stringify(state));}
+          else queueDesktopSave("POST",JSON.stringify(state));
         }
       }catch(err){console.warn("Work/saves恢复不可用，回退浏览器存档：",err);}
     }
