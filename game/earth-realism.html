@@ -141,6 +141,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
             <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
             <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
           </section>
+          <section class="panel audit-panel"><div class="panel-head"><span>人物社会事务 · 工作与家庭协商</span><span class="tag">S · 事件链</span></div><div class="audit-top"><strong id="society-count">0</strong><span>已创建的模拟协商事项；不自动成交或转账</span></div><div id="society-list" class="log-list"></div></section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
             <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
           </section>
@@ -644,15 +645,114 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 </script>
   <script>
+/* Bounded social execution in independent S-grade simulation, not real contract/payment. */
+(function(root,factory){
+  const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame);
+  if(typeof module==="object"&&module.exports)module.exports=api;
+  else root.EarthSociety=api;
+})(typeof globalThis!=="undefined"?globalThis:this,function(E){
+  "use strict";
+  const MINUTE=60000,DAY=86400000;
+  const TIES={
+    P001:{to:"P002",type:"family"},P002:{to:"P001",type:"family"},
+    P005:{to:"P006",type:"family"},P006:{to:"P005",type:"family"},
+    P008:{to:"P009",type:"family"},P009:{to:"P008",type:"family"},
+    P011:{to:"P013",type:"work"},P013:{to:"P011",type:"work"},
+    P014:{to:"P015",type:"work"},P015:{to:"P014",type:"work"}
+  };
+  const VALID=new Set(E.NPCS.map(n=>n.id));
+  function assert(ok,msg){if(!ok)throw Error(msg);}
+  function ensure(s){
+    assert(s&&s.npc&&Number.isFinite(s.time),"世界存档不可用");
+    if(!s.society||s.society.version!==1)s.society={
+      version:1,serial:0,cases:[],history:[],recent:{},moneyTransfers:[]
+    };
+    return s.society;
+  }
+  function tieFor(actor){return TIES[actor]||null;}
+  function caseFor(s,actor){
+    return ensure(s).cases.find(c=>(c.to===actor||c.from===actor)&&c.status==="awaiting_response")||null;
+  }
+  function opportunities(s,actor,at=s.time){
+    ensure(s);
+    const tie=tieFor(actor);
+    if(!tie)return [];
+    const relevant=E.plan(s,actor,at).kind===tie.type;
+    const pending=caseFor(s,actor);
+    if(pending && pending.to===actor && relevant && s.npc[actor].knowledge.some(k=>k.source===pending.from && String(k.topic).includes(pending.id))){
+      return [{id:"review_case",label:"审查收到的协商请求后决定回应"}];
+    }
+    const day=E.localDay(at),last=ensure(s).recent[actor];
+    if(!pending && relevant && last!==day)return [{
+      id:tie.type==="family"?"coordinate_family":"coordinate_work",
+      label:tie.type==="family"?"向已知家人提出事务协调":"向已知同事提出事务协调"
+    }];
+    return [];
+  }
+  function log(s,record){
+    const w=ensure(s),n=E.NPCS.find(x=>x.id===record.npcId);
+    const line={...record,at:s.time,grade:"S",visibility:"out_of_character",kind:"society",
+      text:(n?n.name:"NPC")+" · "+record.text};
+    w.history.push(line);if(w.history.length>320)w.history.shift();
+    s.world.push(line);if(s.world.length>4000)s.world.shift();
+    return line;
+  }
+  function apply(s,actor,action){
+    const w=ensure(s),tie=tieFor(actor);
+    assert(tie&&VALID.has(actor)&&VALID.has(tie.to),"人物没有已确认的关系网");
+    assert(opportunities(s,actor).some(x=>x.id===action),"当前日程、信息或事件阶段不允许执行此行动");
+    if(action==="coordinate_family"||action==="coordinate_work"){
+      const type=action==="coordinate_family"?"family":"work";
+      assert(tie.type===type,"不能越权建立事务关系");
+      const id="CASE-"+String(++w.serial).padStart(5,"0"),day=E.localDay(s.time);
+      // Purpose is deliberately generic. No unknown employer, customer, account or address is created.
+      const title=type==="family"?"协商既有家庭责任与可用时间":"协商既有工作分工与可用时间";
+      const c={id,type,from:actor,to:tie.to,title,status:"awaiting_response",
+        createdAt:s.time,respondedAt:null,result:null,grade:"S",amountCents:null,contractId:null,
+        deliveries:0};
+      w.cases.push(c);
+      if(w.cases.length>500)w.cases.shift();
+      w.recent[actor]=day;
+      s.queue.push({type:"peerDeliver",at:s.time+15*MINUTE,from:actor,to:tie.to,
+        text:id+"："+title+"；尚无约定或同意。",order:s.sequence+w.serial});
+      return log(s,{npcId:actor,caseId:id,action,text:"提出"+id+"，等待"+E.NPCS.find(x=>x.id===tie.to).name+"收到并决定；尚无合同、工资或付款。"});
+    }
+    const c=caseFor(s,actor);
+    assert(c&&c.to===actor,"没有可以回应的协商事项");
+    // Informal response, NOT an enforceable agreement; leave concrete commitment unknown.
+    const result=E.plan(s,actor).kind==="family"?"愿意继续商量，具体时间待确认":"建议进一步核对岗位与时间安排";
+    c.status="discussed";c.respondedAt=s.time;c.result=result;
+    s.queue.push({type:"peerDeliver",at:s.time+10*MINUTE,from:actor,to:c.from,
+      text:c.id+"："+result+"；不构成正式合同或完成工作。",order:s.sequence+w.serial+1});
+    return log(s,{npcId:actor,caseId:c.id,action,text:"已审阅"+c.id+"，回复："+result+"。尚未自动执行任何财务、合同或到场行为。"});
+  }
+  function audit(s){
+    const w=ensure(s),problems=[];
+    const ids=w.cases.map(x=>x.id);
+    if(ids.length!==new Set(ids).size)problems.push("duplicate case id");
+    for(const c of w.cases){
+      if(!TIES[c.from]||TIES[c.from].to!==c.to)problems.push("invalid tie "+c.id);
+      if(!["awaiting_response","discussed"].includes(c.status))problems.push("bad status "+c.id);
+      if(c.amountCents!==null||c.contractId!==null)problems.push("unverified financial/contract mutation "+c.id);
+      if(c.respondedAt!==null&&c.respondedAt<c.createdAt)problems.push("backdated response "+c.id);
+    }
+    return problems;
+  }
+  return Object.freeze({ensure,tieFor,caseFor,opportunities,apply,audit});
+});
+
+</script>
+  <script>
 /* Game 3.0: bounded agent cognition, optional model arbitration.
  * Local rules are NOT an LLM. Ollama can propose a constrained choice via agent_server.py.
  * S-grade characters, goals, memories and locations are synthetic, not real people.
  */
 (function(root,factory){
-  const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame);
+  const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame,
+    typeof module==="object"&&module.exports?require("./society.js"):root.EarthSociety);
   if(typeof module==="object"&&module.exports)module.exports=api;
   else root.EarthAgents=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(E){
+})(typeof globalThis!=="undefined"?globalThis:this,function(E,S){
   "use strict";
   const MINUTE=60000,MAX_MEMORY=12;
   const TIES={
@@ -675,7 +775,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     rest:"安排个人休息",personal_planning:"整理私事与下一步计划",
     defer:"暂缓非紧急事务",recover:"恢复体力与调整作息",
     run_errand:"处理力所能及的日常杂务",sleep:"按作息休息",
-    attend_school:"遵循当前教育/监护安排"
+    attend_school:"遵循当前教育/监护安排",
+    coordinate_family:"提出家庭事务协调",coordinate_work:"提出工作事务协调",review_case:"审阅待处理的协商消息"
   };
   const GOALS={
     F01:["兼顾家庭责任","保持生活事务稳定"],F02:["稳定职业责任","照顾家庭"],
@@ -712,6 +813,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     if(!TIES[id])options=options.filter(x=>x!=="check_relatives");
     // A child cannot enter contractual work, make payments, or bypass guardians.
     if(n.age<18)options=options.filter(x=>!["continue_work","check_relatives"].includes(x));
+    options.push(...S.opportunities(s,id,at).map(x=>x.id));
     return {npc:n,stage,options:options.map(id=>({id,label:LABEL[id]}))};
   }
   function snapshot(s,id,at=s.time){
@@ -735,6 +837,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       if(item.id==="check_relatives")score+=Math.round(m.needs.social*0.45);
       if(item.id==="short_break")score+=m.needs.rest>70?20:0;
       if(item.id==="defer")score+=12;
+      if(item.id==="review_case")score+=100;
+      if(item.id==="coordinate_family"||item.id==="coordinate_work")score+=75;
       if(m.intent===item.id)score-=8;
       return score;
     };
@@ -750,6 +854,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     const allowed=choices(s,id,s.time).options.map(x=>x.id);
     guard(allowed.includes(result.choice),"候选行动之外的命令被拒绝");
     const source=result.provider==="ollama"?"ollama":"rules";
+    if(["coordinate_family","coordinate_work","review_case"].includes(result.choice))S.apply(s,id,result.choice);
     const reason=String(result.reason||"没有追加理由").replace(/[\r\n\t]+/g," ").slice(0,180);
     const now=s.time,prev=m.lastAt,elapsed=prev===null?30:Math.max(1,Math.min(120,Math.round((now-prev)/MINUTE)));
     m.needs.rest=Math.max(0,Math.min(100,m.needs.rest+Math.round(elapsed/7)-(result.choice==="rest"||result.choice==="sleep"||result.choice==="recover"?27:0)));
@@ -802,6 +907,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   "use strict";
   const E=window.EarthGame;
   const A=window.EarthAgents;
+  const S=window.EarthSociety;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
@@ -895,6 +1001,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $("autonomy-detail").value=state.autonomy.detail;
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
+    const society=S.ensure(state);
+    $("society-count").textContent=society.cases.length;
+    $("society-list").innerHTML=society.cases.length?society.cases.slice(-35).reverse().map(x=>
+      '<article class="log-line"><div class="meta">'+escapeHTML(E.clock(x.createdAt))+' · '+escapeHTML(x.id)+' · '+escapeHTML(x.status)+'</div><p>'+escapeHTML(x.title)+' · '+escapeHTML(NPC(x.from)?.name||x.from)+' → '+escapeHTML(NPC(x.to)?.name||x.to)+(x.result?'；'+escapeHTML(x.result):'；等待对方知情并决定')+'</p></article>').join(""):'<p class="micro">尚无模拟协商事务。开启自主NPC模拟、推进游戏时间后，既有家人/同事才可能发起事务。</p>';
     $("world-total").textContent=records.length;
     $("world-list").innerHTML=logs(records.map(x=>({...x,kind:x.kind||"自主活动"})),150);
     if(id==="all"){
