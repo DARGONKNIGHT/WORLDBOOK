@@ -33,8 +33,9 @@ jobs:
           node --check game/society.js
           node --check game/economy.js
           node --check game/agent_ai.js
+          node --check game/simulation.js
           node --check game/app.js
-          node --test game/tests/engine.test.cjs game/tests/agents.test.cjs game/tests/society.test.cjs game/tests/economy.test.cjs
+          node --test game/tests/engine.test.cjs game/tests/agents.test.cjs game/tests/society.test.cjs game/tests/economy.test.cjs game/tests/simulation.test.cjs
       - name: Verify Python and changelog
         run: |
           python -m unittest discover -s game/tests -p "test_*server*.py" -v
