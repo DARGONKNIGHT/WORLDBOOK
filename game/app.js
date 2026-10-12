@@ -159,7 +159,7 @@
     try{
       const speed=state.agentAI.speed;
       E.act(state,"background_tick",{minutes:speed});
-      A.runRules(state,8); // bounded scheduling; model decisions add separate audited thoughts
+      A.runRules(state,31); // all 31 local agents replan when due; model results are separate audited refinements
       if(state.agentAI.mode==="ollama")void runOneModel();
       tickCount++;
       if(tickCount%5===0)save(true);
@@ -174,6 +174,7 @@
     if(!state)return;
     const mode=$("ai-provider").value,speed=Number($("ai-speed").value);
     if(mode==="ollama"){
+      if(speed!==1){toast("本地大模型请使用每秒推进1游戏分钟，以免推理期间的日程过期。",true);return;}
       if(location.protocol==="file:"){
         toast("大模型模式需要运行 python3 game/agent_server.py，并打开本地服务的网址。",true);
         return;
