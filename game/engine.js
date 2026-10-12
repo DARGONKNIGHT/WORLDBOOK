@@ -203,6 +203,16 @@
     assert(Array.isArray(s.player.contacts)&&s.player.contacts.every(id=>NPCS.some(n=>n.id===id)),"联系人列表无效");
     assert(s.autonomy && typeof s.autonomy.enabled==="boolean" && ["balanced","detailed"].includes(s.autonomy.detail),"NPC自主选项无效");
     assert(Array.isArray(s.player.met)&&Array.isArray(s.player.declined),"相遇状态无效");
+    if(s.player.mobility){
+      const m=s.player.mobility;
+      assert(["en_route","stranded"].includes(m.status)&&DISTRICTS.includes(m.from)&&DISTRICTS.includes(m.to)
+        &&m.from!==m.to&&m.lastKnownDistrict===m.from&&s.player.district===m.from,
+        "在途状态损坏或与最后确认行政区不一致");
+      assert(m.positionGrade==="U"&&m.routeGrade==="S_ESTIMATED"&&Number.isFinite(m.remainingMs)
+        &&m.remainingMs>0&&Number.isFinite(m.plannedMs)&&m.plannedMs>=m.remainingMs
+        &&Number.isInteger(m.travelEnergySpent)&&m.travelEnergySpent>=0&&m.travelEnergySpent<=8,
+        "行程时长、未知位置或体力凭证不合法");
+    }
     assert(NPCS.every(n=>Number.isInteger(s.npc[n.id].relation)&&Array.isArray(s.npc[n.id].decisions)),"NPC关系/决策数据无效");
     assert(s.queue.every(q=>Number.isFinite(q.at)&&q.at>=s.time&&typeof q.type==="string"),"待办队列有过期或非法事件");
     return s;
@@ -340,6 +350,11 @@
     validateGame(s);
     assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
     const p=s.player, at=s.time, noAdvance=payload.__realtimeComplete===true;
+    if(p.mobility&&["en_route","stranded"].includes(p.mobility.status)){
+      const completing=kind==="travel"&&noAdvance&&p.mobility.status==="en_route";
+      assert(completing||kind==="background_tick"||kind==="npc_autonomy",
+        "角色正在途中且当前所在区未知；请先继续完成原行程，不得在出发区或目的区凭空行动");
+    }
     if(kind==="background_tick"){
       const minutes=Number(payload.minutes);
       assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=10,"实时推进每秒只允许1—10游戏分钟");
@@ -352,13 +367,16 @@
       assert(Number.isSafeInteger(fare)&&fare>=0,"交通支出必须为非负整数元");
       assert(fare===0||p.cash!==null,"现金未知，无法登记已支付交通费");
       assert(fare===0||p.cash>=fare,"资金不足，不能登记这笔支出");
-      assert(p.energy>=8,"精力不足，请先休息");
+      const remainingEnergy=noAdvance&&p.mobility?8-p.mobility.travelEnergySpent:8;
+      assert(Number.isInteger(remainingEnergy)&&remainingEnergy>=0&&remainingEnergy<=8,"原行程体力结算数据无效");
+      assert(p.energy>=remainingEnergy,"精力不足以完成剩余行程");
       const from=p.district;
-      event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
+      if(!noAdvance)event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
       if(!noAdvance)advance(s,minutes);
-      p.district=to;p.energy=Math.max(0,p.energy-8);
+      p.district=to;p.energy=Math.max(0,p.energy-remainingEnergy);
       if(fare>0) {p.cash-=fare;event(s,s.time,"你登记了交通支出 ¥"+fare+"。此为单人账本，不表示外部银行已过账。","finance");}
-      event(s,s.time,"到达北京"+to+"区。新地点在行程完成后才更新。","arrival");
+      event(s,s.time,"到达北京"+to+"区。这是S级假设行程的终点；真实GPS坐标、途经道路与时刻表仍未知。","arrival");
+      if(noAdvance)p.mobility=null;
     }else if(kind==="explore"){
       assert(p.energy>=6,"精力不足，请先休息");
       if(!noAdvance)advance(s,35);p.energy-=6;
