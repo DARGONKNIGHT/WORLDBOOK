@@ -153,9 +153,9 @@
      if(live.task&&untilTask===0){finishTask(s);continue;}
      const step=Math.min(10,available,untilTask||10);
      E.act(s,"background_tick",{minutes:step});
-     if(s.autonomy.enabled)A.runRules(s,31);
      available-=step;
      if(live.task&&s.time>=live.task.endsAt)finishTask(s);
+     if(s.autonomy.enabled)A.runRules(s,31);
    }
    return {advancedMinutes:total,task:live.task,omittedMinutes:live.omittedMinutes};
  }
@@ -166,5 +166,6 @@
    ensureLive(s,wallMs);s.live.running=true;s.live.lastWallMs=wallMs;
    A.ensure(s).realtime=true;
  }
- return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,setRate,stopLive,resumeLive});
+ function checkAction(s,kind,payload={}){taskDuration(kind,payload);canStart(s,kind,payload);return true;}
+ return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,setRate,stopLive,resumeLive,checkAction});
 });
