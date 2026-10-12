@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import sys
 ROOT=Path(__file__).resolve().parents[1]
-ASSETS=["index.html","style.css","engine.js","society.js","agent_ai.js","app.js"]
+ASSETS=["index.html","style.css","engine.js","society.js","agent_ai.js","app.js","VERSION"]
 NAME="EarthRealism"
 
 def is_beneath(path,root):
@@ -93,7 +93,7 @@ def main():
     shutil.rmtree(bundle)
     verify(out)
     (out/"README.txt").write_text(
-        "EARTH REALISM 4.0 / 地球：现实人生\n"
+        "EARTH REALISM "+(ROOT/"game"/"VERSION").read_text(encoding="utf-8").strip()+" / 地球：现实人生\n"
         "Double-click EarthRealism.exe. Keep Work/_internal next to the .exe.\n"
         "The launcher opens your web browser at http://127.0.0.1:8765/ .\n"
         "Do not move only the .exe out of Work. Optional Ollama runs separately.\n"
