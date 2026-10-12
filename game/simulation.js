@@ -105,9 +105,15 @@
    syncLive(s,wallMs);
    const live=ensureLive(s,wallMs),task=live.task;
    safe(task,"当前没有可打断的玩家活动");
+   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((s.time-task.startedAt)/MINUTE)));
+   const costs={travel:8,explore:6,social:9,study:12,work:22,message:1,request_contact:2};
+   let energyEffect=0;
+   if(task.kind==="rest")energyEffect=Math.floor(25*elapsed/task.minutes);
+   else energyEffect=-Math.ceil((costs[task.kind]||0)*elapsed/task.minutes);
+   s.player.energy=Math.min(100,Math.max(0,s.player.energy+energyEffect));
    live.task=null;live.interrupted++;
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_interrupted",visible:true,grade:"S",
-     text:"你中止了"+task.kind+"，已过去的时间不会倒流，也不获得尚未完成的成果。"});
+     text:"你中止了"+task.kind+"；已进行"+elapsed+"分钟，精力变化"+energyEffect+"。已经流逝的时间不会倒流，未完成任务不兑现结果。"});
    return task;
  }
  function finishTask(s){
