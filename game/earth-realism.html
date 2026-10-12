@@ -62,7 +62,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v34</strong><span>游戏行为层 v5.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v35</strong><span>游戏行为层 v6.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -75,7 +75,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <section class="tab-panel" id="tab-life">
           <div class="eyebrow">CHAPTER 01 / EVERYDAY LIFE</div>
           <h1>每一次选择，<br><em>都会花费真实的时间。</em></h1>
-          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界只会在你主动推进游戏时间时结算。</p>
+          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界从你创建分支起便按照现实时间连续运行；NPC不会因为你没有操作而暂停。你可以随时开始行动、介入或打断。</p>
           <div class="two-col">
             <section class="panel scene-panel"><div class="panel-head"><span>01 / 当前场景</span><span class="tag">S · 模拟情境</span></div>
               <h2 id="scene-title"></h2><p id="scene-desc"></p>
@@ -86,14 +86,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
               <p class="micro">未提供实时路况、准确区际交通时间或交通票价。前礼务村为顺义区观察样本，不是默认住所。</p>
             </section>
           </div>
-          <div class="section-head"><h2>现在，你准备做什么？</h2><span>每次行动将推进游戏时钟</span></div>
+          <section class="panel"><div class="panel-head"><span>连续世界 · 当前状态</span><span class="tag">无回合</span></div>
+          <p class="micro" id="live-state">世界正在初始化…</p><p id="player-task">当前空闲 · 可随时行动</p>
+          <button type="button" class="ghost" id="interrupt-task" disabled>随时中断当前行动</button>
+          <p class="micro">行动有实际占用时间；到期后结算结果。你可以在途中中断改做其他事，NPC及消息传播不会因此等待。</p></section>
+          <div class="section-head"><h2>任何时刻，你都可以介入。</h2><span>没有结束回合、等待或轮流行动</span></div>
           <div class="actions-grid">
             <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="social"><span class="action-glyph">♧</span><strong>参加公共活动</strong><small>可能认识一位虚构人物</small><span class="action-time">45 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="study"><span class="action-glyph">⌘</span><strong>整理计划</strong><small>分析信息，不自动知晓秘密</small><span class="action-time">60 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="work"><span class="action-glyph">▣</span><strong>处理工作</strong><small>需要创建角色时填写职业</small><span class="action-time">120 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="rest"><span class="action-glyph">◌</span><strong>休息恢复</strong><small>恢复模拟精力，不产生收入</small><span class="action-time">60 分钟 <b>↗</b></span></button>
-            <button class="action-card" data-kind="wait"><span class="action-glyph">◷</span><strong>等待 / 推进</strong><small>让后台独立事件继续结算</small><span class="action-time">自定时长 <b>↗</b></span></button>
+
           </div>
           <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
             <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
@@ -127,19 +131,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <p class="lead">你可以控制自主模拟的启停和记录详细程度，但不能替NPC强迫决定。个人工作、家庭、休息和拒绝行动按时间优先级结算；这里是玩家外审计视图，不会自动进入角色认知。</p>
           <section class="panel autonomy-controls"><div class="panel-head"><span>人物自主活动 · 控制台</span><span class="tag">S · 决策模拟</span></div>
             <form id="autonomy-form" class="autonomy-form"><label>自动结算<select id="autonomy-enabled"><option value="true">开启 · 所有行动同步推进NPC</option><option value="false">暂停 · 不生成后续NPC活动</option></select></label><label>活动记录<select id="autonomy-detail"><option value="balanced">日常 · 只记录状态变更</option><option value="detailed">详细 · 每小时记录决定</option></select></label><button class="primary" type="submit">应用设置</button></form>
-            <div class="autonomy-steps"><button type="button" class="ghost" id="world-step-60">所有NPC自主运行 1 小时</button><button type="button" class="ghost" id="world-step-240">所有NPC自主运行 4 小时</button><span class="micro">会推进游戏时间；暂停时按钮只推进时间，不生成活动</span></div>
+            <p class="micro">世界按真实经过时间推进。NPC自主结算独立于玩家操作；不再提供跳过整段时间的“等待回合”按钮。</p>
             <div class="autonomy-focus"><label>观察单个人物（玩家外视角）<select id="world-npc"></select></label><div id="npc-preview" class="npc-preview"></div></div>
           </section>
           <section class="panel autonomy-controls" id="ai-control-panel">
-            <div class="panel-head"><span>31名独立NPC · 持续思考模式</span><span class="tag">S · 实时仅在页面打开时</span></div>
-            <p class="panel-desc">每个NPC有自己的需求、目标、私有记忆、候选行动与决策记录。规则模式离线运行；真实AI模式需自己在电脑上启动Ollama及本地服务，无法在普通GitHub Pages直接运行。</p>
+            <div class="panel-head"><span>31名独立NPC · 持续思考模式</span><span class="tag">S · 连续世界 · 无回合</span></div>
+            <p class="panel-desc">创建角色后世界自动开始连续运行；NPC的日程、信息与个人需求独立结算。网页隐藏时按墙钟补算；关闭程序后仍可在下次打开时有限追算并明确标记未模拟区间。离线规则不是LLM；Ollama需另行安装。</p>
             <form id="ai-form" class="autonomy-form">
               <label>思考引擎<select id="ai-provider"><option value="rules">离线 · 有限决策器（不是大模型）</option><option value="ollama">本机 · Ollama语言模型</option></select></label>
-              <label>时间速度<select id="ai-speed"><option value="1">每秒推进1游戏分钟</option><option value="5">每秒推进5游戏分钟</option><option value="10">每秒推进10游戏分钟</option></select></label>
-              <button class="primary" type="submit" id="ai-start">启动实时世界</button>
+              <label>现实时间倍率<select id="ai-speed"><option value="1">1×：现实1秒 = 游戏1秒（默认）</option><option value="60">60×：现实1秒 = 游戏1分钟</option><option value="300">300×：现实1秒 = 游戏5分钟</option></select></label>
+              <button class="primary" type="submit" id="ai-start">应用模型与时间倍率</button>
             </form>
-            <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
-            <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
+            <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">管理员冻结模拟（非回合操作）</button><span id="ai-status" class="micro" aria-live="polite">世界自动运行，等待初始化</span></div>
+            <p class="micro">所有NPC按世界时间安排自己的行动；模型只从单个NPC的合法候选中选择，不可越权改财产。管理员冻结仅用于调试，不是“轮到玩家”机制；不调用模型时仍有31人的有限决策器。</p>
           </section>
           <section class="panel audit-panel">
             <div class="panel-head"><span>经济执行层 · S级测试账本</span><span class="tag">不是真实支付</span></div>
@@ -170,9 +174,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
             <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
             <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
             <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
-            <div class="archive-line"><span>世界书</span><strong>GitHub v34.0（规则资料只读）</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v35.0（规则资料只读）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
-            <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
+            <p class="micro">Windows版本同时保存到Work/saves/autoplay.json和本地浏览器缓存；建议定期导出JSON备份。关闭程序后不会继续实际运行大模型，再打开时有限追算并记录未模拟间隔。</p>
             <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
           </section>
           <div class="section-head"><h2>主角经历的事件</h2><span>不展示尚未公开的NPC内幕</span></div>
@@ -549,7 +553,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   function act(s, kind, payload={}) {
     validateGame(s);
     assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
-    const p=s.player, at=s.time;
+    const p=s.player, at=s.time, noAdvance=payload.__realtimeComplete===true;
     if(kind==="background_tick"){
       const minutes=Number(payload.minutes);
       assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=10,"实时推进每秒只允许1—10游戏分钟");
@@ -565,33 +569,34 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       assert(p.energy>=8,"精力不足，请先休息");
       const from=p.district;
       event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
-      advance(s,minutes);
+      if(!noAdvance)advance(s,minutes);
       p.district=to;p.energy=Math.max(0,p.energy-8);
       if(fare>0) {p.cash-=fare;event(s,s.time,"你登记了交通支出 ¥"+fare+"。此为单人账本，不表示外部银行已过账。","finance");}
       event(s,s.time,"到达北京"+to+"区。新地点在行程完成后才更新。","arrival");
     }else if(kind==="explore"){
       assert(p.energy>=6,"精力不足，请先休息");
-      advance(s,35);p.energy-=6;
+      if(!noAdvance)advance(s,35);p.energy-=6;
       event(s,s.time,"你在"+p.district+"区观察日常环境、留意公开告示。具体营业状态、新闻和服务资格仍需核实。","scene");
     }else if(kind==="study"){
       assert(p.energy>=12,"精力不足，请先休息");
-      advance(s,60);p.energy-=12;
+      if(!noAdvance)advance(s,60);p.energy-=12;
       event(s,s.time,"你用一小时整理公开信息与下一步计划。这不构成对非公开事实的自动获知。","scene");
     }else if(kind==="work"){
       assert(p.occupation,"尚未声明职业或业务，不能凭空结算工作");
       assert(p.energy>=22,"精力不足，请先休息");
-      advance(s,120);p.energy-=22;
+      if(!noAdvance)advance(s,120);p.energy-=22;
       event(s,s.time,"你投入两小时处理“"+p.occupation+"”相关事务；本系统没有可靠工资、客户和合同数据，因此不自动生成收入。","work");
     }else if(kind==="rest"){
-      advance(s,60);p.energy=Math.min(100,p.energy+25);
+      if(!noAdvance)advance(s,60);p.energy=Math.min(100,p.energy+25);
       event(s,s.time,"你休息了一个小时。精力是S级游戏数值，不代表医学测量。","scene");
     }else if(kind==="wait"){
+      assert(!noAdvance,"无回合模式不允许瞬间等待");
       const mins=Number(payload.minutes);
       advance(s,mins);
       event(s,s.time,"你按自己的决定等待了"+mins+"分钟。等待期间，部分独立NPC事务已在后台结算，但不会自动进入你的认知。","scene");
     }else if(kind==="social"){
       assert(p.energy>=9,"精力不足，请先休息");
-      advance(s,45);p.energy-=9;
+      if(!noAdvance)advance(s,45);p.energy-=9;
       const eligible=NPCS.filter(n=>n.age>=18&&districtFor(n)===p.district
           &&choice(s,n,s.time).kind==="errand"
           &&!p.contacts.includes(n.id)
@@ -613,7 +618,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       assert(!p.declined.some(x=>x.id===id&&x.at>=met.at),"同一次相遇已被拒绝，请尊重对方决定");
       assert(met.district===p.district&&s.time-met.at<=APPROACH_TTL,"已离开相遇场景，不能远程索取联系方式");
       assert(p.energy>=2,"精力不足");
-      advance(s,5);p.energy-=2;
+      if(!noAdvance)advance(s,5);p.energy-=2;
       const c=choice(s,n,s.time),r=s.npc[id].relation,seed=s.sequence*917+id.charCodeAt(3)+dayNumber(s.time);
       const consents=pseudorand(seed)>0.5 && !["work","sleep","family"].includes(c.kind);
       if(consents){
@@ -635,7 +640,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       assert(p.contacts.includes(to),"主角尚未建立该联系人关系");
       assert(text.length>0,"消息不能为空");
       assert(p.energy>=1,"精力不足");
-      advance(s,5);p.energy-=1;
+      if(!noAdvance)advance(s,5);p.energy-=1;
       const n=NPCS.find(x=>x.id===to);
       const delay=1+Math.floor(pseudorand(s.sequence*83+to.length)*12);
       s.queue.push({type:"deliver",at:s.time+delay*MINUTE,to,text,order:s.sequence+1,seed:s.sequence*83+to.charCodeAt(1)});
@@ -1152,7 +1157,133 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   E.validateGame(s);
   return {minutes,started,ended:s.time,agents:was.minds};
  }
- return Object.freeze({advance});
+
+ const MINUTE=60000, MAX_CATCHUP_MINUTES=480;
+ const ACTION_MINUTES={explore:35,social:45,study:60,work:120,rest:60,request_contact:5,message:5};
+ const safe=(ok,msg)=>{if(!ok)throw Error(msg);};
+ function ensureLive(s,wallMs=Date.now()){
+   E.validateGame(s);
+   if(!s.live||s.live.version!==1){
+     s.live={version:1,running:true,rate:1,lastWallMs:wallMs,carryMs:0,task:null,
+       omittedMinutes:0,completed:0,interrupted:0};
+   }
+   A.ensure(s).realtime=s.live.running;
+   return s.live;
+ }
+ function setRate(s,rate,wallMs=Date.now()){
+   syncLive(s,wallMs);
+   safe([1,60,300].includes(rate),"无回合时钟只能为真实速度、60倍或300倍");
+   s.live.rate=rate;
+   return s.live;
+ }
+ function taskDuration(kind,payload){
+   if(kind==="travel"){
+     const m=Number(payload.minutes);
+     safe(Number.isInteger(m)&&m>=15&&m<=480,"行程时间为15至480分钟");
+     return m;
+   }
+   safe(Object.prototype.hasOwnProperty.call(ACTION_MINUTES,kind),"该动作不能建立持续日程");
+   return ACTION_MINUTES[kind];
+ }
+ function canStart(s,kind,payload){
+   const p=s.player,energy=p.energy;
+   if(kind==="travel"){
+     safe(E.DISTRICTS.includes(payload.destination)&&payload.destination!==p.district,"出行目的区无效");
+     const fare=Number(payload.fare??0);
+     safe(Number.isSafeInteger(fare)&&fare>=0,"行程支出必须为非负整数元");
+     safe(fare===0||(p.cash!==null&&p.cash>=fare),"余额未知或不足，禁止登记该行程费用");
+     safe(energy>=8,"当前精力不足以出行");
+   }else if(kind==="explore")safe(energy>=6,"精力不足");
+   else if(kind==="study")safe(energy>=12,"精力不足");
+   else if(kind==="work")safe(!!p.occupation&&energy>=22,"缺少明确职业或精力不足");
+   else if(kind==="social")safe(energy>=9,"精力不足");
+   else if(kind==="request_contact"){
+     safe(p.met.some(m=>m.id===payload.recipient),"必须先有过实际相遇");
+     safe(!p.contacts.includes(payload.recipient),"已有联系方式");
+     const meet=p.met.filter(m=>m.id===payload.recipient).at(-1);
+     safe(meet.district===p.district && s.time-meet.at<=100*MINUTE,"已不在有效相遇场景");
+     safe(!p.declined.some(x=>x.id===payload.recipient&&x.at>=meet.at),"请尊重此前拒绝");
+     safe(energy>=2,"精力不足");
+   }else if(kind==="message"){
+     safe(p.contacts.includes(payload.recipient)&&String(payload.text||"").trim().length>0,"必须使用已同意的联系人并填写消息");
+     safe(energy>=1,"精力不足");
+   }
+ }
+ function startTask(s,kind,payload={},wallMs=Date.now()){
+   syncLive(s,wallMs);
+   safe(s.live.running,"世界时钟已停止");
+   safe(!s.live.task,"你正在执行另一项需要占用时间的活动，可以随时打断");
+   const minutes=taskDuration(kind,payload);canStart(s,kind,payload);
+   // Copy only serializable intent; do not mutate global time on initiation.
+   const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind,payload:JSON.parse(JSON.stringify(payload)),
+     startedAt:s.time,endsAt:s.time+minutes*MINUTE,minutes};
+   s.live.task=task;
+   s.journal.push({id:++s.sequence,at:s.time,kind:"action_started",visible:true,grade:"S",
+     text:"你开始"+({travel:"前往其他区",explore:"观察街区",social:"参加公共活动",study:"整理计划",
+       work:"处理已有工作",rest:"休息",message:"撰写并发送消息",request_contact:"询问联系方式"}[kind]||kind)+"，预计占用"+minutes+"游戏分钟。期间世界不会暂停。"});
+   if(s.journal.length>3000)s.journal.shift();
+   return task;
+ }
+ function interruptTask(s,wallMs=Date.now()){
+   syncLive(s,wallMs);
+   const live=ensureLive(s,wallMs),task=live.task;
+   safe(task,"当前没有可打断的玩家活动");
+   live.task=null;live.interrupted++;
+   s.journal.push({id:++s.sequence,at:s.time,kind:"action_interrupted",visible:true,grade:"S",
+     text:"你中止了"+task.kind+"，已过去的时间不会倒流，也不获得尚未完成的成果。"});
+   return task;
+ }
+ function finishTask(s){
+   const live=s.live,task=live.task;
+   if(!task||s.time<task.endsAt)return null;
+   // Completion first clears the reservation; legacy E.act applies a bounded
+   // outcome without skipping time. NPCs did not wait for this player action.
+   live.task=null;
+   try{
+     E.act(s,task.kind,{...task.payload,__realtimeComplete:true});
+     live.completed++;
+   }catch(err){
+     s.journal.push({id:++s.sequence,at:s.time,kind:"action_unfulfilled",grade:"S",visible:true,
+       text:"行动"+task.kind+"在完成时不再满足条件，未兑现原定结果："+String(err.message).slice(0,120)});
+   }
+   return task;
+ }
+ function syncLive(s,wallMs=Date.now()){
+   const live=ensureLive(s,wallMs);
+   safe(Number.isFinite(wallMs)&&wallMs>=0,"现实时间无效");
+   if(!live.running){live.lastWallMs=wallMs;return {advancedMinutes:0,task:live.task};}
+   // Moving the host clock backwards must never make the simulation regress.
+   if(wallMs<=live.lastWallMs)return {advancedMinutes:0,task:live.task};
+   const elapsed=(wallMs-live.lastWallMs)*live.rate+live.carryMs;
+   let available=Math.floor(elapsed/MINUTE);
+   live.carryMs=elapsed%MINUTE;live.lastWallMs=wallMs;
+   if(available>MAX_CATCHUP_MINUTES){
+     live.omittedMinutes+=available-MAX_CATCHUP_MINUTES;
+     const dropped=available-MAX_CATCHUP_MINUTES;
+     available=MAX_CATCHUP_MINUTES;
+     s.journal.push({id:++s.sequence,at:s.time,kind:"catchup_limit",visible:true,grade:"S",
+       text:"设备/页面停顿过久，超过单次8游戏小时可验证结算上限，未模拟的"+dropped+"分钟明确记为U，不虚构完整离线生活。"});
+   }
+   const total=available;
+   while(available>0){
+     const untilTask=live.task?Math.max(0,Math.ceil((live.task.endsAt-s.time)/MINUTE)):10;
+     if(live.task&&untilTask===0){finishTask(s);continue;}
+     const step=Math.min(10,available,untilTask||10);
+     E.act(s,"background_tick",{minutes:step});
+     if(s.autonomy.enabled)A.runRules(s,31);
+     available-=step;
+     if(live.task&&s.time>=live.task.endsAt)finishTask(s);
+   }
+   return {advancedMinutes:total,task:live.task,omittedMinutes:live.omittedMinutes};
+ }
+ function stopLive(s,wallMs=Date.now()){
+   syncLive(s,wallMs);s.live.running=false;A.ensure(s).realtime=false;
+ }
+ function resumeLive(s,wallMs=Date.now()){
+   ensureLive(s,wallMs);s.live.running=true;s.live.lastWallMs=wallMs;
+   A.ensure(s).realtime=true;
+ }
+ return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,setRate,stopLive,resumeLive});
 });
 
 </script>
@@ -1168,7 +1299,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   const Sim=window.EarthSimulation;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
-  let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
+  let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="离线有限决策器 · 世界钟不依赖玩家操作";
   let diskQueue=Promise.resolve();
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1199,7 +1330,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     }catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);if(F.audit(loaded).length)throw Error("经济账本未通过核验");loaded.agentAI.realtime=false;return loaded;}
+    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);if(F.audit(loaded).length)throw Error("经济账本未通过核验");Sim.ensureLive(loaded,Date.now());return loaded;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -1227,6 +1358,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $("stat-district").textContent="北京 · "+p.district;
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
+    const task=state.live?.task;
+    $("live-state").textContent=state.live?.running?"世界连续运行 · "+state.live.rate+"×现实时间":"世界已被管理员冻结";
+    $("player-task").textContent=task?"当前行动："+task.kind+" · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
+    $("interrupt-task").disabled=!task;
     $("scene-title").textContent=p.district+"区 · 你所在的城市";
     $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
     $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
@@ -1270,8 +1405,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $("autonomy-enabled").value=String(state.autonomy.enabled);
     const ai=A.ensure(state);
     $("ai-provider").value=ai.mode;
-    $("ai-speed").value=String(ai.speed);
-    $("ai-status").textContent=(ai.realtime?"运行中":"已暂停")+" · "+(ai.mode==="ollama"?"Ollama模型":"离线有限决策器")+" · "+modelStatus;
+    $("ai-speed").value=String(state.live?.rate||1);
+    $("ai-status").textContent=(state.live?.running?"世界时钟持续流动":"模拟已冻结")+" · "+(ai.mode==="ollama"?"Ollama模型":"离线决策器")+" · "+modelStatus;
     $("autonomy-detail").value=state.autonomy.detail;
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
@@ -1315,16 +1450,29 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   function execute(kind,payload={}){
     if(!state)return;
     try{
-      if(kind==="wait")Sim.advance(state,Number(payload.minutes));
-      else {E.act(state,kind,payload);if(kind!=="npc_autonomy"&&state.autonomy.enabled)A.runRules(state,31);}
-      save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");
-    }
-    catch(err){toast(err.message,true);}
+      Sim.syncLive(state,Date.now());
+      if(kind==="npc_autonomy"){E.act(state,kind,payload);}
+      else if(kind==="wait")throw Error("连续世界没有等待/结束回合，时间自然流逝");
+      else {
+        if(state.live?.task){
+          if(!window.confirm("目前正在执行 "+state.live.task.kind+"。要现在中断，并开始新的行动吗？已花费时间不会倒流。"))return;
+          Sim.interruptTask(state,Date.now());
+        }
+        Sim.startTask(state,kind,payload,Date.now());
+      }
+      save(true);render();toast(kind==="npc_autonomy"?"NPC设置已更新":"已开始行动；世界不会暂停，你可以随时介入或打断。");
+    }catch(err){toast(err.message,true);}
+  }
+  function startWorldTimer(){
+    if(autoClock!==null)clearInterval(autoClock);
+    autoClock=setInterval(pulse,1000);
+    window.addEventListener("focus",pulse);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)pulse();});
   }
   function stopRealtime(){
-    if(autoClock!==null){clearInterval(autoClock);autoClock=null;}
-    if(state)A.settings(state,{realtime:false});
-    if(state){save(true);render();}
+    if(!state)return;
+    try{Sim.stopLive(state,Date.now());save(true);render();}
+    catch(err){toast(err.message,true);}
   }
   async function runOneModel(){
     if(modelBusy||!state||!state.agentAI.realtime||state.agentAI.mode!=="ollama")return;
@@ -1354,43 +1502,36 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     }
   }
   function pulse(){
-    if(!state||!state.agentAI.realtime)return;
+    if(!state)return;
     try{
-      const speed=state.agentAI.speed;
-      E.act(state,"background_tick",{minutes:speed});
-      A.runRules(state,31); // all 31 local agents replan when due; model results are separate audited refinements
-      if(state.agentAI.mode==="ollama")void runOneModel();
+      const output=Sim.syncLive(state,Date.now());
+      if(state.live?.running&&state.agentAI.mode==="ollama"&&tickCount%10===0)void runOneModel();
       tickCount++;
-      if(tickCount%5===0)save(true);
+      if(tickCount%10===0)save(true);
       render();
     }catch(err){
-      modelStatus="实时模拟停止："+err.message;
-      stopRealtime();
+      modelStatus="世界同步受阻："+err.message;
       toast(modelStatus,true);
     }
   }
   async function startRealtime(){
     if(!state)return;
-    const mode=$("ai-provider").value,speed=Number($("ai-speed").value);
-    if(mode==="ollama"){
-      if(speed!==1){toast("本地大模型请使用每秒推进1游戏分钟，以免推理期间的日程过期。",true);return;}
-      if(location.protocol==="file:"){
-        toast("大模型模式需要运行 python3 game/agent_server.py，并打开本地服务的网址。",true);
-        return;
-      }
-      try{
+    try{
+      const mode=$("ai-provider").value,rate=Number($("ai-speed").value);
+      if(mode==="ollama"){
+        if(!desktopServer()){
+          toast("真实模型推理需要运行本机服务，普通静态网页仍可用规则模式",true);return;
+        }
         const response=await fetch("/api/health",{cache:"no-store"});
-        if(!response.ok)throw Error("没有本地模型服务");
-        const status=await response.json();
-        if(status.provider!=="ollama")throw Error("不是Ollama代理");
-        modelStatus="代理已连接；请确保Ollama和模型已启动";
-      }catch(err){toast("无法连接本地模型代理："+err.message,true);return;}
-    }else modelStatus="规则模拟正常；不调用语言模型";
-    A.settings(state,{realtime:true,mode,speed});
-    if(autoClock!==null)clearInterval(autoClock);
-    tickCount=0;
-    autoClock=setInterval(pulse,1000);
-    save(true);render();toast("已启动31名NPC实时模拟，关闭网页后停止。");
+        const info=await response.json();
+        if(!response.ok||info.provider!=="ollama")throw Error("本机Ollama代理不可用");
+        modelStatus="代理已连接，模型调用会异步进行";
+      }else modelStatus="31名NPC采用有限决策规则";
+      Sim.setRate(state,rate,Date.now());
+      A.settings(state,{mode,realtime:true,speed:1});
+      Sim.resumeLive(state,Date.now());
+      save(true);render();toast("世界持续运行中；切换模式无需结束回合。");
+    }catch(err){toast(err.message,true);}
   }
   async function setup(){
     $("new-district").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
@@ -1401,20 +1542,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       try{
         const form=new FormData(ev.currentTarget);
         state=E.makeGame(Object.fromEntries(form.entries()));
-        A.ensure(state);
+        A.ensure(state);Sim.ensureLive(state,Date.now());
         save(true);
         $("setup").close();
         selectTab("life");render();
-        toast("新游戏已创建。世界时钟开始按你的行动推进。");
+        toast("新游戏已创建。世界现在连续流动；你可以随时参与。");
       }catch(err){$("setup-error").textContent=err.message;}
     });
     document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
     document.querySelectorAll(".action-card").forEach(b=>b.addEventListener("click",()=>{
       const kind=b.dataset.kind;
-      if(kind!=="wait"){execute(kind);return;}
-      const input=window.prompt("本次等待多少分钟？（1—480，时间不会在后台自行流逝）","60");
-      if(input===null)return;
-      execute("wait",{minutes:Number(input)});
+      execute(kind);
     }));
     $("travel-form").addEventListener("submit",ev=>{
       ev.preventDefault();
@@ -1451,9 +1589,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     });
     $("world-npc").addEventListener("change",()=>renderWorld());
     $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
-    $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("实时世界已暂停。");});
-    $("world-step-60").addEventListener("click",()=>execute("wait",{minutes:60}));
-    $("world-step-240").addEventListener("click",()=>execute("wait",{minutes:240}));
+    $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("管理员已冻结本地模拟（正常游玩无需此操作）。");});
+    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast("当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
       execute("message",{recipient:$("message-to").value,text:$("message-text").value});
@@ -1478,7 +1616,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         const candidate=E.upgradeGame(JSON.parse(await file.text()));
         if(F.audit(candidate).length)throw Error("导入账本金额不守恒，无法恢复");
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
-        state=candidate;A.ensure(state);state.agentAI.realtime=false;save(true);$("setup").close();selectTab("life");render();
+        state=candidate;A.ensure(state);Sim.ensureLive(state,Date.now());save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
       }catch(err){toast("导入失败："+err.message,true);}
       finally{ev.target.value="";}
@@ -1497,13 +1635,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         const res=await fetch("/api/save",{cache:"no-store"});
         if(res.ok){
           const candidate=E.upgradeGame(await res.json());
-          A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");candidate.agentAI.realtime=false;
+          A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");Sim.ensureLive(candidate,Date.now());
           state=candidate;localStorage.setItem(KEY,JSON.stringify(state));
         }
       }catch(err){console.warn("Work/saves恢复不可用，回退浏览器存档：",err);}
     }
-    if(state){selectTab("life");render();}
+    if(state){Sim.syncLive(state,Date.now());selectTab("life");render();}
     else{$("setup").showModal();}
+    startWorldTimer();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
 })();
