@@ -16,10 +16,10 @@
 
 **启用真正的本机语言模型推理**（可选）：
 
-1. 在电脑上安装并运行 [Ollama](https://ollama.com/)，打开终端执行 \`ollama pull qwen2.5:3b\`（安装成功并拥有合适设备内存时）。
-2. 下载/克隆本仓库，在仓库根目录执行 \`python3 game/agent_server.py\`；这是127.0.0.1上的本地网页和AI代理，无需云端密钥。可用环境变量 \`OLLAMA_MODEL\` 修改已下载的模型名称。
+1. 在电脑上安装并运行 [Ollama](https://ollama.com/)，打开终端执行 `ollama pull qwen2.5:3b`（安装成功并拥有合适设备内存时）。
+2. 下载/克隆本仓库，在仓库根目录执行 `python3 game/agent_server.py`；这是127.0.0.1上的本地网页和AI代理，无需云端密钥。可用环境变量 `OLLAMA_MODEL` 修改已下载的模型名称。
 3. 在浏览器打开 **http://127.0.0.1:8765/**（不是双击file://的单文件版），创建或导入存档，在社会后台选择「本机 · Ollama语言模型」、速度1分钟/秒，点击「启动实时世界」。
-4. NPC的规则决策始终持续运行；本地模型逐个异步审议NPC的可行动作。审计日志里 \`provider=rules\` 与 \`provider=ollama\` 严格区分。若模型未启动或输出非法，会显示错误，**不假装LLM已经作了决定**。
+4. NPC的规则决策始终持续运行；本地模型逐个异步审议NPC的可行动作。审计日志里 `provider=rules` 与 `provider=ollama` 严格区分。若模型未启动或输出非法，会显示错误，**不假装LLM已经作了决定**。
 
 ### 设计界限与成本
 
@@ -63,7 +63,6 @@
 
 - node --test game/tests/*.test.cjs
 - python3 -m unittest discover -s game/tests -p "test_*server*.py" -v
-
 - node --check game/engine.js
 - node --check game/app.js
 - node --test game/tests/engine.test.cjs
