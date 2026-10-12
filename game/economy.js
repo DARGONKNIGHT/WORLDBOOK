@@ -31,7 +31,8 @@
     check([c.from,c.to].sort().join(":")===PARTIES.slice().sort().join(":"),"仅限既有维修经营者与技术合作者的S级试验");
     check(known(s,c.from,c.id,c.to),"双方协商回执尚未送达发起方");
     const price=Number(priceYuan),payer=Number(payerOpeningYuan),provider=Number(providerOpeningYuan);
-    check(validAmount(price)&&price>0&&validAmount(payer)&&validAmount(provider),"S级假设金额须为安全整数元");
+    const yuan=n=>Number.isSafeInteger(n)&&n>=0&&n<=10000000;
+    check(yuan(price)&&price>0&&yuan(payer)&&yuan(provider),"S级假设金额须为不超过1000万元的非负整数元");
     check(!e.fixtures[caseId],"此事务已设定假设经济条件，不能覆盖");
     check(!(PAYER in e.accounts)&&!(PROVIDER in e.accounts),"S级账户已有开局余额，不得再次注资");
     // Opening balances are unverified external endowments with an explicit S fixture origin,
@@ -128,7 +129,7 @@
     const balance=e.accounts[PAYER],received=e.accounts[PROVIDER],sum=q.priceCents;
     check(validAmount(balance)&&validAmount(received),"双方资金未知，禁止付款");
     check(Number.isSafeInteger(sum)&&sum>0&&balance>=sum,"账户余额不足，不能记账");
-    check(Number.isSafeInteger(received+sum),"接受方余额超出安全整数");
+    check(validAmount(received+sum),"接收方S级测试余额超出账本上限");
     // Atomic pair: validate all conditions before changing any balance.
     const txId="TX-"+String(e.transfers.length+1).padStart(5,"0");
     const debit={txId,at:s.time,account:PAYER,deltaCents:-sum,quoteId,grade:"S"};
