@@ -18,4 +18,6 @@ for title,_ in rows:
         assert re.fullmatch(r"\d+\.\d+\.\d+",token), "Game must have semver"
         versions.append(tuple(map(int,token.split("."))))
 assert versions==sorted(versions,reverse=True), "Game versions must be newest first"
+current=(path.parent/"game"/"VERSION").read_text(encoding="utf-8").strip()
+assert versions and current==".".join(map(str,versions[0])), "game/VERSION must match the newest CHANGELOG game release"
 print(f"Validated {len(rows)} release notes in reverse chronological order")
