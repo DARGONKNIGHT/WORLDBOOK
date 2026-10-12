@@ -64,6 +64,7 @@
  }
  function canStart(s,kind,payload){
    const p=s.player,energy=p.energy;
+   safe(!p.mobility||p.mobility.status==="onsite","行程仍在途中或已经中断，当前位置未知；请先恢复并完成原行程");
    if(kind==="travel"){
      safe(E.DISTRICTS.includes(payload.destination)&&payload.destination!==p.district,"出行目的区无效");
      const fare=Number(payload.fare??0);
@@ -95,6 +96,12 @@
    const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind,payload:JSON.parse(JSON.stringify(payload)),
      startedAt:s.time+s.live.carryMs,endsAt:s.time+s.live.carryMs+minutes*MINUTE,minutes};
    s.live.task=task;
+   if(kind==="travel"){
+     s.player.mobility={status:"en_route",from:s.player.district,to:payload.destination,
+       plannedMs:minutes*MINUTE,remainingMs:minutes*MINUTE,travelEnergySpent:0,
+       lastKnownDistrict:s.player.district,positionGrade:"U",routeGrade:"S_ESTIMATED",
+       fare:payload.fare??0,departedAt:task.startedAt};
+   }
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_started",visible:true,grade:"S",
      text:"你开始"+({travel:"前往其他区",explore:"观察街区",social:"参加公共活动",study:"整理计划",
        work:"处理已有工作",rest:"休息",message:"撰写并发送消息",request_contact:"询问联系方式"}[kind]||kind)+"，预计占用"+minutes+"游戏分钟。期间世界不会暂停。"});
@@ -105,11 +112,24 @@
    syncLive(s,wallMs);
    const live=ensureLive(s,wallMs),task=live.task;
    safe(task,"当前没有可打断的玩家活动");
-   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((s.time+live.carryMs-task.startedAt)/MINUTE)));
+   const preciseNow=s.time+live.carryMs;
+   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((preciseNow-task.startedAt)/MINUTE)));
    const costs={travel:8,explore:6,social:9,study:12,work:22,message:1,request_contact:2};
    let energyEffect=0;
    if(task.kind==="rest")energyEffect=Math.floor(25*elapsed/task.minutes);
-   else energyEffect=-Math.ceil((costs[task.kind]||0)*elapsed/task.minutes);
+   else if(task.kind==="travel"){
+     const movement=s.player.mobility;
+     safe(movement&&movement.status==="en_route","缺失有效在途记录，不能取消行程");
+     // The elapsed time is knowable; physical progress along an unknown route is not.
+     const remaining=Math.max(1,task.endsAt-preciseNow);
+     movement.remainingMs=remaining;
+     const totalElapsed=Math.max(0,movement.plannedMs-remaining);
+     const charged=Math.min(8,Math.floor(8*totalElapsed/movement.plannedMs));
+     energyEffect=-Math.max(0,charged-movement.travelEnergySpent);
+     movement.travelEnergySpent=charged;
+     movement.status="stranded";
+     movement.interruptedAt=preciseNow;
+   }else energyEffect=-Math.ceil((costs[task.kind]||0)*elapsed/task.minutes);
    s.player.energy=Math.min(100,Math.max(0,s.player.energy+energyEffect));
    live.task=null;live.interrupted++;
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_interrupted",visible:true,grade:"S",
@@ -124,11 +144,31 @@
    live.task=null;
    try{
      E.act(s,task.kind,{...task.payload,__realtimeComplete:true});
+     if(task.kind==="travel")s.player.mobility=null;
      live.completed++;
    }catch(err){
      s.journal.push({id:++s.sequence,at:s.time,kind:"action_unfulfilled",grade:"S",visible:true,
        text:"行动"+task.kind+"在完成时不再满足条件，未兑现原定结果："+String(err.message).slice(0,120)});
    }
+   return task;
+ }
+ // A broken journey does not teleport the player back to the origin.
+ // Only the original simulated destination and unused duration are available.
+ function resumeTravel(s,wallMs=Date.now()){
+   syncLive(s,wallMs);
+   const live=ensureLive(s,wallMs),mob=s.player.mobility;
+   safe(live.running&&!live.task,"必须有空闲且运行中的模拟时钟");
+   safe(mob&&mob.status==="stranded","目前没有可恢复的中断旅程");
+   safe(Number.isFinite(mob.remainingMs)&&mob.remainingMs>0,"剩余行程时长无效");
+   safe(s.player.energy>=8-mob.travelEnergySpent,"精力不足以完成剩余行程");
+   const at=s.time+live.carryMs;
+   const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind:"travel",
+     payload:{destination:mob.to,minutes:Math.round(mob.plannedMs/MINUTE),fare:mob.fare},
+     startedAt:at,endsAt:at+mob.remainingMs,minutes:mob.remainingMs/MINUTE,resumed:true};
+   mob.status="en_route";
+   live.task=task;
+   s.journal.push({id:++s.sequence,at:s.time,kind:"journey_resumed",visible:true,grade:"S",
+     text:"你重新继续此前的S级跨区行程，余下的是先前预估时间；途中精确位置、换乘与道路仍未知。"});
    return task;
  }
  function syncLive(s,wallMs=Date.now()){
@@ -169,5 +209,5 @@
    A.ensure(s).realtime=true;
  }
  function checkAction(s,kind,payload={}){taskDuration(kind,payload);canStart(s,kind,payload);return true;}
- return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,setRate,stopLive,resumeLive,checkAction});
+ return Object.freeze({advance,ensureLive,syncLive,startTask,interruptTask,resumeTravel,setRate,stopLive,resumeLive,checkAction});
 });
