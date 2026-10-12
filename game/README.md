@@ -10,6 +10,14 @@
 
 **源代码方法**：下载本仓库 ZIP，解压后双击 game/index.html；该入口会引用同目录 engine.js、app.js、style.css。两个入口都可离线玩。
 
+## Game 5.0 · NPC经济执行流程（EXE主交付）
+
+- **世界书**：[v34证据门槛与社会经济规则](../worldbook/v34.md)。此版增量保留31名S级NPC、正式世界2026-10-09冻结和未知资料不得推断原则。
+- **操作**：打开Windows游戏，在「社会后台」启动自主NPC并推进时间，让马志强与高鹏这组已有维修合作伙伴自主形成工作协商并互相回复。社会后台出现status=discussed的工作案例CASE-id后，使用「经济执行层 · S级测试账本」输入**假设的**价格、经营者测试余额和合作方测试余额。这些金额不代表真实个人或企业资产。
+- **自主行为**：高鹏知晓已讨论事项后可以决定报价；报价经消息延迟传到马志强后，后者决定接受/拒绝，且余额不足不能接受；高鹏收到原则接受消息后才可能报告模拟完成。只有当报告送达且用户在元视角明确确认S级模拟履约，才能点击「授权S级成对记账」。
+- **账目**：每次通过审核的S级资金结算写入唯一交易ID和两个正负金额分录，双方余额严格守恒。报价不等于合同，报告不等于真实履约，S级付款不代表银行卡实际划转。UI的日志是**元视角**，不会把NPC私人资金披露给玩家角色。
+- **EXE**：新版自动打包仍输出Work/EarthRealism.exe，_internal及所有编译中间文件/日志/存档归属Work。Windows Actions成功发布后从Artifacts下载完整exe依赖包，不能单独移动exe。game/VERSION与CHANGELOG顶层同步更新；旧存档schema=2无需清空，经济层字段在首次使用时建立。
+
 ## Game 4.0 · Windows EXE（今后版本主要交付）
 
 **标准下载方式：** 打开[Windows EXE构建工作流](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/workflows/windows-exe.yml)，选择最近一个成功的运行，从 Artifacts 下载 `EarthRealism-Windows-v4-Work`。解压到一个叫 `Work` 的目录，使目录结构如下：
