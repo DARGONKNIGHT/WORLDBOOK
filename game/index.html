@@ -30,7 +30,7 @@
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v34</strong><span>游戏行为层 v5.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v35</strong><span>游戏行为层 v6.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -43,7 +43,7 @@
         <section class="tab-panel" id="tab-life">
           <div class="eyebrow">CHAPTER 01 / EVERYDAY LIFE</div>
           <h1>每一次选择，<br><em>都会花费真实的时间。</em></h1>
-          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界只会在你主动推进游戏时间时结算。</p>
+          <p class="lead">这里没有主角光环。你的决定会改变自己，其他人的生活也有自己的节奏。世界从你创建分支起便按照现实时间连续运行；NPC不会因为你没有操作而暂停。你可以随时开始行动、介入或打断。</p>
           <div class="two-col">
             <section class="panel scene-panel"><div class="panel-head"><span>01 / 当前场景</span><span class="tag">S · 模拟情境</span></div>
               <h2 id="scene-title"></h2><p id="scene-desc"></p>
@@ -54,14 +54,18 @@
               <p class="micro">未提供实时路况、准确区际交通时间或交通票价。前礼务村为顺义区观察样本，不是默认住所。</p>
             </section>
           </div>
-          <div class="section-head"><h2>现在，你准备做什么？</h2><span>每次行动将推进游戏时钟</span></div>
+          <section class="panel"><div class="panel-head"><span>连续世界 · 当前状态</span><span class="tag">无回合</span></div>
+          <p class="micro" id="live-state">世界正在初始化…</p><p id="player-task">当前空闲 · 可随时行动</p>
+          <button type="button" class="ghost" id="interrupt-task" disabled>随时中断当前行动</button>
+          <p class="micro">行动有实际占用时间；到期后结算结果。你可以在途中中断改做其他事，NPC及消息传播不会因此等待。</p></section>
+          <div class="section-head"><h2>任何时刻，你都可以介入。</h2><span>没有结束回合、等待或轮流行动</span></div>
           <div class="actions-grid">
             <button class="action-card" data-kind="explore"><span class="action-glyph">⌁</span><strong>观察街区</strong><small>留意公开环境和周围生活</small><span class="action-time">35 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="social"><span class="action-glyph">♧</span><strong>参加公共活动</strong><small>可能认识一位虚构人物</small><span class="action-time">45 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="study"><span class="action-glyph">⌘</span><strong>整理计划</strong><small>分析信息，不自动知晓秘密</small><span class="action-time">60 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="work"><span class="action-glyph">▣</span><strong>处理工作</strong><small>需要创建角色时填写职业</small><span class="action-time">120 分钟 <b>↗</b></span></button>
             <button class="action-card" data-kind="rest"><span class="action-glyph">◌</span><strong>休息恢复</strong><small>恢复模拟精力，不产生收入</small><span class="action-time">60 分钟 <b>↗</b></span></button>
-            <button class="action-card" data-kind="wait"><span class="action-glyph">◷</span><strong>等待 / 推进</strong><small>让后台独立事件继续结算</small><span class="action-time">自定时长 <b>↗</b></span></button>
+
           </div>
           <section class="panel travel-panel"><div class="panel-head"><span>03 / 跨区出行</span><span class="tag">先出发 → 再抵达</span></div>
             <p class="panel-desc">出行耗时与支出由玩家按具体路线输入，属于S级假设，不是地图导航或票价查询。</p>
@@ -95,19 +99,19 @@
           <p class="lead">你可以控制自主模拟的启停和记录详细程度，但不能替NPC强迫决定。个人工作、家庭、休息和拒绝行动按时间优先级结算；这里是玩家外审计视图，不会自动进入角色认知。</p>
           <section class="panel autonomy-controls"><div class="panel-head"><span>人物自主活动 · 控制台</span><span class="tag">S · 决策模拟</span></div>
             <form id="autonomy-form" class="autonomy-form"><label>自动结算<select id="autonomy-enabled"><option value="true">开启 · 所有行动同步推进NPC</option><option value="false">暂停 · 不生成后续NPC活动</option></select></label><label>活动记录<select id="autonomy-detail"><option value="balanced">日常 · 只记录状态变更</option><option value="detailed">详细 · 每小时记录决定</option></select></label><button class="primary" type="submit">应用设置</button></form>
-            <div class="autonomy-steps"><button type="button" class="ghost" id="world-step-60">所有NPC自主运行 1 小时</button><button type="button" class="ghost" id="world-step-240">所有NPC自主运行 4 小时</button><span class="micro">会推进游戏时间；暂停时按钮只推进时间，不生成活动</span></div>
+            <p class="micro">世界按真实经过时间推进。NPC自主结算独立于玩家操作；不再提供跳过整段时间的“等待回合”按钮。</p>
             <div class="autonomy-focus"><label>观察单个人物（玩家外视角）<select id="world-npc"></select></label><div id="npc-preview" class="npc-preview"></div></div>
           </section>
           <section class="panel autonomy-controls" id="ai-control-panel">
-            <div class="panel-head"><span>31名独立NPC · 持续思考模式</span><span class="tag">S · 实时仅在页面打开时</span></div>
-            <p class="panel-desc">每个NPC有自己的需求、目标、私有记忆、候选行动与决策记录。规则模式离线运行；真实AI模式需自己在电脑上启动Ollama及本地服务，无法在普通GitHub Pages直接运行。</p>
+            <div class="panel-head"><span>31名独立NPC · 持续思考模式</span><span class="tag">S · 连续世界 · 无回合</span></div>
+            <p class="panel-desc">创建角色后世界自动开始连续运行；NPC的日程、信息与个人需求独立结算。网页隐藏时按墙钟补算；关闭程序后仍可在下次打开时有限追算并明确标记未模拟区间。离线规则不是LLM；Ollama需另行安装。</p>
             <form id="ai-form" class="autonomy-form">
               <label>思考引擎<select id="ai-provider"><option value="rules">离线 · 有限决策器（不是大模型）</option><option value="ollama">本机 · Ollama语言模型</option></select></label>
-              <label>时间速度<select id="ai-speed"><option value="1">每秒推进1游戏分钟</option><option value="5">每秒推进5游戏分钟</option><option value="10">每秒推进10游戏分钟</option></select></label>
-              <button class="primary" type="submit" id="ai-start">启动实时世界</button>
+              <label>现实时间倍率<select id="ai-speed"><option value="1">1×：现实1秒 = 游戏1秒（默认）</option><option value="60">60×：现实1秒 = 游戏1分钟</option><option value="300">300×：现实1秒 = 游戏5分钟</option></select></label>
+              <button class="primary" type="submit" id="ai-start">应用模型与时间倍率</button>
             </form>
-            <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
-            <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
+            <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">管理员冻结模拟（非回合操作）</button><span id="ai-status" class="micro" aria-live="polite">世界自动运行，等待初始化</span></div>
+            <p class="micro">所有NPC按世界时间安排自己的行动；模型只从单个NPC的合法候选中选择，不可越权改财产。管理员冻结仅用于调试，不是“轮到玩家”机制；不调用模型时仍有31人的有限决策器。</p>
           </section>
           <section class="panel audit-panel">
             <div class="panel-head"><span>经济执行层 · S级测试账本</span><span class="tag">不是真实支付</span></div>
@@ -138,7 +142,7 @@
             <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
             <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
             <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
-            <div class="archive-line"><span>世界书</span><strong>GitHub v34.0（规则资料只读）</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v35.0（规则资料只读）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
             <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
             <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
