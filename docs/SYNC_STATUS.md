@@ -137,3 +137,15 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - [x] [Windows Game6 EXE实际编译并自检成功](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38200683072)：Artifact **EarthRealism-Windows-v6.0.0-Work**，打包exe和依赖位于同一Work根目录，构建缓存/中间物限制Work，冻结EXE --self-test、桌面本地存档契约及资源完整性通过。GitHub Actions下载件为有限期保留，未进行用户本人设备的GUI交互测试。
 - [ ] 尚未实现exe进程在浏览器彻底关闭期间独立实时计算NPC或完全24小时AI社会；超出480模拟分钟不编造离线生活。NPC行为仍为有限自主状态机，并非31个并行真人水平大模型。真实企业、金融、交通、合同、劳动和医疗资料仍缺。
 - 正式世界书基准2026-10-09、具体钟点U、玩家未创建、真实历史为空、前礼务村仅为观察样本，正式档案不受影响。
+
+
+## 2026-10-12 · 真实性宪章 / 世界书v36 / Game7 Windows EXE最终验收
+
+- [x] **最高级永久规则** [docs/REALISM_CONSTITUTION.md](REALISM_CONSTITUTION.md)及根目录AGENTS.md显式规定“真实性优先于玩法便利、叙事和开发速度”，今后每轮现实资料、NPC、角色权限、社会经济、无回合时空模型和EXE演进均先审查证据R/S/U及因果，不能为了好玩编造人物或现实。此规则不能代替实际科学核查。
+- [x] [worldbook/v36.md](../worldbook/v36.md)增加在途、未知实际地点(U)、最后确认行政区和原目的区之间区别；旅行取消不凭空瞬移或允许原地工作社交。没有真实GPS和交通路由就只能在S级假设下沿剩余预计时间恢复原行程。
+- [x] [game/simulation.js](../game/simulation.js)、[game/engine.js](../game/engine.js)、[game/app.js](../game/app.js)、[game/index.html](../game/index.html)：en_route与stranded状态、行动中断后位置U、同一原行程恢复、体力总量核验、行程费用只按S级完成结果登记一次、异常直接调用拒绝、界面不再把出发区标作当前位置，超限未模拟墙钟间隔明确提示。
+- [x] [scripts/check_realism.py](../scripts/check_realism.py)成为Linux/Windows双流水线准入脚本，动态校验最新世界书版本、真实性宪章与位置/资金边界测试、EXE交付目录约束。检查器验证最低工程结构，不能宣称现实数据已全量采集。
+- [x] [Linux最新成功验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38201833364)：**74/74 JS，5/5 Python代理**，真实性宪章准入、版本更新日志、EXE路径规划与单HTML构建一致性均通过。
+- [x] [Windows Game7最终成功构建](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38201833412)：真实EXE编译、Work/_internal运行资源、Work路径检查、桌面存档接口、冻结二进制--self-test与Artifact上传均成功。产物 **EarthRealism-Windows-v7.0.0-Work**，Artifact有限期留存；**没有进行用户本人Windows设备上的手工GUI验收**。
+- [ ] 仍未补齐全北京实时路线/GPS、公共交通运营与票价、已确认的现实亲属资产工资数据、合同/机构身份核验、31个并行真人水平LLM人格、关闭程序后的全天候自主计算后台。未知U持续保持，不以游戏S级测试替换现实事实。
+- 原正式世界仍2026-10-09冻结，钟点U、玩家未创建、正式事件0；前礼务村仍只是随机观察样本，不当玩家默认地址。
