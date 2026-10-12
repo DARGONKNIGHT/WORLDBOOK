@@ -8,6 +8,7 @@ Ollama is optional and is not bundled into the executable.
 """
 from __future__ import annotations
 import logging
+import json
 import os
 from pathlib import Path
 import sys
@@ -21,6 +22,64 @@ from game.agent_server import Handler
 
 APP_NAME="地球：现实人生"
 APP_PORT=8765
+
+MAX_SAVE=3*1024*1024
+class DesktopHandler(Handler):
+    """Desktop-only save endpoint; fixed Work/saves location and atomic writes."""
+    def allowed(self):
+        origin=self.headers.get("Origin","")
+        return not origin or origin in (f"http://127.0.0.1:{APP_PORT}",f"http://localhost:{APP_PORT}")
+
+    def saved_path(self):
+        return app_root()/"saves"/"autoplay.json"
+
+    def do_GET(self):
+        if self.path!="/api/save":
+            return super().do_GET()
+        path=self.saved_path()
+        if not path.is_file():
+            return self.send_json(404,{"error":"No desktop save yet"})
+        data=path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type","application/json; charset=utf-8")
+        self.send_header("Cache-Control","no-store")
+        self.send_header("Content-Length",str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_POST(self):
+        if self.path!="/api/save":
+            return super().do_POST()
+        if not self.allowed():
+            return self.send_json(403,{"error":"Cross-origin save request rejected"})
+        if self.headers.get("Content-Type","").split(";")[0].strip()!="application/json":
+            return self.send_json(415,{"error":"Expected JSON"})
+        try:
+            length=int(self.headers.get("Content-Length","0"))
+            if length<2 or length>MAX_SAVE:
+                return self.send_json(413,{"error":"Save exceeds limit"})
+            raw=self.rfile.read(length)
+            payload=json.loads(raw)
+            if not isinstance(payload,dict) or payload.get("mode")!="S_INDEPENDENT_PLAYTHROUGH" or not isinstance(payload.get("player"),dict):
+                return self.send_json(422,{"error":"Invalid local game save"})
+            target=self.saved_path()
+            target.parent.mkdir(parents=True,exist_ok=True)
+            # Unique staging name is under Work/saves, never system TMP.
+            temp_name=target.parent/("."+target.name+".stage")
+            temp_name.write_bytes(raw)
+            os.replace(temp_name,target)
+            return self.send_json(200,{"saved":True})
+        except (OSError,TypeError,ValueError) as exc:
+            return self.send_json(422,{"error":str(exc)[:120]})
+
+    def do_DELETE(self):
+        if self.path!="/api/save":
+            return self.send_json(404,{"error":"Unknown endpoint"})
+        if not self.allowed():
+            return self.send_json(403,{"error":"Cross-origin delete request rejected"})
+        self.saved_path().unlink(missing_ok=True)
+        return self.send_json(200,{"deleted":True})
+
 
 def app_root():
     return Path(sys.executable).resolve().parent if getattr(sys,"frozen",False) else Path(__file__).resolve().parent / "Work"
@@ -53,7 +112,7 @@ def main():
                     bg="#121d26",fg="#aac3c9",font=("Microsoft YaHei",9))
     status.pack(anchor="w",pady=5)
     try:
-        server=ThreadingHTTPServer(("127.0.0.1",APP_PORT),Handler)
+        server=ThreadingHTTPServer(("127.0.0.1",APP_PORT),DesktopHandler)
     except OSError as exc:
         logging.exception("Port conflict")
         messagebox.showerror("启动失败",f"本机端口 {APP_PORT} 无法使用。请关闭其他游戏实例或本地代理服务。\n{exc}")
