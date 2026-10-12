@@ -100,7 +100,7 @@ def self_test():
     root=prepare_directories()
     logging.basicConfig(filename=root/"logs"/"launcher.log",level=logging.INFO,format="%(asctime)s %(levelname)s %(message)s",encoding="utf-8",force=True)
     assets=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).parent)/"game"
-    for name in ("index.html","engine.js","society.js","agent_ai.js","app.js","VERSION"):
+    for name in ("index.html","engine.js","society.js","economy.js","agent_ai.js","app.js","VERSION"):
         if not (assets/name).is_file():
             raise RuntimeError(f"Bundled asset missing: {name}")
     service=ThreadingHTTPServer(("127.0.0.1",0),DesktopHandler)
@@ -112,7 +112,7 @@ def self_test():
             if response.status!=200:raise RuntimeError("Local health check failed")
         with urllib.request.urlopen(base+"/index.html",timeout=5) as response:
             page=response.read(300000)
-            if b'<script src="./society.js"></script>' not in page:
+            if b'<script src="./economy.js"></script>' not in page:
                 raise RuntimeError("Local frontend missing society wiring")
         logging.info("Frozen executable self-test passed; assets=%s",assets)
     finally:
