@@ -2,6 +2,22 @@
 
 本文件记录 **仓库可核查的功能交付**，依照日期与版本倒序排列，**最新条目必须位于最上方**。世界书的分层版本规则另见 [docs/VERSIONS.md](docs/VERSIONS.md)。R=已核查现实资料；S=实验性模拟；U=仍未知的事实。这里的“完成”只指列出的代码/测试范围，不等于完整地球模拟。
 
+## [Game 4.0.0] - 2026-10-12
+
+### Windows EXE优先与NPC社会事务执行链
+
+- **今后新游戏版本统一优先交付Windows可执行程序**：新增 `desktop_launcher.py`、`scripts/build_windows_exe.py` 与 Windows GitHub Actions 自动打包。目标入口为 `Work/EarthRealism.exe`，双击运行启动本机网页游戏服务与默认浏览器；无需用户自行启动Python服务。Ollama仍为可选外部本地软件，不会伪称包含在EXE内。
+- **目录约束**：可执行文件和所有构建中间物统一归属同一输出根目录。默认 `Work/EarthRealism.exe`、`Work/_internal/`运行依赖、`Work/.build/`编译产物、`Work/.spec/`规格、`Work/.cache/`缓存、`Work/tmp/`临时文件、`Work/logs/`日志、`Work/saves/`预留用户存档。Win版使用 PyInstaller `--onedir` 打平到 `Work/`，避免 onefile 将运行时文件释放到系统其他临时目录。生成的二进制与依赖通过 Windows Actions Artifact 交付，非把HTML改名为EXE，非在代码仓库提交超大二进制。
+- 新增 `game/society.js`：NPC根据**原世界书明确的家人／同事关系**、工作或家庭时间及已接收消息自主提出和回应S级事务，包含独立事务编号、状态、提出/送达/回复时刻、延迟回执与玩家外审计；不能直接生成真实合同、金额、工资或付款。旧schema=2存档按需建立society新增字段，人物与正式冻结世界不变。
+- `game/agent_ai.js` 新增 `coordinate_work`、`coordinate_family` 和 `review_case` 等有前置条件的模型与规则共用候选动作；玩家可在社会后台查看事务列表、未完成状态和协商结果。真实AI仍只负责受约束的候选行为，不可越权更改钱财或人员信息。
+- 增加事务链测试、Windows构建布局检查，保留旧浏览器单文件仅用于兼容/调试（不再作为今后新版主交付介质）。
+
+### 发布边界
+
+- 生成EXE须在真正Windows构建环境执行，CI验证后方能宣称EXE已成功打包。用户下载 Actions 中的 `EarthRealism-Windows-v4-Work`，解压后**保持EXE与`_internal`同目录**，不可只移动单个EXE。
+- Windows版是本地进程+浏览器UI，而非原生3D图形引擎；浏览器关闭后实时NPC循环仍停止。经济和社会执行目前只覆盖有可知关系的协商状态机，不具备全量双边财务、真实政府审批、真实工作合同或完整生活自主性。
+- 正式v33世界仍2026-10-09冻结；所有新事件属于单独S级模拟存档。
+
 ## [Game 3.0.0] - 2026-10-12
 
 ### 31名NPC独立认知状态、实时游戏钟、本机真实模型推理（S级）
@@ -39,7 +55,7 @@
 
 ## [Game 1.0.0] - 2026-10-10
 
-- 新增可下载双击运行的 \`game/earth-realism.html\`，以及 \`game/index.html\`、独立JavaScript引擎与中文界面。
+- 新增可下载双击运行的 `game/earth-realism.html`，以及 `game/index.html`、独立JavaScript引擎与中文界面。
 - 首次引入角色创建、动作耗时、跨区移动、31名NPC档案、基本消息、日志、本地保存、JSON导入/导出。
 - 添加Node测试、无需依赖的Python单文件生成器，CI离线测试与可选GitHub Pages发布工作流。
 - **已知问题（由2.0.0修复）**：随机相遇必然获得联系方式；NPC仅产生随机短句；回应单一，缺少主动控制界面。
