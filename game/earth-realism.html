@@ -745,8 +745,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   function commit(s,id,result,observedAt=s.time){
     const ai=ensure(s),m=ai.minds[id];
     guard(typeof result==="object"&&result!==null,"模型输出无效");
-    guard(within(observedAt,s.time-15*MINUTE,s.time),"过期决策不写入世界");
-    guard(m.lastAt===null||observedAt>=m.lastAt,"不接受倒序决策");
+    guard(within(observedAt,s.time-60*MINUTE,s.time),"过期决策不写入世界");
+    guard(E.plan(s,id,observedAt).kind===E.plan(s,id,s.time).kind,"人物当前日程已变化，旧模型结果已丢弃");
     const allowed=choices(s,id,s.time).options.map(x=>x.id);
     guard(allowed.includes(result.choice),"候选行动之外的命令被拒绝");
     const source=result.provider==="ollama"?"ollama":"rules";
@@ -957,7 +957,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     try{
       const speed=state.agentAI.speed;
       E.act(state,"background_tick",{minutes:speed});
-      A.runRules(state,8); // bounded scheduling; model decisions add separate audited thoughts
+      A.runRules(state,31); // all 31 local agents replan when due; model results are separate audited refinements
       if(state.agentAI.mode==="ollama")void runOneModel();
       tickCount++;
       if(tickCount%5===0)save(true);
@@ -972,6 +972,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     if(!state)return;
     const mode=$("ai-provider").value,speed=Number($("ai-speed").value);
     if(mode==="ollama"){
+      if(speed!==1){toast("本地大模型请使用每秒推进1游戏分钟，以免推理期间的日程过期。",true);return;}
       if(location.protocol==="file:"){
         toast("大模型模式需要运行 python3 game/agent_server.py，并打开本地服务的网址。",true);
         return;
