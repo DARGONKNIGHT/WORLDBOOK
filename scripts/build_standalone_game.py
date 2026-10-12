@@ -20,6 +20,7 @@ def build():
     substitutions = [
         ('<link rel="stylesheet" href="./style.css">', "<style>\n" + read("style.css") + "\n</style>"),
         ('<script src="./engine.js"></script>', "<script>\n" + read("engine.js") + "\n</script>"),
+        ('<script src="./agent_ai.js"></script>', "<script>\n" + read("agent_ai.js") + "\n</script>"),
         ('<script src="./app.js"></script>', "<script>\n" + read("app.js") + "\n</script>"),
     ]
     for source, replacement in substitutions:
