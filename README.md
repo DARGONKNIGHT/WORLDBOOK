@@ -97,7 +97,7 @@ OSM实际识别前礼务村地点节点6410843713（N40.1880155 E116.7077492）�
 
 ## Game 4.0 · Windows EXE主交付与家庭/工作协商事件链
 
-**今后新游戏版本使用Windows EXE交付，不再把HTML作为主要发布包。** Windows Actions的`EarthRealism-Windows-v4-Work`产物包含`Work/EarthRealism.exe`与同目录的`_internal/`；下载整个构建产物并保持目录结构，双击exe后会在电脑上启动本地服务和浏览器游戏。编译过程所有中间产物也限制在`Work/`下。Windows打包工作流见[EXE工作流](.github/workflows/windows-exe.yml)，具体是否产出请以最新CI为准；不得凭源码声称EXE已发布。
+**今后新游戏版本使用Windows EXE交付，不再把HTML作为主要发布包。** Windows Actions的`EarthRealism-Windows-v4-Work`产物包含`Work/EarthRealism.exe`与同目录的`_internal/`；下载整个构建产物并保持目录结构，双击exe后会在电脑上启动本地服务和浏览器游戏。编译过程所有中间产物也限制在`Work/`下；桌面版还会把存档保存在`Work/saves/autoplay.json`。Windows打包工作流见[EXE工作流](.github/workflows/windows-exe.yml)，具体是否产出请以最新CI为准；不得凭源码声称EXE已发布。
 
 新的社会事务执行层将31人自主决策连接到已有家庭/同事关系网络：提出协商→延迟送达→收件人自主审阅/回复→审计记录。账务及合同缺乏真实证据时保持未知，不会凭空生成人员工资/家庭资产。新增[行动事件实现](game/society.js)、[Windows构建脚本](scripts/build_windows_exe.py)、[游戏安装说明](game/README.md)。
 
