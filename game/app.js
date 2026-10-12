@@ -3,8 +3,10 @@
 (() => {
   "use strict";
   const E=window.EarthGame;
+  const A=window.EarthAgents;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
+  let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt=(n)=>n===null?"未知（U）":"¥"+Number(n).toLocaleString("zh-CN");
@@ -19,7 +21,7 @@
     catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);return raw?E.upgradeGame(JSON.parse(raw)):null;}
+    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);loaded.agentAI.realtime=false;return loaded;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -88,6 +90,10 @@
       select.innerHTML='<option value="all">全部31名人物</option>'+E.NPCS.map(n=>'<option value="'+escapeHTML(n.id)+'">'+escapeHTML(n.name)+' · '+escapeHTML(n.id)+'</option>').join("");
     }else if(current)select.value=current;
     $("autonomy-enabled").value=String(state.autonomy.enabled);
+    const ai=A.ensure(state);
+    $("ai-provider").value=ai.mode;
+    $("ai-speed").value=String(ai.speed);
+    $("ai-status").textContent=(ai.realtime?"运行中":"已暂停")+" · "+(ai.mode==="ollama"?"Ollama模型":"离线有限决策器")+" · "+modelStatus;
     $("autonomy-detail").value=state.autonomy.detail;
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
@@ -98,8 +104,12 @@
       return;
     }
     const n=NPC(id),c=E.plan(state,id),latest=state.npc[id].lastActivity;
+    const mind=A.ensure(state).minds[id];
+    const agentThought=mind.history.at(-1);
     $("npc-preview").innerHTML='<strong>'+escapeHTML(n.name)+' · '+escapeHTML(c.kind)+'</strong><p>当前判断：'+escapeHTML(c.reason)+'；优先事务：'+escapeHTML(c.focus)+'。</p><p>假设所在地区：'+escapeHTML(c.location)+' · 状态评分：'+escapeHTML(c.score)+'（S级规则权重，不代表人的心理测量）</p>'+
-    '<p>最近结算：'+(latest?escapeHTML(E.clock(latest.at))+' · '+escapeHTML(latest.text):'尚无执行记录')+'</p>';
+    '<p>最近结算：'+(latest?escapeHTML(E.clock(latest.at))+' · '+escapeHTML(latest.text):'尚无执行记录')+'</p>'+
+    '<p>个人目标：'+escapeHTML(mind.goals.join('；'))+' · 休息需求：'+mind.needs.rest+' · 社交需求：'+mind.needs.social+'</p>'+
+    '<p>最近自主选择：'+(agentThought?escapeHTML(A.LABEL[agentThought.choice])+' · '+escapeHTML(agentThought.provider)+' · '+escapeHTML(agentThought.reason):'尚未形成独立思考记录')+'</p>';
   }
   function renderArchive(){
     $("archive-player").textContent=state.player.name+"（"+state.player.age+"岁）";
@@ -112,6 +122,76 @@
     try{E.act(state,kind,payload);save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");}
     catch(err){toast(err.message,true);}
   }
+  function stopRealtime(){
+    if(autoClock!==null){clearInterval(autoClock);autoClock=null;}
+    if(state)A.settings(state,{realtime:false});
+    if(state){save(true);render();}
+  }
+  async function runOneModel(){
+    if(modelBusy||!state||!state.agentAI.realtime||state.agentAI.mode!=="ollama")return;
+    if(location.protocol==="file:"){modelStatus="单文件模式不支持大模型；请用本地Python服务";return;}
+    const id=E.NPCS[modelCursor++%E.NPCS.length].id;
+    const source=state,observedAt=source.time, payload=A.snapshot(source,id);
+    modelBusy=true;
+    const ctl=new AbortController();
+    const abort=setTimeout(()=>ctl.abort(),45000);
+    try{
+      const response=await fetch("/api/ai/decide",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload),signal:ctl.signal
+      });
+      const result=await response.json();
+      if(!response.ok)throw Error(result.error||"本地模型未就绪");
+      if(source!==state||!state.agentAI.realtime)return;
+      A.commit(state,id,result,observedAt);
+      modelStatus="模型在线 · 最近成功："+NPC(id).name;
+      save(true);
+    }catch(err){
+      // Never pretend rules are language model output.
+      modelStatus="模型调用失败："+String(err.message).slice(0,85)+"；其余NPC仍以规则持续运行";
+    }finally{
+      clearTimeout(abort);modelBusy=false;
+      if(state&&activeTab==="world")renderWorld();
+    }
+  }
+  function pulse(){
+    if(!state||!state.agentAI.realtime)return;
+    try{
+      const speed=state.agentAI.speed;
+      E.act(state,"background_tick",{minutes:speed});
+      A.runRules(state,8); // bounded scheduling; model decisions add separate audited thoughts
+      if(state.agentAI.mode==="ollama")void runOneModel();
+      tickCount++;
+      if(tickCount%5===0)save(true);
+      render();
+    }catch(err){
+      modelStatus="实时模拟停止："+err.message;
+      stopRealtime();
+      toast(modelStatus,true);
+    }
+  }
+  async function startRealtime(){
+    if(!state)return;
+    const mode=$("ai-provider").value,speed=Number($("ai-speed").value);
+    if(mode==="ollama"){
+      if(location.protocol==="file:"){
+        toast("大模型模式需要运行 python3 game/agent_server.py，并打开本地服务的网址。",true);
+        return;
+      }
+      try{
+        const response=await fetch("/api/health",{cache:"no-store"});
+        if(!response.ok)throw Error("没有本地模型服务");
+        const status=await response.json();
+        if(status.provider!=="ollama")throw Error("不是Ollama代理");
+        modelStatus="代理已连接；请确保Ollama和模型已启动";
+      }catch(err){toast("无法连接本地模型代理："+err.message,true);return;}
+    }else modelStatus="规则模拟正常；不调用语言模型";
+    A.settings(state,{realtime:true,mode,speed});
+    if(autoClock!==null)clearInterval(autoClock);
+    tickCount=0;
+    autoClock=setInterval(pulse,1000);
+    save(true);render();toast("已启动31名NPC实时模拟，关闭网页后停止。");
+  }
   function setup(){
     $("new-district").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
     $("new-district").value="海淀";
@@ -121,6 +201,7 @@
       try{
         const form=new FormData(ev.currentTarget);
         state=E.makeGame(Object.fromEntries(form.entries()));
+        A.ensure(state);
         save(true);
         $("setup").close();
         selectTab("life");render();
@@ -148,6 +229,8 @@
       execute("npc_autonomy",{enabled:$("autonomy-enabled").value==="true",detail:$("autonomy-detail").value});
     });
     $("world-npc").addEventListener("change",()=>renderWorld());
+    $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
+    $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("实时世界已暂停。");});
     $("world-step-60").addEventListener("click",()=>execute("wait",{minutes:60}));
     $("world-step-240").addEventListener("click",()=>execute("wait",{minutes:240}));
     $("message-form").addEventListener("submit",ev=>{
@@ -173,16 +256,17 @@
         if(file.size>3*1024*1024)throw new Error("存档超过3MB，拒绝导入");
         const candidate=E.upgradeGame(JSON.parse(await file.text()));
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
-        state=candidate;save(true);$("setup").close();selectTab("life");render();
+        state=candidate;A.ensure(state);state.agentAI.realtime=false;save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
       }catch(err){toast("导入失败："+err.message,true);}
       finally{ev.target.value="";}
     });
     $("btn-reset").addEventListener("click",()=>{
       if(state&&!window.confirm("创建新游戏将替换当前本地存档。请先导出旧存档，确认继续？"))return;
-      state=null;localStorage.removeItem(KEY);$("play-layout").hidden=true;$("setup-error").textContent="";
+      stopRealtime();state=null;localStorage.removeItem(KEY);$("play-layout").hidden=true;$("setup-error").textContent="";
       $("setup-form").reset();$("new-district").value="海淀";$("setup").showModal();
     });
+    window.addEventListener("beforeunload",()=>{if(state)save(true);});
     state=restore();
     if(state){selectTab("life");render();}
     else{$("setup").showModal();}
