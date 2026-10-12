@@ -30,10 +30,13 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check game/engine.js
+          node --check game/agent_ai.js
           node --check game/app.js
           node --check game/tests/engine.test.cjs
       - name: Run game engine regression tests
-        run: node --test game/tests/engine.test.cjs
+        run: node --test game/tests/*.test.cjs
+      - name: Check local inference server syntax
+        run: python3 -m py_compile game/agent_server.py
       - name: Verify changelog newest-first order
         run: python3 scripts/check_changelog.py
       - name: Verify reproducible self-contained HTML build
