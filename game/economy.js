@@ -150,9 +150,16 @@
     const ids=e.transfers.map(t=>t.quoteId);
     if(ids.length!==new Set(ids).size)errors.push("duplicate settlement");
     for(const t of e.transfers){
-      const entries=e.ledger.filter(l=>l.txId===t.id);
+      const entries=e.ledger.filter(l=>l.txId===t.id),q=e.quotes.find(q=>q.id===t.quoteId);
       if(entries.length!==2||entries.reduce((a,b)=>a+b.deltaCents,0)!==0)errors.push("unbalanced transfer "+t.id);
       if(entries.some(l=>!["P014","P015"].includes(l.account)))errors.push("unknown payee "+t.id);
+      if(!q||t.amountCents!==q.priceCents||t.payer!==PAYER||t.recipient!==PROVIDER)
+        errors.push("settlement does not match agreed quote "+t.id);
+      if(entries.length===2&&(!entries.some(l=>l.account===PAYER&&l.deltaCents===-t.amountCents)
+            ||!entries.some(l=>l.account===PROVIDER&&l.deltaCents===t.amountCents)))
+        errors.push("wrong ledger parties or amount "+t.id);
+      if(q&&(!q.verifiedAt||t.at<q.verifiedAt||q.paidAt!==t.at))
+        errors.push("invalid settlement chronology "+t.id);
     }
     if(Object.values(e.accounts).some(x=>!validAmount(x)))errors.push("invalid balance");
     if(e.transfers.length>0&&!e.openingAccounts)errors.push("opening balances not recorded");
