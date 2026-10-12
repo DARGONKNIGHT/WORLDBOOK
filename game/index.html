@@ -109,6 +109,22 @@
             <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
             <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
           </section>
+          <section class="panel audit-panel">
+            <div class="panel-head"><span>经济执行层 · S级测试账本</span><span class="tag">不是真实支付</span></div>
+            <p class="panel-desc">仅能对马志强（经营）与高鹏（维修合作）的已知、已回复工作协商建立一次显式假设。金额由外视角输入，NPC自行报价、接受或拒绝，报告服务；付款还需明确核验和授权，未知余额不会自动补全。</p>
+            <form id="economy-fixture-form" class="travel-form">
+              <label>已讨论事务<select id="economy-case" required></select></label>
+              <label>合作报价 · 元<input id="economy-price" type="number" min="1" max="10000000" step="1" value="150" required></label>
+              <label>经营者初始测试余额 · 元<input id="economy-payer" type="number" min="0" max="10000000" step="1" value="500" required></label>
+              <label>合作方初始测试余额 · 元<input id="economy-provider" type="number" min="0" max="10000000" step="1" value="100" required></label>
+              <button type="submit" class="primary">注入明确的S级条件 ↗</button>
+            </form>
+            <div class="line"></div>
+            <div class="autonomy-steps"><label>当前报价<select id="economy-quote"></select></label>
+              <button type="button" id="economy-verify" class="ghost">确认模拟服务已核验</button>
+              <button type="button" id="economy-settle" class="ghost">授权S级成对记账</button></div>
+            <div id="economy-status" class="log-list"></div>
+          </section>
           <section class="panel audit-panel"><div class="panel-head"><span>人物社会事务 · 工作与家庭协商</span><span class="tag">S · 事件链</span></div><div class="audit-top"><strong id="society-count">0</strong><span>已创建的模拟协商事项；不自动成交或转账</span></div><div id="society-list" class="log-list"></div></section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
             <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
@@ -161,6 +177,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./engine.js"></script>
   <script src="./society.js"></script>
+  <script src="./economy.js"></script>
   <script src="./agent_ai.js"></script>
   <script src="./app.js"></script>
 </body>
