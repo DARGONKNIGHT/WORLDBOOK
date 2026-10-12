@@ -10,6 +10,11 @@ on:
       - "desktop_launcher.py"
       - "scripts/check_changelog.py"
       - "CHANGELOG.md"
+      - "AGENTS.md"
+      - "docs/REALISM_CONSTITUTION.md"
+      - "docs/WORLDBOOK_MASTER.md"
+      - "worldbook/**"
+      - "scripts/check_realism.py"
       - ".github/workflows/game-tests.yml"
   pull_request:
     paths:
@@ -17,6 +22,11 @@ on:
       - "scripts/build_standalone_game.py"
       - "scripts/check_changelog.py"
       - "CHANGELOG.md"
+      - "AGENTS.md"
+      - "docs/REALISM_CONSTITUTION.md"
+      - "docs/WORLDBOOK_MASTER.md"
+      - "worldbook/**"
+      - "scripts/check_realism.py"
       - ".github/workflows/game-tests.yml"
   workflow_dispatch:
 
@@ -26,6 +36,8 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPYCACHEPREFIX: Work/.pycache
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,6 +58,8 @@ jobs:
         run: python3 -m unittest discover -s game/tests -p "test_*server*.py" -v
       - name: Check exe build layout plan
         run: python3 scripts/build_windows_exe.py --output Work --dry-run
+      - name: Enforce realism-first foundation and physical constraints
+        run: python3 scripts/check_realism.py
       - name: Verify changelog newest-first order
         run: python3 scripts/check_changelog.py
       - name: Verify reproducible self-contained HTML build
