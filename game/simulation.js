@@ -93,7 +93,7 @@
    const minutes=taskDuration(kind,payload);canStart(s,kind,payload);
    // Copy only serializable intent; do not mutate global time on initiation.
    const task={id:"ACT-"+String(++s.sequence).padStart(6,"0"),kind,payload:JSON.parse(JSON.stringify(payload)),
-     startedAt:s.time,endsAt:s.time+minutes*MINUTE,minutes};
+     startedAt:s.time+s.live.carryMs,endsAt:s.time+s.live.carryMs+minutes*MINUTE,minutes};
    s.live.task=task;
    s.journal.push({id:++s.sequence,at:s.time,kind:"action_started",visible:true,grade:"S",
      text:"你开始"+({travel:"前往其他区",explore:"观察街区",social:"参加公共活动",study:"整理计划",
@@ -105,7 +105,7 @@
    syncLive(s,wallMs);
    const live=ensureLive(s,wallMs),task=live.task;
    safe(task,"当前没有可打断的玩家活动");
-   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((s.time-task.startedAt)/MINUTE)));
+   const elapsed=Math.min(task.minutes,Math.max(0,Math.floor((s.time+live.carryMs-task.startedAt)/MINUTE)));
    const costs={travel:8,explore:6,social:9,study:12,work:22,message:1,request_contact:2};
    let energyEffect=0;
    if(task.kind==="rest")energyEffect=Math.floor(25*elapsed/task.minutes);
@@ -118,7 +118,7 @@
  }
  function finishTask(s){
    const live=s.live,task=live.task;
-   if(!task||s.time<task.endsAt)return null;
+   if(!task||s.time+live.carryMs<task.endsAt)return null;
    // Completion first clears the reservation; legacy E.act applies a bounded
    // outcome without skipping time. NPCs did not wait for this player action.
    live.task=null;
@@ -157,6 +157,8 @@
      if(live.task&&s.time>=live.task.endsAt)finishTask(s);
      if(s.autonomy.enabled)A.runRules(s,31);
    }
+   // Sub-minute wall time can complete a scheduled action without making the entire world leap another minute.
+   if(live.task&&s.time+live.carryMs>=live.task.endsAt)finishTask(s);
    return {advancedMinutes:total,task:live.task,omittedMinutes:live.omittedMinutes};
  }
  function stopLive(s,wallMs=Date.now()){
