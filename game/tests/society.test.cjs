@@ -1,0 +1,76 @@
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const E=require("../engine.js");
+const S=require("../society.js");
+const A=require("../agent_ai.js");
+const create=(start="09:00")=>E.makeGame({name:"测试玩家",age:25,district:"顺义",start,cash:"",occupation:"自由事务"});
+test("模拟社会事务启动时不存在合同、钱款、隐造客户",()=>{
+ const s=create();
+ assert.equal(S.ensure(s).cases.length,0);
+ assert.equal(S.ensure(s).moneyTransfers.length,0);
+ assert.equal(S.audit(s).length,0);
+});
+test("修理业务合作者自行协商，送达后才能审查和回复",()=>{
+ const s=create();A.ensure(s);
+ const initial=S.opportunities(s,"P014");
+ assert.ok(initial.some(x=>x.id==="coordinate_work"));
+ assert.equal(S.opportunities(s,"P015").some(x=>x.id==="review_case"),false);
+ const offer=A.commit(s,"P014",{choice:"coordinate_work",provider:"rules",reason:"需要确认现有维修合作资源"});
+ assert.equal(offer.action,"coordinate_work");
+ const c=S.ensure(s).cases[0];
+ assert.equal(c.status,"awaiting_response");
+ assert.equal(c.amountCents,null);
+ assert.equal(s.npc.P015.knowledge.length,0);
+ E.act(s,"wait",{minutes:14});
+ assert.equal(s.npc.P015.knowledge.some(x=>String(x.topic).includes(c.id)),false);
+ E.act(s,"wait",{minutes:1});
+ assert.equal(s.npc.P015.knowledge.some(x=>String(x.topic).includes(c.id)),true);
+ assert.ok(A.choices(s,"P015").options.some(x=>x.id==="review_case"));
+ A.commit(s,"P015",{choice:"review_case",provider:"ollama",reason:"先回应已知工单安排"});
+ assert.equal(c.status,"discussed");
+ assert.equal(s.npc.P014.knowledge.some(x=>String(x.topic).includes(c.id)),false);
+ E.act(s,"wait",{minutes:10});
+ assert.equal(s.npc.P014.knowledge.some(x=>String(x.topic).includes(c.id)),true);
+ assert.deepEqual(S.audit(s),[]);
+ assert.equal(s.player.knowledge.length,0);
+ assert.equal(S.ensure(s).moneyTransfers.length,0);
+});
+test("没有已知家人同事纽带，不可以伪造工作关系",()=>{
+ const s=create();S.ensure(s);
+ assert.deepEqual(S.opportunities(s,"P019"),[]);
+ assert.throws(()=>S.apply(s,"P019","coordinate_work"),/关系网/);
+ assert.throws(()=>S.apply(s,"P014","coordinate_family"),/不允许/);
+});
+test("家庭协调只在家庭时间进行，不得把儿童当交易主体",()=>{
+ const s=create("20:00");A.ensure(s);
+ assert.ok(S.opportunities(s,"P005").some(x=>x.id==="coordinate_family"));
+ assert.ok(!S.opportunities(s,"P005").some(x=>x.id==="coordinate_work"));
+ assert.deepEqual(S.opportunities(s,"P007"),[]);
+ A.commit(s,"P005",{choice:"coordinate_family",provider:"rules",reason:"联系配偶，确认照护安排"});
+ assert.equal(S.ensure(s).cases[0].type,"family");
+ assert.equal(S.ensure(s).cases[0].status,"awaiting_response");
+ assert.equal(s.npc.P006.knowledge.some(x=>String(x.topic).includes("CASE-")),false);
+ E.act(s,"wait",{minutes:15});
+ assert.ok(S.opportunities(s,"P006").some(x=>x.id==="review_case"));
+ A.commit(s,"P006",{choice:"review_case",provider:"rules",reason:"已获知配偶协商消息"});
+ assert.equal(S.ensure(s).cases[0].status,"discussed");
+});
+test("阻止重复提案、重复回复，历史信息在独立分支",()=>{
+ const s=create();A.ensure(s);
+ A.commit(s,"P014",{choice:"coordinate_work",provider:"rules"});
+ assert.throws(()=>S.apply(s,"P014","coordinate_work"),/不允许/);
+ E.act(s,"wait",{minutes:15});
+ A.commit(s,"P015",{choice:"review_case",provider:"rules"});
+ assert.throws(()=>S.apply(s,"P015","review_case"),/不允许/);
+ assert.equal(S.ensure(s).cases.length,1);
+ assert.equal(s.player.knowledge.length,0);
+});
+test("持久化社会事务与私有NPC认知，人工已知余额不产生变更",()=>{
+ const s=create();A.ensure(s);
+ A.commit(s,"P014",{choice:"coordinate_work",provider:"rules"});
+ const copy=JSON.parse(JSON.stringify(s));
+ E.validateGame(copy);S.ensure(copy);A.ensure(copy);
+ assert.deepEqual(copy.society,s.society);
+ assert.equal(copy.player.cash,null);
+ assert.equal(copy.society.moneyTransfers.length,0);
+});
