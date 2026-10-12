@@ -1,5 +1,5 @@
-/* Offline UI. Browser localStorage is the only automatic persistence layer.
-   No network APIs, no cloud accounts, and no write access to the canonical worldbook. */
+/* Desktop/browser UI for an S-grade continuous-time independent sandbox.
+   Browser storage plus optional localhost EXE disk mirror; no canonical worldbook mutations. */
 (() => {
   "use strict";
   const E=window.EarthGame;
