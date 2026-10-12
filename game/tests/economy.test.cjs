@@ -129,6 +129,13 @@ test("余额单方篡改即使历史借贷平衡也会被发现并拒绝继续�
  assert.throws(()=>F.settle(s,{quoteId:id,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"}),/审计失败/);
  assert.equal(F.ensure(s).ledger.length,0);
 });
+test("即使双方账本守恒，篡改交易价格或收款身份仍被审计拒绝",()=>{
+ const s=setup();stage(s,120,500,50);const id=reported(s);
+ F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
+ F.settle(s,{quoteId:id,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"});
+ F.ensure(s).transfers[0].amountCents=1;
+ assert.ok(F.audit(s).some(x=>x.includes("agreed quote")));
+});
 test("审计能检测存档篡改造成的失衡条目",()=>{
  const s=setup();stage(s);const id=reported(s);
  F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
