@@ -94,6 +94,7 @@ def prepare_directories(root=None):
 def self_test():
     """Headless smoke test of the actual frozen .exe's bundled local web service."""
     root=prepare_directories()
+    logging.basicConfig(filename=root/"logs"/"launcher.log",level=logging.INFO,format="%(asctime)s %(levelname)s %(message)s",encoding="utf-8",force=True)
     assets=(Path(sys._MEIPASS) if getattr(sys,"frozen",False) else Path(__file__).parent)/"game"
     for name in ("index.html","engine.js","society.js","agent_ai.js","app.js"):
         if not (assets/name).is_file():
