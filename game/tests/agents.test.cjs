@@ -54,10 +54,17 @@ test("实际模型选择写入带提供者标签的私有审计而不改主角�
 });
 test("缺失/过期/倒序推理一律拒绝，状态不写入",()=>{
  const s=create();A.ensure(s);const at=s.time;
- E.act(s,"wait",{minutes:30});
+ E.act(s,"wait",{minutes:70});
  const candidate=A.choices(s,"P003").options[0].id;
  assert.throws(()=>A.commit(s,"P003",{choice:candidate,provider:"ollama"},at),/过期/);
  assert.equal(s.agentAI.minds.P003.thoughts,0);
+});
+test("模型响应若跨越不可变的日程界限则丢弃，而非伪造到岗",()=>{
+ const s=create();A.ensure(s);const start=s.time;
+ const first=A.choices(s,"P003",start).options.find(x=>x.id==="continue_work");
+ assert.ok(first);
+ E.act(s,"wait",{minutes:240}); // 09:00 to 13:00; still work.
+ assert.throws(()=>A.commit(s,"P003",{choice:first.id,provider:"ollama"},start),/过期/);
 });
 test("已知亲属/同事协商使用延迟消息而非瞬时共享",()=>{
  const s=create();A.ensure(s);
