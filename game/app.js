@@ -165,6 +165,7 @@
       if(kind==="npc_autonomy"){E.act(state,kind,payload);}
       else if(kind==="wait")throw Error("连续世界没有等待/结束回合，时间自然流逝");
       else {
+        Sim.checkAction(state,kind,payload);
         if(state.live?.task){
           if(!window.confirm("目前正在执行 "+state.live.task.kind+"。要现在中断，并开始新的行动吗？已花费时间不会倒流。"))return;
           Sim.interruptTask(state,Date.now());
