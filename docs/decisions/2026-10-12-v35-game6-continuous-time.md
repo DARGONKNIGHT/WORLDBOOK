@@ -25,3 +25,7 @@ live状态保存上一次实际墙钟、累积不足1分钟的余量、占用任
 新增worldbook/v35.md；修改game/engine.js、game/simulation.js、game/app.js、game/index.html、game/tests/live.test.cjs、桌面启动器、世界书主档案/版本索引、根README、游戏README、AGENTS.md、CHANGELOG.md和工作流，保留v34经济事务完整性与源数据门槛。Windows EXE仍Work/EarthRealism.exe，全部打包中间文件Work/.build、Work/.spec、Work/.cache、Work/tmp和运行依赖Work/_internal；测试需验证JS连续计时、行动取消、路径未完成、消息边界、旧档案兼容、WINDOWS PyInstaller及冻结EXE --self-test，再据CI真实状态归档结果。
 
 没有实现持续驻留的服务端仿真，不会在浏览器退出后立即计算每一真实秒的NPC活动；当前只有有限逻辑追算，不能据此声称“NPC已在外部世界24小时自主活动”。真实市场、具体法律/医疗、员工工资合同与真实人口资料仍缺。
+
+## 秒级行为补充
+
+确认Game6中间检视暴露的边界：行动如果只能在整分钟标记起始，会使第45秒开始的工作提前45秒结束，违反任意时刻参与。修复为玩家行动在分钟内部携带毫秒级开始与结束时间，钟点由实际墙钟余量和模拟分钟整步共同组成；世界既有NPC消息仍按分钟粒度结算，保留信息和现实限制。测试必须覆盖非整分钟开始、提前一毫秒不可完成及足时才兑现。
