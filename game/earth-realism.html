@@ -911,6 +911,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
+  let diskQueue=Promise.resolve();
   const $=(id)=>document.getElementById(id);
   const escapeHTML=(text)=>String(text??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt=(n)=>n===null?"未知（U）":"¥"+Number(n).toLocaleString("zh-CN");
@@ -919,10 +920,24 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     const el=$("toast");el.textContent=message;el.style.borderColor=error?"#b86868":"#5d806e";el.classList.add("show");
     clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove("show"),3600);
   }
+  const desktopServer=()=>location.protocol==="http:" && ["localhost","127.0.0.1"].includes(location.hostname) && location.port==="8765";
+  function queueDesktopSave(method,payload){
+    if(!desktopServer())return;
+    const body=payload||"";
+    diskQueue=diskQueue.catch(()=>{}).then(async()=>{
+      const res=await fetch("/api/save",{method,headers:method==="POST"?{"Content-Type":"application/json"}:{},body:method==="POST"?body:undefined});
+      if(!res.ok&&res.status!==404)throw Error("Work/saves写入失败："+res.status);
+    }).catch(err=>{console.warn("Desktop save failed:",err);});
+  }
   function save(silent=false){
     if(!state)return;
-    try{E.validateGame(state);localStorage.setItem(KEY,JSON.stringify(state));if(!silent)toast("已保存到本机浏览器。");}
-    catch(err){toast("无法自动保存：" +err.message,true);}
+    try{
+      E.validateGame(state);
+      const snapshot=JSON.stringify(state);
+      localStorage.setItem(KEY,snapshot);
+      queueDesktopSave("POST",snapshot);
+      if(!silent)toast(desktopServer()?"浏览器已保存，正在同步Work/saves。":"已保存到本机浏览器。");
+    }catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
     try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);loaded.agentAI.realtime=false;return loaded;}
@@ -1101,7 +1116,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     autoClock=setInterval(pulse,1000);
     save(true);render();toast("已启动31名NPC实时模拟，关闭网页后停止。");
   }
-  function setup(){
+  async function setup(){
     $("new-district").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
     $("new-district").value="海淀";
     $("travel-destination").innerHTML=E.DISTRICTS.map(d=>'<option value="'+d+'">'+d+'区</option>').join("");
@@ -1172,11 +1187,23 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     });
     $("btn-reset").addEventListener("click",()=>{
       if(state&&!window.confirm("创建新游戏将替换当前本地存档。请先导出旧存档，确认继续？"))return;
-      stopRealtime();state=null;localStorage.removeItem(KEY);$("play-layout").hidden=true;$("setup-error").textContent="";
+      stopRealtime();state=null;localStorage.removeItem(KEY);queueDesktopSave("DELETE");$("play-layout").hidden=true;$("setup-error").textContent="";
       $("setup-form").reset();$("new-district").value="海淀";$("setup").showModal();
     });
     window.addEventListener("beforeunload",()=>{if(state)save(true);});
     state=restore();
+    // Desktop-saved snapshots live next to EXE. Recovery takes precedence over
+    // browser localStorage, and never downloads anything from a cloud service.
+    if(desktopServer()){
+      try{
+        const res=await fetch("/api/save",{cache:"no-store"});
+        if(res.ok){
+          const candidate=E.upgradeGame(await res.json());
+          A.ensure(candidate);candidate.agentAI.realtime=false;
+          state=candidate;localStorage.setItem(KEY,JSON.stringify(state));
+        }
+      }catch(err){console.warn("Work/saves恢复不可用，回退浏览器存档：",err);}
+    }
     if(state){selectTab("life");render();}
     else{$("setup").showModal();}
   }
