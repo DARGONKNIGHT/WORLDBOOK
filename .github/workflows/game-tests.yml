@@ -37,6 +37,8 @@ jobs:
         run: node --test game/tests/*.test.cjs
       - name: Check local inference server syntax
         run: python3 -m py_compile game/agent_server.py
+      - name: Verify local Ollama proxy contract
+        run: python3 -m unittest discover -s game/tests -p "test_*server*.py" -v
       - name: Verify changelog newest-first order
         run: python3 scripts/check_changelog.py
       - name: Verify reproducible self-contained HTML build
