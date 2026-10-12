@@ -136,6 +136,23 @@ test("即使双方账本守恒，篡改交易价格或收款身份仍被审计�
  F.ensure(s).transfers[0].amountCents=1;
  assert.ok(F.audit(s).some(x=>x.includes("agreed quote")));
 });
+test("模型信息边界：付款人只看自己的余额、报价送达前不能看到价格",()=>{
+ const s=setup();stage(s,120,500,80);
+ let snap=A.snapshot(s,"P014");
+ assert.equal(snap.economic_context.own_balance_cents,50000);
+ assert.deepEqual(snap.economic_context.quotes,[]);
+ assert.ok(!JSON.stringify(snap).includes("8000"));
+ A.commit(s,"P015",{choice:"issue_quote",provider:"rules"});
+ snap=A.snapshot(s,"P014");
+ assert.equal(snap.economic_context.quotes.length,0);
+ E.act(s,"wait",{minutes:15});
+ snap=A.snapshot(s,"P014");
+ assert.equal(snap.economic_context.quotes.length,1);
+ assert.equal(snap.economic_context.quotes[0].price_cents,12000);
+ const other=A.snapshot(s,"P015");
+ assert.equal(other.economic_context.own_balance_cents,8000);
+ assert.ok(!JSON.stringify(other).includes('"own_balance_cents":50000'));
+});
 test("审计能检测存档篡改造成的失衡条目",()=>{
  const s=setup();stage(s);const id=reported(s);
  F.verifyDelivery(s,{quoteId:id,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
