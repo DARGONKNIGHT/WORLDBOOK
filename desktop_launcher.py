@@ -112,7 +112,7 @@ def self_test():
             if response.status!=200:raise RuntimeError("Local health check failed")
         with urllib.request.urlopen(base+"/index.html",timeout=5) as response:
             page=response.read(300000)
-            if b'<script src="./economy.js"></script>' not in page:
+            if b'<script src="./simulation.js"></script>' not in page:
                 raise RuntimeError("Local frontend missing society wiring")
         logging.info("Frozen executable self-test passed; assets=%s",assets)
     finally:
