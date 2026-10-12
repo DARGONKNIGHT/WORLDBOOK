@@ -5,6 +5,7 @@
   const E=window.EarthGame;
   const A=window.EarthAgents;
   const S=window.EarthSociety;
+  const F=window.EarthEconomy;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
@@ -114,6 +115,18 @@
     const id=select.value;
     const records=id==="all"?state.world:state.world.filter(x=>x.npcId===id);
     const society=S.ensure(state);
+    const economy=F.ensure(state), caseselect=$("economy-case"), quoteSelect=$("economy-quote");
+    const oldCase=caseselect.value,oldQuote=quoteSelect.value;
+    const paired=society.cases.filter(c=>c.type==="work"&&c.status==="discussed"&&
+      [c.from,c.to].sort().join(":")==="P014:P015");
+    caseselect.innerHTML=paired.map(c=>'<option value="'+escapeHTML(c.id)+'">'+escapeHTML(c.id)+' · '+escapeHTML(c.title)+'</option>').join("");
+    if(paired.some(c=>c.id===oldCase))caseselect.value=oldCase;
+    const quotes=economy.quotes.slice(-50);
+    quoteSelect.innerHTML=quotes.map(q=>'<option value="'+escapeHTML(q.id)+'">'+escapeHTML(q.id)+' · '+escapeHTML(q.status)+'</option>').join("");
+    if(quotes.some(q=>q.id===oldQuote))quoteSelect.value=oldQuote;
+    const balance=(id)=>economy.accounts[id]===undefined?"未知（U）":"¥"+(economy.accounts[id]/100).toLocaleString("zh-CN")+"（S）";
+    $("economy-status").innerHTML='<p class="micro">马志强测试余额：'+balance("P014")+'；高鹏测试余额：'+balance("P015")+'。该余额仅属游戏试验，与现实财产及玩家资产无关。</p>'+
+      (quotes.length?quotes.slice(-10).reverse().map(q=>'<article class="log-line"><div class="meta">'+escapeHTML(q.id)+' · '+escapeHTML(q.status)+' · S级模拟</div><p>价格：¥'+(q.priceCents/100).toLocaleString("zh-CN")+'；'+escapeHTML(q.caseId)+' · '+(q.verifiedAt?"已核验模拟交付；":"真实履约未证明；")+(q.paidAt?"已S级成对记账":"未付款")+'</p></article>').join(""):'<p class="micro">暂无报价。须先完成工作协商并建立显式S级测试条件。</p>');
     $("society-count").textContent=society.cases.length;
     $("society-list").innerHTML=society.cases.length?society.cases.slice(-35).reverse().map(x=>
       '<article class="log-line"><div class="meta">'+escapeHTML(E.clock(x.createdAt))+' · '+escapeHTML(x.id)+' · '+escapeHTML(x.status)+'</div><p>'+escapeHTML(x.title)+' · '+escapeHTML(NPC(x.from)?.name||x.from)+' → '+escapeHTML(NPC(x.to)?.name||x.to)+(x.result?'；'+escapeHTML(x.result):'；等待对方知情并决定')+'</p></article>').join(""):'<p class="micro">尚无模拟协商事务。开启自主NPC模拟、推进游戏时间后，既有家人/同事才可能发起事务。</p>';
@@ -248,6 +261,27 @@
     $("autonomy-form").addEventListener("submit",ev=>{
       ev.preventDefault();
       execute("npc_autonomy",{enabled:$("autonomy-enabled").value==="true",detail:$("autonomy-detail").value});
+    });
+    $("economy-fixture-form").addEventListener("submit",ev=>{
+      ev.preventDefault();
+      if(!state)return;
+      try{
+        F.opening(state,{caseId:$("economy-case").value,priceYuan:Number($("economy-price").value),
+          payerOpeningYuan:Number($("economy-payer").value),providerOpeningYuan:Number($("economy-provider").value)});
+        save(true);render();toast("已录入一次性S级假设，NPC可自行决定是否提出报价。");
+      }catch(err){toast(err.message,true);}
+    });
+    $("economy-verify").addEventListener("click",()=>{
+      if(!state)return;
+      if(!window.confirm("这仅确认沙盒内的模拟履约，不代表现实服务。确认继续？"))return;
+      try{F.verifyDelivery(state,{quoteId:$("economy-quote").value,confirmation:"S_SIMULATED_DELIVERY_VERIFIED"});
+        save(true);render();toast("S级模拟履约已核验，尚未支付。");}catch(err){toast(err.message,true);}
+    });
+    $("economy-settle").addEventListener("click",()=>{
+      if(!state)return;
+      if(!window.confirm("将从经营者S级测试账户扣除，并向合作方S级测试账户增加同额款项；非真实银行支付。确认？"))return;
+      try{F.settle(state,{quoteId:$("economy-quote").value,confirmation:"S_AUTHORIZE_DOUBLE_ENTRY"});
+        save(true);render();toast("模拟双边记账已完成，实际世界余额未变。");}catch(err){toast(err.message,true);}
     });
     $("world-npc").addEventListener("change",()=>renderWorld());
     $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
