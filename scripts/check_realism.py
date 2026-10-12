@@ -32,7 +32,7 @@ for phrase in ["真实性优先于", "R", "S", "U", "时间", "未知", "NPC", "
 assert agent.index("docs/REALISM_CONSTITUTION.md") < agent.index("## 强制工作流"),"Realism must be at the top of AGENTS"
 assert "真实性" in master and "docs/REALISM_CONSTITUTION.md" in readme
 assert "最高" in world and "中断" in world and "未知" in world
-assert "positionGrade:\"U\"" in sim and "resumeTravel" in sim and 'status:"stranded"' in sim
+assert "positionGrade:\"U\"" in sim and "resumeTravel" in sim and 'movement.status="stranded"' in sim
 assert "在途" in engine and "mobility" in engine
 assert tests.count('test("') >= 7, "Need realistic counterexample/regression tests"
 assert version=="7.0.0" or re.fullmatch(r"[1-9]\d*\.\d+\.\d+",version),"Unexpected game version"
