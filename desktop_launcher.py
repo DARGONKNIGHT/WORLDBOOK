@@ -1,4 +1,4 @@
-"""Earth Realism Windows launcher (game 4.0).
+"""Earth Realism Windows launcher (game 6.0).
 
 PyInstaller --onedir binary is flattened to Work/EarthRealism.exe, with _internal
 in the *same* Work directory. No onefile extraction in an external temp folder.
@@ -133,7 +133,7 @@ def main():
     panel.pack(fill="both",expand=True)
     tk.Label(panel,text=APP_NAME+"  v"+game_version(),font=("Microsoft YaHei",18,"bold"),
              bg="#121d26",fg="#e3eecf").pack(anchor="w")
-    tk.Label(panel,text="31名S级自主人物 · 家庭与工作协商 · 本地AI可选",
+    tk.Label(panel,text="31名S级自主人物 · 无回合连续时间 · 本地AI可选",
              font=("Microsoft YaHei",10),bg="#121d26",fg="#aac3c9",pady=10).pack(anchor="w")
     url=f"http://127.0.0.1:{APP_PORT}/"
     tk.Button(panel,text="打开游戏窗口（浏览器）",font=("Microsoft YaHei",11),
