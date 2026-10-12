@@ -109,6 +109,7 @@
             <div class="autonomy-steps"><button type="button" class="ghost" id="ai-stop">暂停实时世界</button><span id="ai-status" class="micro" aria-live="polite">当前：暂停；不在后台自行运行</span></div>
             <p class="micro">推理时只送单个NPC已知的信息，AI输出必须符合候选动作。工作/学校/法律/资金仍受引擎约束，模型不能越权操作。每名NPC约每30游戏分钟形成新计划，不是每秒调用31次大模型。</p>
           </section>
+          <section class="panel audit-panel"><div class="panel-head"><span>人物社会事务 · 工作与家庭协商</span><span class="tag">S · 事件链</span></div><div class="audit-top"><strong id="society-count">0</strong><span>已创建的模拟协商事项；不自动成交或转账</span></div><div id="society-list" class="log-list"></div></section>
           <section class="panel audit-panel"><div class="panel-head"><span>独立NPC活动记录</span><span class="tag">S · 玩家外视角</span></div>
             <div class="audit-top"><strong id="world-total">0</strong><span>已结算后台决定</span></div><div id="world-list" class="log-list"></div>
           </section>
@@ -159,6 +160,7 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./engine.js"></script>
+  <script src="./society.js"></script>
   <script src="./agent_ai.js"></script>
   <script src="./app.js"></script>
 </body>
