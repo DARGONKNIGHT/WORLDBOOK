@@ -339,7 +339,7 @@
   function act(s, kind, payload={}) {
     validateGame(s);
     assert(typeof kind==="string"&&payload&&typeof payload==="object","操作无效");
-    const p=s.player, at=s.time;
+    const p=s.player, at=s.time, noAdvance=payload.__realtimeComplete===true;
     if(kind==="background_tick"){
       const minutes=Number(payload.minutes);
       assert(Number.isInteger(minutes)&&minutes>=1&&minutes<=10,"实时推进每秒只允许1—10游戏分钟");
@@ -355,33 +355,34 @@
       assert(p.energy>=8,"精力不足，请先休息");
       const from=p.district;
       event(s,at,"从"+from+"区出发，前往"+to+"区。"+minutes+"分钟是玩家设定的S级行程估计，不是导航数据。","travel");
-      advance(s,minutes);
+      if(!noAdvance)advance(s,minutes);
       p.district=to;p.energy=Math.max(0,p.energy-8);
       if(fare>0) {p.cash-=fare;event(s,s.time,"你登记了交通支出 ¥"+fare+"。此为单人账本，不表示外部银行已过账。","finance");}
       event(s,s.time,"到达北京"+to+"区。新地点在行程完成后才更新。","arrival");
     }else if(kind==="explore"){
       assert(p.energy>=6,"精力不足，请先休息");
-      advance(s,35);p.energy-=6;
+      if(!noAdvance)advance(s,35);p.energy-=6;
       event(s,s.time,"你在"+p.district+"区观察日常环境、留意公开告示。具体营业状态、新闻和服务资格仍需核实。","scene");
     }else if(kind==="study"){
       assert(p.energy>=12,"精力不足，请先休息");
-      advance(s,60);p.energy-=12;
+      if(!noAdvance)advance(s,60);p.energy-=12;
       event(s,s.time,"你用一小时整理公开信息与下一步计划。这不构成对非公开事实的自动获知。","scene");
     }else if(kind==="work"){
       assert(p.occupation,"尚未声明职业或业务，不能凭空结算工作");
       assert(p.energy>=22,"精力不足，请先休息");
-      advance(s,120);p.energy-=22;
+      if(!noAdvance)advance(s,120);p.energy-=22;
       event(s,s.time,"你投入两小时处理“"+p.occupation+"”相关事务；本系统没有可靠工资、客户和合同数据，因此不自动生成收入。","work");
     }else if(kind==="rest"){
-      advance(s,60);p.energy=Math.min(100,p.energy+25);
+      if(!noAdvance)advance(s,60);p.energy=Math.min(100,p.energy+25);
       event(s,s.time,"你休息了一个小时。精力是S级游戏数值，不代表医学测量。","scene");
     }else if(kind==="wait"){
+      assert(!noAdvance,"无回合模式不允许瞬间等待");
       const mins=Number(payload.minutes);
       advance(s,mins);
       event(s,s.time,"你按自己的决定等待了"+mins+"分钟。等待期间，部分独立NPC事务已在后台结算，但不会自动进入你的认知。","scene");
     }else if(kind==="social"){
       assert(p.energy>=9,"精力不足，请先休息");
-      advance(s,45);p.energy-=9;
+      if(!noAdvance)advance(s,45);p.energy-=9;
       const eligible=NPCS.filter(n=>n.age>=18&&districtFor(n)===p.district
           &&choice(s,n,s.time).kind==="errand"
           &&!p.contacts.includes(n.id)
@@ -403,7 +404,7 @@
       assert(!p.declined.some(x=>x.id===id&&x.at>=met.at),"同一次相遇已被拒绝，请尊重对方决定");
       assert(met.district===p.district&&s.time-met.at<=APPROACH_TTL,"已离开相遇场景，不能远程索取联系方式");
       assert(p.energy>=2,"精力不足");
-      advance(s,5);p.energy-=2;
+      if(!noAdvance)advance(s,5);p.energy-=2;
       const c=choice(s,n,s.time),r=s.npc[id].relation,seed=s.sequence*917+id.charCodeAt(3)+dayNumber(s.time);
       const consents=pseudorand(seed)>0.5 && !["work","sleep","family"].includes(c.kind);
       if(consents){
@@ -425,7 +426,7 @@
       assert(p.contacts.includes(to),"主角尚未建立该联系人关系");
       assert(text.length>0,"消息不能为空");
       assert(p.energy>=1,"精力不足");
-      advance(s,5);p.energy-=1;
+      if(!noAdvance)advance(s,5);p.energy-=1;
       const n=NPCS.find(x=>x.id===to);
       const delay=1+Math.floor(pseudorand(s.sequence*83+to.length)*12);
       s.queue.push({type:"deliver",at:s.time+delay*MINUTE,to,text,order:s.sequence+1,seed:s.sequence*83+to.charCodeAt(1)});
