@@ -1,6 +1,6 @@
 # 《地球：现实人生》· Windows EXE 无回合持续世界
 
-本项目以 WORLDBOOK v35 为当前规则依据（继承v33证据门槛与v34经济守恒），实现独立**S级单机连续模拟游戏**。Windows EXE是新版主交付，运行本机服务并打开浏览器界面；不是实时地球数字孪生，不改动正式冻结世界，不内置Ollama模型。
+本项目以 WORLDBOOK v36 为当前规则依据（继承v33证据门槛与v34经济守恒），实现独立**S级单机连续模拟游戏**。Windows EXE是新版主交付，运行本机服务并打开浏览器界面；不是实时地球数字孪生，不改动正式冻结世界，不内置Ollama模型。
 
 ## 开始游玩
 
@@ -11,6 +11,14 @@
 **Windows EXE主交付（推荐）**：前往[Windows构建工作流](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/workflows/windows-exe.yml)，下载最新成功运行的 EarthRealism-Windows-v6.0.0-Work Artifact，解压后双击 Work/EarthRealism.exe。保留 _internal 与exe在同一目录，不用安装Python。GitHub Artifact有保留期限。
 
 **开发用源码启动**：下载仓库后使用本机Python运行 desktop_launcher.py，或直接在浏览器打开game/index.html（后者没有桌面文件自动备份与本地AI代理）。
+
+## Game 7.0 · 真实性宪章和行程物理状态（Windows EXE）
+
+**最高级开发规则**：[真实性宪章](../docs/REALISM_CONSTITUTION.md)长期生效。后续版本必须对实际失真提出修正、证据来源和反例测试，不得为了加快剧情自动推断资金、私人知识或角色移动。
+
+**新功能**：跨区出行一开始，屏幕显示“在途中，具体位置未知(U)”而不会继续把出发区显示成当前位置；若中途按「随时中断」，角色变为“旅程中断、未知位置”，此时不能直接在出发区工作/社交、瞬移至其他区。使用「继续原行程」后，系统在剩余的S级预计耗时结束时才更新目的区，且只对同一旅程登记一次原估计费用。中途经过何站/道路、真实坐标/票价仍U。
+
+最新Windows EXE由[GitHub Actions工作流](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/workflows/windows-exe.yml)打包，找成功的`EarthRealism-Windows-v7.0.0-Work`，保持`Work/EarthRealism.exe`与`Work/_internal/`同目录；`Work/saves`本地存档、构建中间文件也归属同一根。下载件为有限期Artifacts。
 
 ## Game 6.0 · 无回合连续世界（Windows EXE）
 
