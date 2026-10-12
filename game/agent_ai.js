@@ -3,10 +3,11 @@
  * S-grade characters, goals, memories and locations are synthetic, not real people.
  */
 (function(root,factory){
-  const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame);
+  const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame,
+    typeof module==="object"&&module.exports?require("./society.js"):root.EarthSociety);
   if(typeof module==="object"&&module.exports)module.exports=api;
   else root.EarthAgents=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(E){
+})(typeof globalThis!=="undefined"?globalThis:this,function(E,S){
   "use strict";
   const MINUTE=60000,MAX_MEMORY=12;
   const TIES={
@@ -29,7 +30,8 @@
     rest:"安排个人休息",personal_planning:"整理私事与下一步计划",
     defer:"暂缓非紧急事务",recover:"恢复体力与调整作息",
     run_errand:"处理力所能及的日常杂务",sleep:"按作息休息",
-    attend_school:"遵循当前教育/监护安排"
+    attend_school:"遵循当前教育/监护安排",
+    coordinate_family:"提出家庭事务协调",coordinate_work:"提出工作事务协调",review_case:"审阅待处理的协商消息"
   };
   const GOALS={
     F01:["兼顾家庭责任","保持生活事务稳定"],F02:["稳定职业责任","照顾家庭"],
@@ -66,6 +68,7 @@
     if(!TIES[id])options=options.filter(x=>x!=="check_relatives");
     // A child cannot enter contractual work, make payments, or bypass guardians.
     if(n.age<18)options=options.filter(x=>!["continue_work","check_relatives"].includes(x));
+    options.push(...S.opportunities(s,id,at).map(x=>x.id));
     return {npc:n,stage,options:options.map(id=>({id,label:LABEL[id]}))};
   }
   function snapshot(s,id,at=s.time){
@@ -89,6 +92,8 @@
       if(item.id==="check_relatives")score+=Math.round(m.needs.social*0.45);
       if(item.id==="short_break")score+=m.needs.rest>70?20:0;
       if(item.id==="defer")score+=12;
+      if(item.id==="review_case")score+=100;
+      if(item.id==="coordinate_family"||item.id==="coordinate_work")score+=75;
       if(m.intent===item.id)score-=8;
       return score;
     };
@@ -104,6 +109,7 @@
     const allowed=choices(s,id,s.time).options.map(x=>x.id);
     guard(allowed.includes(result.choice),"候选行动之外的命令被拒绝");
     const source=result.provider==="ollama"?"ollama":"rules";
+    if(["coordinate_family","coordinate_work","review_case"].includes(result.choice))S.apply(s,id,result.choice);
     const reason=String(result.reason||"没有追加理由").replace(/[\r\n\t]+/g," ").slice(0,180);
     const now=s.time,prev=m.lastAt,elapsed=prev===null?30:Math.max(1,Math.min(120,Math.round((now-prev)/MINUTE)));
     m.needs.rest=Math.max(0,Math.min(100,m.needs.rest+Math.round(elapsed/7)-(result.choice==="rest"||result.choice==="sleep"||result.choice==="recover"?27:0)));
