@@ -1027,6 +1027,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       schedule_reason:c.stage.reason,goals:[...mind.goals],needs:{...mind.needs},
       known_messages:priv.knowledge.slice(-4).map(x=>({topic:String(x.topic).slice(0,160),source:x.source})),
       memories:mind.memory.slice(-4).map(x=>x.text),intent:mind.intent,
+      economic_context: (()=>{
+        const economy=F.ensure(s), ownBalance=economy.accounts[id]===undefined?null:economy.accounts[id];
+        const visibleQuotes=economy.quotes.filter(q=>
+          q.provider===id || (q.payer===id&&priv.knowledge.some(k=>k.source===q.provider&&String(k.topic).includes(q.id))));
+        return {own_balance_cents:ownBalance,grade:ownBalance===null?"U":"S",
+          quotes:visibleQuotes.slice(-3).map(q=>({id:q.id,status:q.status,price_cents:q.priceCents,
+            role:q.payer===id?"payer":"provider"}))};
+      })(),
       candidates:c.options,source_grade:"S"
     };
   }
