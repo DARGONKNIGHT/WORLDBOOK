@@ -30,7 +30,7 @@
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>游戏行为层 v2.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v34</strong><span>游戏行为层 v5.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -133,12 +133,12 @@
 
         <section class="tab-panel" id="tab-archive" hidden>
           <div class="eyebrow">ARCHIVE / SAVE & SOURCES</div><h1>每一件已发生的事，<br><em>都应当留下记录。</em></h1>
-          <p class="lead">此处存储的是浏览器试玩分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
+          <p class="lead">此处存储的是Windows EXE运行的独立S级分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
           <section class="panel"><div class="panel-head"><span>存档与版本</span><span class="tag">本地优先</span></div>
             <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
             <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
             <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
-            <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v34.0（规则资料只读）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
             <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
             <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
@@ -159,7 +159,7 @@
   <dialog id="setup" class="setup" aria-labelledby="setup-title">
     <form id="setup-form" class="setup-inner">
       <div class="eyebrow">A NEW LIFE / NEW GAME</div><h1 id="setup-title">现实人生，<br><em>由你的选择开始。</em></h1>
-      <p class="lead">创建一条独立试玩存档。不会修改世界书 v33、31名NPC的原始资料或正式冻结状态。</p>
+      <p class="lead">创建一条独立试玩存档。不会修改世界书 v34、31名NPC的原始资料或正式冻结状态。</p>
       <div class="setup-grid">
         <label>角色姓名 <input name="name" id="new-name" maxlength="30" required placeholder="输入姓名" autocomplete="off"></label>
         <label>年龄 <input name="age" type="number" min="16" max="100" value="25" required></label>
@@ -179,6 +179,7 @@
   <script src="./society.js"></script>
   <script src="./economy.js"></script>
   <script src="./agent_ai.js"></script>
+  <script src="./simulation.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
