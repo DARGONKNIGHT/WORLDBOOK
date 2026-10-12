@@ -23,7 +23,7 @@ MODEL=os.environ.get("OLLAMA_MODEL","qwen2.5:3b")
 OLLAMA="http://127.0.0.1:11434/api/chat"
 MAX_REQUEST=8192
 ALLOWED={"npc_id","name","age","occupation","time","location","obligation",
-         "schedule_reason","goals","needs","known_messages","memories","intent","candidates","source_grade"}
+         "schedule_reason","goals","needs","known_messages","memories","intent","economic_context","candidates","source_grade"}
 SYSTEM=(
   "你是现实社会模拟的有限理性NPC决策器，不扮演万能叙述者。"
   "输入是虚构人物自身可知的信息、明确候选行动和既定约束。"
