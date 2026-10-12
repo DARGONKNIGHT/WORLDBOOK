@@ -51,10 +51,16 @@ jobs:
           $proc = Start-Process -FilePath (Resolve-Path "Work/EarthRealism.exe") -ArgumentList "--self-test" -Wait -PassThru
           if ($proc.ExitCode -ne 0) { throw "Frozen EXE smoke test failed with exit code $($proc.ExitCode)" }
           if (-not (Test-Path "Work/logs/launcher.log")) { throw "EXE self-test did not create Work/logs/launcher.log" }
+      - name: Read game release version
+        id: meta
+        shell: pwsh
+        run: |
+          $version = (Get-Content "game/VERSION" -Raw).Trim()
+          echo "version=$version" >> $env:GITHUB_OUTPUT
       - name: Upload Work directory (EXE plus runtime files)
         uses: actions/upload-artifact@v4
         with:
-          name: EarthRealism-Windows-v4-Work
+          name: EarthRealism-Windows-v${{ steps.meta.outputs.version }}-Work
           path: |
             Work/EarthRealism.exe
             Work/_internal/
