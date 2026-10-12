@@ -31,6 +31,7 @@
     if(!state)return;
     try{
       E.validateGame(state);
+      if(F.audit(state).length)throw Error("S级经济账本未通过守恒核验");
       const snapshot=JSON.stringify(state);
       localStorage.setItem(KEY,snapshot);
       queueDesktopSave("POST",snapshot);
@@ -38,7 +39,7 @@
     }catch(err){toast("无法自动保存：" +err.message,true);}
   }
   function restore(){
-    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);loaded.agentAI.realtime=false;return loaded;}
+    try{const raw=localStorage.getItem(KEY);if(!raw)return null;const loaded=E.upgradeGame(JSON.parse(raw));A.ensure(loaded);if(F.audit(loaded).length)throw Error("经济账本未通过核验");loaded.agentAI.realtime=false;return loaded;}
     catch(err){toast("已有本地存档校验失败，可通过导入JSON恢复。",true);return null;}
   }
   function selectTab(tab){
@@ -310,6 +311,7 @@
       try{
         if(file.size>3*1024*1024)throw new Error("存档超过3MB，拒绝导入");
         const candidate=E.upgradeGame(JSON.parse(await file.text()));
+        if(F.audit(candidate).length)throw Error("导入账本金额不守恒，无法恢复");
         if(!window.confirm("导入将覆盖本机当前试玩存档。是否继续？"))return;
         state=candidate;A.ensure(state);state.agentAI.realtime=false;save(true);$("setup").close();selectTab("life");render();
         toast("已导入并验证存档结构。");
@@ -330,7 +332,7 @@
         const res=await fetch("/api/save",{cache:"no-store"});
         if(res.ok){
           const candidate=E.upgradeGame(await res.json());
-          A.ensure(candidate);candidate.agentAI.realtime=false;
+          A.ensure(candidate);if(F.audit(candidate).length)throw Error("桌面存档账本无法通过核验");candidate.agentAI.realtime=false;
           state=candidate;localStorage.setItem(KEY,JSON.stringify(state));
         }
       }catch(err){console.warn("Work/saves恢复不可用，回退浏览器存档：",err);}
