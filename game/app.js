@@ -65,7 +65,8 @@
     $("player-name").textContent=p.name;
     $("player-job").textContent=p.occupation||"职业未设定（U）";
     $("stat-time").textContent=new Date(state.time+(state.live?.carryMs||0)).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai",hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    $("stat-district").textContent="北京 · "+p.district;
+    const mobility=p.mobility;
+    $("stat-district").textContent=mobility?(mobility.status==="en_route"?"在途 · 实际所在区未知 (U)":"行程中断 · 位置待核实 (U)"):"北京 · "+p.district;
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
     const task=state.live?.task;
@@ -73,8 +74,12 @@
     const remaining=task?Math.max(0,Math.ceil((task.endsAt-state.time-(state.live?.carryMs||0))/60000)):0;
     $("player-task").textContent=task?"当前行动："+task.kind+" · 剩余约"+remaining+"游戏分钟 · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
     $("interrupt-task").disabled=!task;
-    $("scene-title").textContent=p.district+"区 · 你所在的城市";
-    $("scene-desc").textContent=E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。");
+    $("resume-travel").hidden=!(mobility?.status==="stranded");
+    $("scene-title").textContent=mobility?(mobility.status==="en_route"?"正在从"+mobility.from+"区前往"+mobility.to+"区":"旅程中断 · 具体所在区未知"):p.district+"区 · 你所在的城市";
+    $("scene-desc").textContent=mobility?
+      ("最后确认位置："+mobility.lastKnownDistrict+"区；原目的地："+mobility.to+"区。由于未核实路线与GPS，不能把出发区或目的区当作你此刻确切的位置。"+
+       (mobility.status==="stranded"?" 请使用「继续原行程」；不允许凭空切换地区或在未知地点进行现场活动。":" 世界继续运行，预计抵达后才能确认目的区。")):
+      (E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。"));
     $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
     $("travel-destination").value=E.DISTRICTS.find(d=>d!==p.district);
     const recent=state.journal.filter(x=>x.visible).slice(-7).reverse();
@@ -302,7 +307,8 @@
     $("world-npc").addEventListener("change",()=>renderWorld());
     $("ai-form").addEventListener("submit",ev=>{ev.preventDefault();void startRealtime();});
     $("ai-stop").addEventListener("click",()=>{stopRealtime();toast("管理员已冻结本地模拟（正常游玩无需此操作）。");});
-    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast("当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+    $("interrupt-task").addEventListener("click",()=>{if(!state)return;try{Sim.interruptTask(state,Date.now());save(true);render();toast(state.player.mobility?.status==="stranded"?"行程已中断：位置仍未知(U)，不能瞬间返回出发区。":"当前行动已中断，NPC仍按自己的安排活动。");}catch(err){toast(err.message,true);}});
+    $("resume-travel").addEventListener("click",()=>{if(!state)return;try{Sim.resumeTravel(state,Date.now());save(true);render();toast("已继续剩余S级预计行程；实际途中位置仍未知。");}catch(err){toast(err.message,true);}});
 
     $("message-form").addEventListener("submit",ev=>{
       ev.preventDefault();
