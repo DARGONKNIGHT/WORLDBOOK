@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import sys
 ROOT=Path(__file__).resolve().parents[1]
-ASSETS=["index.html","style.css","engine.js","society.js","economy.js","agent_ai.js","app.js","VERSION"]
+ASSETS=["index.html","style.css","engine.js","society.js","economy.js","agent_ai.js","simulation.js","app.js","VERSION"]
 NAME="EarthRealism"
 
 def is_beneath(path,root):
