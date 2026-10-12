@@ -46,14 +46,21 @@ test("打断正在进行的行动不会逆转NPC已发生的事件或领取未�
  Sim.syncLive(s,t0+20*60000);
  const at=s.time,recorded=s.world.length;
  Sim.interruptTask(s,t0+20*60000);
- assert.equal(s.player.energy,80);
+ assert.equal(s.player.energy,88); // 20/60 of a rest yields part of the benefit
  assert.equal(s.time,at);
  assert.equal(s.world.length,recorded);
  Sim.startTask(s,"explore",{},t0+20*60000);
  Sim.syncLive(s,t0+55*60000);
- assert.equal(s.player.energy,74);
+ assert.equal(s.player.energy,82);
  assert.equal(s.live.interrupted,1);
  assert.ok(s.journal.some(j=>j.kind==="action_interrupted"));
+});
+test("取消一小时未完成工作仍扣除对应比例精力，但不产生收入或完成日志",()=>{
+ const s=fresh();Sim.ensureLive(s,t0);Sim.startTask(s,"work",{},t0);
+ Sim.syncLive(s,t0+60*60000);Sim.interruptTask(s,t0+60*60000);
+ assert.equal(s.player.energy,69);
+ assert.ok(!s.journal.some(j=>j.kind==="work"));
+ assert.equal(s.player.cash,null);
 });
 test("角色无法利用等待回合跳跃；NPC和玩家按同一时间轴结算",()=>{
  const s=fresh();Sim.ensureLive(s,t0);
