@@ -70,7 +70,9 @@
     $("stat-cash").textContent=fmt(p.cash);
     $("stat-energy").textContent=p.energy+"/100";
     const task=state.live?.task;
-    $("live-state").textContent=state.live?.running?"世界连续运行 · "+state.live.rate+"×现实时间":"世界已被管理员冻结";
+    $("live-state").textContent=state.live?.running?
+      "世界连续运行 · "+state.live.rate+"×现实时间"+(state.live.omittedMinutes?" · 尚未模拟"+state.live.omittedMinutes+"分钟(U)，模拟钟与现实存在缺口":""):
+      "世界已被管理员冻结";
     const remaining=task?Math.max(0,Math.ceil((task.endsAt-state.time-(state.live?.carryMs||0))/60000)):0;
     $("player-task").textContent=task?"当前行动："+task.kind+" · 剩余约"+remaining+"游戏分钟 · 预计完成 "+E.clock(task.endsAt):"当前空闲 · 可随时开始行动";
     $("interrupt-task").disabled=!task;
@@ -80,7 +82,7 @@
       ("最后确认位置："+mobility.lastKnownDistrict+"区；原目的地："+mobility.to+"区。由于未核实路线与GPS，不能把出发区或目的区当作你此刻确切的位置。"+
        (mobility.status==="stranded"?" 请使用「继续原行程」；不允许凭空切换地区或在未知地点进行现场活动。":" 世界继续运行，预计抵达后才能确认目的区。")):
       (E.AREAS[p.district]+(p.goal?" 你当前希望："+p.goal+"。":" 你尚未设定具体目标，可以自行决定下一步。"));
-    $("map-location").textContent=p.district.toUpperCase()+" DISTRICT";
+    $("map-location").textContent=mobility?"TRANSIT · UNKNOWN":p.district.toUpperCase()+" DISTRICT";
     $("travel-destination").value=E.DISTRICTS.find(d=>d!==p.district);
     const recent=state.journal.filter(x=>x.visible).slice(-7).reverse();
     $("recent-log").innerHTML=recent.map(x=>'<div class="log-item"><time>'+escapeHTML(E.clock(x.at))+'</time><span class="log-kind">'+escapeHTML(x.kind)+' · '+escapeHTML(x.grade)+'</span><p>'+escapeHTML(x.text)+'</p></div>').join("");
