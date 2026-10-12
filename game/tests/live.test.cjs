@@ -62,6 +62,11 @@ test("取消一小时未完成工作仍扣除对应比例精力，但不产生�
  assert.ok(!s.journal.some(j=>j.kind==="work"));
  assert.equal(s.player.cash,null);
 });
+test("非法替换行动能先校验，原任务保持占用直到用户真的中断",()=>{
+ const s=fresh();Sim.ensureLive(s,t0);Sim.startTask(s,"rest",{},t0);
+ assert.throws(()=>Sim.checkAction(s,"travel",{destination:"未知区",minutes:12,fare:0}),/行程时间/);
+ assert.equal(s.live.task.kind,"rest");
+});
 test("角色无法利用等待回合跳跃；NPC和玩家按同一时间轴结算",()=>{
  const s=fresh();Sim.ensureLive(s,t0);
  assert.throws(()=>Sim.startTask(s,"wait",{minutes:120},t0),/不能建立持续日程/);
