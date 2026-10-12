@@ -102,3 +102,14 @@ GitHub Actions工作流： https://github.com/DARGONKNIGHT/WORLDBOOK/actions/run
 - 提供离线规则模式与本机Ollama真实语言模型提议模式；模型仅作限权选择，禁止对未知真实数据、合同、资金和他人私有状态越权修改。本机Python代理绑定127.0.0.1，不托管云端密钥。
 - GitHub Actions已实际验证 [38193060500](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38193060500)：29项Node测试通过、5项Python本地代理契约测试通过、更新日志倒序检查和单HTML一致性检查通过。测试不等于已在用户设备安装并运行Ollama或网页可长期后台执行。
 - 最新更新说明已写入根 CHANGELOG.md 顶部Game 3.0.0（2026-10-12）；正式v33世界不变，正式历史仍冻结；浏览器分支另存，人物完整智能与现实数据库尚未达到完成条件。
+
+
+## 2026-10-12 Game 4.0 · Windows EXE与社会事务链的实际验收
+
+- [x] Windows可执行程序主交付：Work/EarthRealism.exe（Windows PyInstaller onedir），依赖位于同一Work/_internal；构建工作、规格、缓存及临时字节也全部在Work/内。未来新版本默认依同目录约束构建。
+- [x] 社会事务执行层：game/society.js把既有家人/同事关系接入NPC自主决策，独立的协商状态、延迟送达、对方掌握信息后审阅及回复；不虚构已完成合同、工资或资金转移。
+- [x] 桌面版浏览器服务由exe启动；Work/saves/autoplay.json支持原子本地保存、恢复与重置；Work/logs/保存运行日志。游戏浏览器关闭时实时模拟停止，无后台常驻服务之承诺。Ollama可选且不内置。
+- [x] [GitHub Actions Windows EXE成功构建与下载](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38194902965)：实际通过打包、同目录布局检查、本地EXE --self-test与存档API测试。产物 EarthRealism-Windows-v4-Work 含EXE及运行依赖；Actions Artifact有保留期限，不是永久Release。
+- [x] [35项JavaScript用例及5项Python代理用例成功验收](https://github.com/DARGONKNIGHT/WORLDBOOK/actions/runs/38194902953)；倒序更新日志、单HTML兼容版本可重复构建检查通过。另Windows工作流包含本地桌面存档测试。
+- [ ] 尚缺完整受证据约束的劳资合同/工资与双边银行账本、住房服务与机构资格、北京市完整现实交通、真正24小时独立模型常驻、人工在用户设备上的图形交互验收。Game 4.0是下一阶段的有限可玩事务链，不是完整真实地球。
+- 正式世界书v33与2026-10-09的冻结状态无修改；世界书版本未因EXE发行而虚增。
