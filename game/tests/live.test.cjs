@@ -76,6 +76,18 @@ test("角色无法利用等待回合跳跃；NPC和玩家按同一时间轴结�
  Sim.syncLive(s,t0+61000);
  assert.equal(s.time,original+60000);
 });
+test("玩家在任意秒发起行动，需实际经过完整时长才完成，不利用分钟舍入偷时间",()=>{
+ const s=fresh();Sim.ensureLive(s,t0);Sim.setRate(s,60,t0);
+ Sim.syncLive(s,t0+750); // 45 game seconds past this minute
+ const task=Sim.startTask(s,"rest",{},t0+750);
+ assert.equal(task.startedAt-s.time,45000);
+ Sim.syncLive(s,t0+60749); // 59m59.94s of the intended 60m
+ assert.ok(s.live.task);
+ assert.equal(s.player.energy,80);
+ Sim.syncLive(s,t0+60750);
+ assert.equal(s.live.task,null);
+ assert.equal(s.player.energy,100); // rest fills up to max
+});
 test("重启/存档恢复会基于上次真实时间继续追算，不重复第一段时间",()=>{
  const s=fresh();Sim.ensureLive(s,t0);Sim.syncLive(s,t0+35000);
  const copy=JSON.parse(JSON.stringify(s));
