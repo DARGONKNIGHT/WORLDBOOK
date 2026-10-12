@@ -62,7 +62,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button class="nav-btn" data-tab="world"><span>▦</span> 社会后台</button>
           <button class="nav-btn" data-tab="archive"><span>▤</span> 游戏档案</button>
         </nav>
-        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v33</strong><span>游戏行为层 v2.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
+        <div class="rail-foot"><div class="rail-label">世界版本</div><strong>WORLDBOOK v34</strong><span>游戏行为层 v5.0</span><p>模拟事件不会进入仓库的正式世界状态。</p></div>
       </aside>
       <main class="main" id="main">
         <section class="status-row">
@@ -165,12 +165,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
         <section class="tab-panel" id="tab-archive" hidden>
           <div class="eyebrow">ARCHIVE / SAVE & SOURCES</div><h1>每一件已发生的事，<br><em>都应当留下记录。</em></h1>
-          <p class="lead">此处存储的是浏览器试玩分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
+          <p class="lead">此处存储的是Windows EXE运行的独立S级分支。原仓库正式世界存档未创建玩家且没有事件，不会被覆盖。</p>
           <section class="panel"><div class="panel-head"><span>存档与版本</span><span class="tag">本地优先</span></div>
             <div class="archive-line"><span>角色</span><strong id="archive-player">—</strong></div>
             <div class="archive-line"><span>时间</span><strong id="archive-time">—</strong></div>
             <div class="archive-line"><span>游戏分支</span><strong>S_INDEPENDENT_PLAYTHROUGH</strong></div>
-            <div class="archive-line"><span>世界书</span><strong>GitHub v33.0（只读参考）</strong></div>
+            <div class="archive-line"><span>世界书</span><strong>GitHub v34.0（规则资料只读）</strong></div>
             <div class="archive-line"><span>事件账本</span><strong id="archive-events">—</strong></div>
             <p class="micro">自动存档在此浏览器的本地存储。导出JSON以便备份或换设备导入；清除浏览器数据将丢失未导出的存档。</p>
             <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK" target="_blank" rel="noopener noreferrer">查看世界书GitHub源仓库 ↗</a> · <a class="repo-link" href="https://github.com/DARGONKNIGHT/WORLDBOOK/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志（最新在上） ↗</a>
@@ -191,7 +191,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <dialog id="setup" class="setup" aria-labelledby="setup-title">
     <form id="setup-form" class="setup-inner">
       <div class="eyebrow">A NEW LIFE / NEW GAME</div><h1 id="setup-title">现实人生，<br><em>由你的选择开始。</em></h1>
-      <p class="lead">创建一条独立试玩存档。不会修改世界书 v33、31名NPC的原始资料或正式冻结状态。</p>
+      <p class="lead">创建一条独立试玩存档。不会修改世界书 v34、31名NPC的原始资料或正式冻结状态。</p>
       <div class="setup-grid">
         <label>角色姓名 <input name="name" id="new-name" maxlength="30" required placeholder="输入姓名" autocomplete="off"></label>
         <label>年龄 <input name="age" type="number" min="16" max="100" value="25" required></label>
@@ -1100,6 +1100,47 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 </script>
   <script>
+/* Game5 bounded deterministic clock with agent decisions at intermediate intervals.
+ * Works on S_INDEPENDENT_PLAYTHROUGH only, not on canonical world.
+ */
+(function(root,factory){
+ const api=factory(typeof module==="object"&&module.exports?require("./engine.js"):root.EarthGame,
+   typeof module==="object"&&module.exports?require("./agent_ai.js"):root.EarthAgents);
+ if(typeof module==="object"&&module.exports)module.exports=api;
+ else root.EarthSimulation=api;
+})(typeof globalThis!=="undefined"?globalThis:this,function(E,A){
+ "use strict";
+ function advance(s,minutes,{record=true}={}){
+  E.validateGame(s);
+  if(!Number.isInteger(minutes)||minutes<1||minutes>480)throw Error("推进游戏时间必须为1至480分钟");
+  const started=s.time,was=A.ensure(s);
+  if(!s.autonomy.enabled){
+    // Explicit NPC pause: world time may move but no agent choices are injected.
+    let left=minutes;
+    while(left){let step=Math.min(left,10);E.act(s,"background_tick",{minutes:step});left-=step;}
+  }else{
+    let left=minutes;
+    while(left){
+      let step=Math.min(left,10);
+      E.act(s,"background_tick",{minutes:step});
+      A.runRules(s,31);
+      left-=step;
+    }
+  }
+  if(record){
+    s.sequence++;
+    s.journal.push({id:s.sequence,at:s.time,kind:"wait",grade:"S",visible:true,
+      text:"你让这条独立S级世界分支推进"+minutes+"分钟。NPC按照独立时钟与已知消息逐步处理事务；幕后消息不会自动成为你的知识。"});
+    if(s.journal.length>3000)s.journal.shift();
+  }
+  E.validateGame(s);
+  return {minutes,started,ended:s.time,agents:was.minds};
+ }
+ return Object.freeze({advance});
+});
+
+</script>
+  <script>
 /* Offline UI. Browser localStorage is the only automatic persistence layer.
    No network APIs, no cloud accounts, and no write access to the canonical worldbook. */
 (() => {
@@ -1108,6 +1149,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   const A=window.EarthAgents;
   const S=window.EarthSociety;
   const F=window.EarthEconomy;
+  const Sim=window.EarthSimulation;
   const KEY="earth-realism-playable-v1"; // v1 key retained for non-destructive migration
   let state=null, activeTab="life", toastTimeout=null;
   let autoClock=null, modelBusy=false, modelCursor=0, tickCount=0, modelStatus="本地模型未连接";
@@ -1255,7 +1297,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   }
   function execute(kind,payload={}){
     if(!state)return;
-    try{E.act(state,kind,payload);save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");}
+    try{
+      if(kind==="wait")Sim.advance(state,Number(payload.minutes));
+      else {E.act(state,kind,payload);if(kind!=="npc_autonomy"&&state.autonomy.enabled)A.runRules(state,31);}
+      save(true);render();toast(kind==="npc_autonomy"?"NPC自主活动设置已保存":"行动完成 · 时间已推进");
+    }
     catch(err){toast(err.message,true);}
   }
   function stopRealtime(){
